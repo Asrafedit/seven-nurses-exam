@@ -1,13 +1,22 @@
-# SEVEN NURSES
+# SEVEN NURSES — Redesign Frontend
 
-## Render Environment Variables
-- ADMIN_UID=oj3TdOnQiWROOgKa9jVL8a3p74S2
-- SESSION_SECRET=use-a-long-random-secret
-- FIREBASE_DATABASE_URL=https://seven-nurses8-default-rtdb.firebaseio.com
-- FIREBASE_SERVICE_ACCOUNT_JSON=entire Firebase service-account JSON on one line
+এই package-টি আপনার দেওয়া
+`Seven_Nurses_Online_Exam_COMPLETE_FIXED.html`
+এর mobile-first blue/green card design অনুসরণ করে তৈরি করা হয়েছে।
 
-Build: `npm install`
-Start: `npm start`
+## Files
 
-Firebase Realtime Database rules can remain closed because the server uses Firebase Admin SDK.
-Never commit the service account JSON/private key.
+- index.html — student login, exam, timer, result/review
+- admin.html — Firebase Admin login, dashboard, questions, results, settings
+- style.css — original-style responsive UI
+- app.js — student frontend
+- firebase-config.js — seven-nurses8 public Firebase config
+- exam.html/result.html — compatibility redirects
+- firebase-messaging-sw.js — push notification service worker
+
+## Important
+
+Current Render backend-এর API contract যদি আগের server.js থেকে আলাদা হয়,
+endpoint field names অনুযায়ী সামান্য adjustment লাগতে পারে।
+
+Firebase service-account/private key এই package-এ রাখা হয়নি।
