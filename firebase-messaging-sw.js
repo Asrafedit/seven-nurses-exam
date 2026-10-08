@@ -1,1 +1,38 @@
-importScripts('https://www.gstatic.com/firebasejs/12.5.0/firebase-app-compat.js','https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging-compat.js');firebase.initializeApp({apiKey:'AIzaSyArek6tP3kPlGpngJ1gn6MNpFzOh28JpiQ',authDomain:'seven-nurses8.firebaseapp.com',projectId:'seven-nurses8',storageBucket:'seven-nurses8.firebasestorage.app',messagingSenderId:'912003149859',appId:'1:912003149859:web:d4a4f41a6060b37275c196'});const messaging=firebase.messaging();messaging.onBackgroundMessage(p=>{self.registration.showNotification(p.notification?.title||'SEVEN NURSES',{body:p.notification?.body||''})});
+self.addEventListener(
+"install",
+()=>self.skipWaiting()
+);
+
+self.addEventListener(
+"activate",
+e=>e.waitUntil(
+self.clients.claim()
+)
+);
+
+self.addEventListener(
+"push",
+e=>{
+
+let d={
+title:"SEVEN NURSES",
+body:"New notification"
+};
+
+try{
+d=e.data.json();
+}
+catch{}
+
+e.waitUntil(
+self.registration.showNotification(
+d.title||"SEVEN NURSES",
+{
+body:d.body||"",
+icon:d.icon||"/favicon.ico"
+}
+)
+);
+
+}
+);
