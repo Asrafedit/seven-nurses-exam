@@ -1,1 +1,85 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SEVEN NURSES</title><link rel="stylesheet" href="/css/style.css"></head><body><header><div id="brand">SEVEN NURSES</div><nav><a href="/index.html">Student</a><a href="/admin.html">Admin</a></nav></header><main class="card"><h1 id="title">SEVEN NURSES</h1><p id="subtitle"></p><div id="notice" class="notice"></div><h2>Student Login</h2><input id="name" placeholder="Student Name"><input id="pin" type="password" placeholder="Common Exam PIN"><button onclick="login()">Enter Exam</button><p id="msg"></p></main><footer id="footer"></footer><script type="module" src="/js/app.js"></script></body></html>
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEVEN NURSES - ONLINE EXAM SYSTEM</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+<div class="app-container">
+
+<header class="header">
+<img id="logo" class="logo">
+<div class="head-main">
+<div id="siteTitle" class="head-title">SEVEN NURSES</div>
+<div id="siteSub" class="head-sub">ONLINE EXAM SYSTEM</div>
+</div>
+<div id="timer" class="timer hidden">00:00</div>
+</header>
+
+<main>
+
+<div id="notice" class="notice hidden"></div>
+
+<section id="login" class="card">
+<h2 class="center">Student Login</h2>
+
+<label>Registered Student Name</label>
+<input id="studentName" placeholder="আপনার নিবন্ধিত নাম">
+
+<label>Exam PIN</label>
+<input id="pin" type="password" inputmode="numeric" placeholder="Admin-এর দেওয়া Common PIN">
+
+<label>Examination</label>
+<select id="examSelect">
+<option>Loading...</option>
+</select>
+
+<button class="btn btn-green" onclick="studentLogin()">
+Start Examination
+</button>
+
+<button class="btn btn-cyan" onclick="location.href='/admin.html'">
+Admin Panel
+</button>
+
+<p class="small center">
+শুধু নিবন্ধিত ও Active student নাম ব্যবহার করুন।
+</p>
+</section>
+
+<section id="exam" class="hidden">
+
+<div class="exam-box" id="examName">
+Examination
+</div>
+
+<div id="questions"></div>
+
+<div class="submit-bar">
+<button class="btn btn-green" onclick="submitExam(false)">
+Submit Examination
+</button>
+</div>
+
+</section>
+
+<section id="result" class="hidden"></section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<footer id="footer" class="footer">
+SEVEN NURSES
+</footer>
+
+</div>
+
+<script src="/firebase-config.js"></script>
+<script src="/app.js"></script>
+
+</body>
+  </html>
