@@ -2,84 +2,168 @@
 <html lang="bn">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SEVEN NURSES - ONLINE EXAM SYSTEM</title>
 <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
+
 <div class="app-container">
 
 <header class="header">
-<img id="logo" class="logo">
-<div class="head-main">
-<div id="siteTitle" class="head-title">SEVEN NURSES</div>
-<div id="siteSub" class="head-sub">ONLINE EXAM SYSTEM</div>
-</div>
-<div id="timer" class="timer hidden">00:00</div>
+
+  <div class="brand">
+
+    <div class="logo-wrap">
+      <img id="logo" class="logo" alt="Logo">
+    </div>
+
+    <div>
+      <div id="siteTitle" class="head-title">
+        SEVEN NURSES
+      </div>
+
+      <div id="siteSub" class="head-sub">
+        ONLINE EXAM SYSTEM
+      </div>
+    </div>
+
+  </div>
+
+  <div id="timer" class="timer hidden">
+    00:00
+  </div>
+
 </header>
+
 
 <main>
 
 <div id="notice" class="notice hidden"></div>
 
-<section id="login" class="card">
-<h2 class="center">Student Login</h2>
 
-<label>Registered Student Name</label>
-<input id="studentName" placeholder="আপনার নিবন্ধিত নাম">
+<section id="login" class="card login-card">
 
-<label>Exam PIN</label>
-<input id="pin" type="password" inputmode="numeric" placeholder="Admin-এর দেওয়া Common PIN">
+  <div class="section-title">
+    Student Login
+  </div>
 
-<label>Examination</label>
-<select id="examSelect">
-<option>Loading...</option>
-</select>
+  <div class="title-line"></div>
 
-<button class="btn btn-green" onclick="studentLogin()">
-Start Examination
-</button>
+  <label for="studentName">
+    Registered Student Name
+  </label>
 
-<button class="btn btn-cyan" onclick="location.href='/admin.html'">
-Admin Panel
-</button>
+  <input
+    id="studentName"
+    autocomplete="name"
+    placeholder="আপনার নিবন্ধিত নাম"
+  >
 
-<p class="small center">
-শুধু নিবন্ধিত ও Active student নাম ব্যবহার করুন।
-</p>
+  <label for="pin">
+    Common Exam PIN
+  </label>
+
+  <input
+    id="pin"
+    type="password"
+    inputmode="numeric"
+    autocomplete="off"
+    placeholder="Admin-এর দেওয়া PIN"
+  >
+
+  <label for="examSelect">
+    Examination
+  </label>
+
+  <select id="examSelect">
+    <option value="">
+      Loading...
+    </option>
+  </select>
+
+  <button
+    class="btn btn-green"
+    id="startBtn"
+    onclick="studentLogin()"
+  >
+    Start Examination
+  </button>
+
+  <button
+    class="btn btn-cyan"
+    onclick="location.href='/admin.html'"
+  >
+    Admin Panel
+  </button>
+
+  <div class="login-note">
+
+    <b>নির্দেশনা:</b>
+    আপনার নিবন্ধিত নাম এবং Admin-এর দেওয়া Common PIN ব্যবহার করুন।
+
+  </div>
+
 </section>
+
 
 <section id="exam" class="hidden">
 
-<div class="exam-box" id="examName">
-Examination
-</div>
+  <div class="exam-top">
 
-<div id="questions"></div>
+    <div>
 
-<div class="submit-bar">
-<button class="btn btn-green" onclick="submitExam(false)">
-Submit Examination
-</button>
-</div>
+      <div class="exam-label">
+        EXAMINATION
+      </div>
+
+      <div id="examName" class="exam-title">
+        Examination
+      </div>
+
+    </div>
+
+    <div id="questionCounter" class="question-counter">
+      0/0
+    </div>
+
+  </div>
+
+  <div id="questions"></div>
+
+  <div class="submit-bar">
+
+    <button
+      class="btn btn-green"
+      onclick="submitExam(false)"
+    >
+      Submit Examination
+    </button>
+
+  </div>
 
 </section>
 
+
 <section id="result" class="hidden"></section>
+
 
 </main>
 
+
 <div id="toast" class="toast"></div>
 
+
 <footer id="footer" class="footer">
-SEVEN NURSES
+  © SEVEN NURSES
 </footer>
+
 
 </div>
 
-<script src="/firebase-config.js"></script>
+
 <script src="/app.js"></script>
 
 </body>
-  </html>
+    </html>
