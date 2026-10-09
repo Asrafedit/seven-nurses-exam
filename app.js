@@ -1,376 +1,777 @@
-let boot=null,
-questions=[],
-answers={},
-exam=null,
-student=null,
-timerId=null,
-seconds=0,
-submitted=false;
+let boot=null;
+let exams=[];
+let questions=[];
+let answers={};
+let currentExam=null;
+let student=null;
+let timerId=null;
+let secondsLeft=0;
+let submitted=false;
+
+const $=id=>document.getElementById(id);
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function toast(msg){
+
+  const el=$("toast");
+
+  el.textContent=msg;
+
+  el.style.display="block";
+
+  clearTimeout(window.__toast);
+
+  window.__toast=setTimeout(
+    ()=>el.style.display="none",
+    2800
+  );
+
+}
+
+async function api(path,opt={}){
+
+  const token=localStorage.getItem("sn_student_token");
+
+  const headers={
+    "Content-Type":"application/json",
+    ...(opt.headers||{})
+  };
+
+  if(token){
+    headers.Authorization="Bearer "+token;
+  }
+
+  const r=await fetch(
+    path,
+    {
+      ...opt,
+      headers
+    }
+  );
+
+  const raw=await r.text();
+
+  let data={};
+
+  try{
+    data=JSON.parse(raw);
+  }
+  catch{
+    data={
+      error:raw||("HTTP "+r.status)
+    };
+  }
+
+  if(!r.ok){
+    throw new Error(
+      data.error||
+      data.message||
+      ("HTTP "+r.status)
+    );
+  }
+
+  return data;
+}
 
 async function init(){
-try{
-boot=await api("/api/bootstrap");
-applyBoot(boot);
-await loadExams();
-}catch(e){
-toast(e.message);
-}
-}
 
-function applyBoot(b){
-const s=b.settings||{};
+  try{
 
-$("siteTitle").textContent=s.siteName||s.headerTitle||"SEVEN NURSES";
-$("siteSub").textContent=s.subtitle||"ONLINE EXAM SYSTEM";
+    boot=await api("/api/bootstrap");
 
-$("notice").textContent=s.notice||"";
-$("notice").classList.toggle("hidden",!s.notice);
+    applyBootstrap(boot);
 
-$("footer").textContent=s.footerText||"SEVEN NURSES";
+    await loadExams();
 
-if(s.logoUrl){
-$("logo").src=s.logoUrl;
-$("logo").style.display="block";
+  }
+  catch(e){
+
+    toast(
+      "সিস্টেম লোড হয়নি: "+e.message
+    );
+
+    $("examSelect").innerHTML=
+      '<option value="">পরীক্ষা লোড করা যায়নি</option>';
+
+  }
+
 }
 
-if(s.backgroundUrl)
-document.body.style.backgroundImage=`url(${s.backgroundUrl})`;
+function applyBootstrap(s){
+
+  $("siteTitle").textContent=
+    s.siteName||
+    s.headerTitle||
+    "SEVEN NURSES";
+
+  $("siteSub").textContent=
+    s.subtitle||
+    "ONLINE EXAM SYSTEM";
+
+  $("footer").textContent=
+    s.footerText||
+    "© SEVEN NURSES";
+
+  const notice=s.notice||"";
+
+  $("notice").textContent=notice;
+
+  $("notice").classList.toggle(
+    "hidden",
+    !notice
+  );
+
+  if(s.logoUrl){
+
+    $("logo").src=s.logoUrl;
+
+    $("logo").style.display="block";
+
+  }
+  else{
+
+    $("logo").style.display="none";
+
+  }
+
+  if(s.backgroundUrl){
+
+    document.body.style.backgroundImage=
+      `url("${String(
+        s.backgroundUrl
+      ).replace(/"/g,'&quot;')}")`;
+
+    document.body.style.backgroundSize="cover";
+
+    document.body.style.backgroundAttachment="fixed";
+
+  }
+
 }
 
 async function loadExams(){
-const d=await api("/api/student/exams");
-const list=d.exams||[];
 
-$("examSelect").innerHTML=
-list
-.filter(x=>x.active!==false)
-.map(x=>`<option value="${esc(x.id)}">${esc(x.title||x.name||x.id)}</option>`)
-.join("")
-||"<option value=''>No active examination</option>";
+  $("examSelect").innerHTML=
+    '<option value="">Login করার পর পরীক্ষা নির্বাচন করুন</option>';
+
 }
 
 async function studentLogin(){
 
-const name=$("studentName").value.trim();
-const pin=$("pin").value.trim();
-const examId=$("examSelect").value;
+  const name=$("studentName")
+    .value
+    .trim();
 
-if(!name||!pin||!examId)
-return toast("নাম, PIN এবং পরীক্ষা নির্বাচন করুন।");
+  const pin=$("pin")
+    .value
+    .trim();
 
-try{
+  if(!name||!pin){
 
-const d=await api("/api/student/login",{
-method:"POST",
-body:JSON.stringify({
-name,
-pin
-})
-});
+    return toast(
+      "নাম এবং Exam PIN দিন।"
+    );
 
-localStorage.setItem("sn_student_token",d.token||"");
-localStorage.setItem(
-"sn_student",
-JSON.stringify(d.student||{name})
-);
+  }
 
-student=d.student||{name};
+  const btn=$("startBtn");
 
-await startExam(examId);
+  btn.disabled=true;
 
-}catch(e){
-toast(e.message);
+  btn.textContent="Checking...";
+
+  try{
+
+    const login=
+      await api(
+        "/api/student/login",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            name,
+            pin
+          })
+        }
+      );
+
+    localStorage.setItem(
+      "sn_student_token",
+      login.token
+    );
+
+    localStorage.setItem(
+      "sn_student",
+      JSON.stringify(
+        login.student||{}
+      )
+    );
+
+    student=
+      login.student||
+      {name};
+
+    await loadStudentExams();
+
+  }
+  catch(e){
+
+    toast(e.message);
+
+    btn.disabled=false;
+
+    btn.textContent=
+      "Start Examination";
+
+  }
+
 }
+
+async function loadStudentExams(){
+
+  try{
+
+    exams=
+      await api(
+        "/api/student/exams"
+      );
+
+    if(!Array.isArray(exams)){
+      exams=[];
+    }
+
+    $("examSelect").innerHTML=
+      exams.length
+      ?
+      exams.map(e=>
+        `<option value="${esc(e.id)}">
+          ${esc(e.title)} — ${esc(e.duration)} min
+        </option>`
+      ).join("")
+      :
+      '<option value="">কোনো Active Examination নেই</option>';
+
+    const id=
+      $("examSelect").value;
+
+    if(!id){
+
+      return toast(
+        "কোনো Active Examination পাওয়া যায়নি।"
+      );
+
+    }
+
+    await startExam(id);
+
+  }
+  catch(e){
+
+    toast(e.message);
+
+    $("startBtn").disabled=false;
+
+    $("startBtn").textContent=
+      "Start Examination";
+
+  }
+
 }
 
 async function startExam(id){
 
-const d=await api(
-"/api/student/exams/"+encodeURIComponent(id)+"/questions"
-);
+  const data=
+    await api(
+      "/api/student/exam/"
+      +encodeURIComponent(id)
+    );
 
-exam=d.exam||{
-id,
-title:id,
-duration:d.duration
-};
+  currentExam=
+    data.exam||
+    exams.find(
+      x=>x.id===id
+    )||
+    {
+      id,
+      title:id,
+      duration:30
+    };
 
-questions=d.questions||[];
+  questions=
+    Array.isArray(data.questions)
+    ?
+    data.questions
+    :
+    [];
 
-if(!questions.length)
-return toast("এই পরীক্ষায় কোনো প্রশ্ন নেই।");
+  answers={};
 
-answers={};
-submitted=false;
+  submitted=false;
 
-$("login").classList.add("hidden");
-$("exam").classList.remove("hidden");
+  if(!questions.length){
 
-$("examName").textContent=
-exam.title||exam.name||"Examination";
+    return toast(
+      "এই পরীক্ষায় কোনো প্রশ্ন নেই।"
+    );
 
-renderQuestions();
+  }
 
-startTimer(
-Number(
-exam.duration||
-exam.timeLimit||
-questions.length
-)
-);
+  $("login").classList.add("hidden");
+
+  $("exam").classList.remove("hidden");
+
+  $("result").classList.add("hidden");
+
+  $("examName").textContent=
+    currentExam.title||
+    "Examination";
+
+  $("questionCounter").textContent=
+    `${questions.length} Questions`;
+
+  renderQuestions();
+
+  const duration=
+    Number(
+      currentExam.duration||30
+    );
+
+  startTimer(
+    Math.max(1,duration)*60
+  );
+
 }
 
 function renderQuestions(){
 
-$("questions").innerHTML=questions.map((q,i)=>{
+  $("questions").innerHTML=
+    questions.map(
+      (q,i)=>{
 
-const opts=q.options||{};
+        const opts=
+          q.options||{};
 
-return `
-<div class="question-box">
+        return `
+          <div class="question-box">
 
-<div class="question-title">
-Q${i+1}. ${esc(q.question||q.title||"")}
-<span class="badge">1 Mark</span>
-</div>
+            <div class="question-heading">
+              Q${i+1}. ${esc(q.question||"")}
+            </div>
 
-${["A","B","C","D","E"].map(k=>`
+            ${
+              q.imageUrl
+              ?
+              `<img
+                class="question-image"
+                src="${esc(q.imageUrl)}"
+                alt="Question image"
+              >`
+              :
+              ""
+            }
 
-<div class="statement">
+            ${
+              ["A","B","C","D","E"]
+              .map(k=>{
 
-<div class="statement-text">
-<b>${k}.</b>
-${esc(opts[k]?.text||opts[k]||"")}
-</div>
+                const text=
+                  opts[k]?.text||"";
 
-<div class="tf-actions">
+                return `
+                  <div class="statement">
 
-<label>
-<input
-type="radio"
-name="q${i}_${k}"
-value="true"
-onchange="setAns(${i},'${k}',true)">
-<span>TRUE</span>
-</label>
+                    <div class="statement-text">
+                      <b>${k}.</b>
+                      ${esc(text)}
+                    </div>
 
-<label>
-<input
-type="radio"
-name="q${i}_${k}"
-value="false"
-onchange="setAns(${i},'${k}',false)">
-<span>FALSE</span>
-</label>
+                    <div class="tf-row">
 
-</div>
+                      <label class="tf-label">
 
-</div>
+                        <input
+                          type="radio"
+                          name="q_${esc(q.id)}_${k}"
+                          onchange="setAnswer('${esc(q.id)}','${k}',true)"
+                        >
 
-`).join("")}
+                        <span class="true-choice">
+                          TRUE
+                        </span>
 
-</div>
-`;
+                      </label>
 
-}).join("");
+                      <label class="tf-label">
+
+                        <input
+                          type="radio"
+                          name="q_${esc(q.id)}_${k}"
+                          onchange="setAnswer('${esc(q.id)}','${k}',false)"
+                        >
+
+                        <span class="false-choice">
+                          FALSE
+                        </span>
+
+                      </label>
+
+                    </div>
+
+                  </div>
+                `;
+
+              })
+              .join("")
+            }
+
+          </div>
+        `;
+
+      }
+    )
+    .join("");
+
 }
 
-function setAns(i,k,v){
+function setAnswer(
+  qid,
+  key,
+  value
+){
 
-if(!answers[i])
-answers[i]={};
+  if(!answers[qid]){
+    answers[qid]={};
+  }
 
-answers[i][k]=v;
+  answers[qid][key]=value;
+
 }
 
-function startTimer(v){
+function startTimer(totalSeconds){
 
-clearInterval(timerId);
+  clearInterval(timerId);
 
-seconds=v*60;
+  secondsLeft=totalSeconds;
 
-paintTimer();
+  paintTimer();
 
-timerId=setInterval(()=>{
+  timerId=
+    setInterval(
+      ()=>{
+        secondsLeft--;
 
-seconds--;
+        paintTimer();
 
-paintTimer();
+        if(secondsLeft<=0){
 
-if(seconds<=0){
-clearInterval(timerId);
-submitExam(true);
-}
+          clearInterval(timerId);
 
-},1000);
+          toast(
+            "সময় শেষ। পরীক্ষা Submit হচ্ছে..."
+          );
+
+          submitExam(true);
+
+        }
+
+      },
+      1000
+    );
+
 }
 
 function paintTimer(){
 
-const m=Math.floor(seconds/60);
-const s=seconds%60;
+  const m=
+    Math.floor(
+      secondsLeft/60
+    );
 
-$("timer").textContent=
-String(m).padStart(2,"0")+":"+
-String(s).padStart(2,"0");
+  const s=
+    secondsLeft%60;
 
-$("timer").classList.remove("hidden");
+  $("timer").textContent=
+    `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+  $("timer").classList.remove(
+    "hidden"
+  );
+
 }
 
-async function submitExam(auto){
+async function submitExam(autoSubmit){
 
-if(submitted)
-return;
+  if(submitted){
+    return;
+  }
 
-if(!auto&&!confirm("পরীক্ষা Submit করবেন?"))
-return;
+  if(
+    !autoSubmit &&
+    !confirm(
+      "আপনি কি পরীক্ষা Submit করতে চান?"
+    )
+  ){
+    return;
+  }
 
-submitted=true;
+  submitted=true;
 
-clearInterval(timerId);
+  clearInterval(timerId);
 
-try{
+  try{
 
-const d=await api("/api/student/submit",{
-method:"POST",
-body:JSON.stringify({
-examId:exam.id,
-answers
-})
-});
+    const result=
+      await api(
+        "/api/student/submit",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            examId:currentExam.id,
+            answers
+          })
+        }
+      );
 
-showResult(d.result||d);
+    showResult(result);
 
-}catch(e){
+  }
+  catch(e){
 
-submitted=false;
-toast(e.message);
-}
+    submitted=false;
+
+    toast(e.message);
+
+  }
+
 }
 
 function showResult(r){
 
-$("timer").classList.add("hidden");
+  $("timer")
+    .classList
+    .add("hidden");
 
-$("exam").classList.add("hidden");
+  $("exam")
+    .classList
+    .add("hidden");
 
-$("result").classList.remove("hidden");
+  $("result")
+    .classList
+    .remove("hidden");
 
-const review=r.review||[];
+  const status=
+    String(
+      r.status||""
+    ).toUpperCase();
 
-$("result").innerHTML=`
+  const review=
+    Array.isArray(r.review)
+    ?
+    r.review
+    :
+    [];
 
-<div class="card result-hero">
+  $("result").innerHTML=`
 
-<h2>Examination Result</h2>
+    <div class="card result-card">
 
-<div class="score">
-${esc(r.score??0)} / ${esc(r.total??questions.length)}
-</div>
+      <div class="section-title">
+        Examination Result
+      </div>
 
-<div class="${
-r.status==="PASS"
-?"status-pass"
-:"status-fail"
-}">
-${esc(r.status||"")}
-</div>
+      <div class="result-score">
+        ${esc(r.score)}
+        /
+        ${esc(r.total)}
+      </div>
 
-<div class="stat-grid">
+      <div class="${
+        status==="PASS"
+        ?"pass"
+        :
+        "fail"
+      }">
+        ${esc(status)}
+      </div>
 
-<div class="stat">
-<b>${esc(r.percentage??0)}%</b>
-Percentage
-</div>
+      <div class="stats">
 
-<div class="stat">
-<b>${esc(r.grade||"-")}</b>
-Grade
-</div>
+        <div class="stat">
+          <b>${esc(r.percentage)}%</b>
+          <span>Percentage</span>
+        </div>
 
-<div class="stat">
-<b>${esc(r.passMark??"-")}</b>
-Pass Mark
-</div>
+        <div class="stat">
+          <b>${esc(r.grade)}</b>
+          <span>Grade</span>
+        </div>
 
-<div class="stat">
-<b>${esc(r.rank??"-")}</b>
-Rank
-</div>
+        <div class="stat">
+          <b>${esc(r.passMark)}</b>
+          <span>Pass Mark</span>
+        </div>
 
-</div>
+        <div class="stat">
+          <b>${esc(r.rank||"-")}</b>
+          <span>Rank</span>
+        </div>
 
-</div>
+        <div class="stat">
+          <b>${esc(r.totalExaminees||"-")}</b>
+          <span>Total Examinees</span>
+        </div>
 
-<div class="card">
+        <div class="stat">
+          <b>${esc(student?.name||"")}</b>
+          <span>Student</span>
+        </div>
 
-<b>Student:</b>
-${esc(r.studentName||student?.name)}
-<br>
+      </div>
 
-<b>Total Examinees:</b>
-${esc(r.totalExaminees??"-")}
-<br>
+    </div>
 
-<b>Exam:</b>
-${esc(r.examTitle||exam.title||"")}
+    <div class="card">
 
-</div>
+      <div class="review-title">
+        Answer Sheet & Solutions
+      </div>
 
-<div class="card">
+      ${
+        review.length
+        ?
+        review.map(
+          renderReview
+        ).join("")
+        :
+        '<div class="empty">কোনো review পাওয়া যায়নি।</div>'
+      }
 
-<h3>Answer Review</h3>
+    </div>
 
-${review.map((x,i)=>`
+    <button
+      class="btn btn-blue"
+      onclick="location.href='/'"
+    >
+      Back to Student Login
+    </button>
 
-<div class="statement ${
-x.correct
-?"review-ok"
-:x.answered===false
-?"review-none"
-:"review-bad"
-}">
+  `;
 
-<b>Q${i+1}.</b>
-${esc(x.question||"")}
-
-<br>
-
-<span class="small">
-
-Your answers:
-${esc(formatAnswers(x.selected))}
-
-<br>
-
-Correct:
-${esc(formatAnswers(x.correctAnswers))}
-
-</span>
-
-</div>
-
-`).join("")}
-
-</div>
-
-<button
-class="btn btn-blue"
-onclick="location.href='/'">
-Back to Student Login
-</button>
-
-`;
 }
 
-function formatAnswers(x){
+function renderReview(item){
 
-if(!x)
-return "Not answered";
+  const good=
+    !!item.isCorrect;
 
-return Object.entries(x)
-.map(([k,v])=>k+":"+(v?"TRUE":"FALSE"))
-.join("  ");
+  const opts=
+    item.options||{};
+
+  return `
+
+    <div class="review-item ${
+      good
+      ?
+      "correct"
+      :
+      "wrong"
+    }">
+
+      <div class="review-q">
+        Q${esc(item.number)}.
+        ${esc(item.question)}
+      </div>
+
+      <div class="review-opt">
+
+        ${
+          ["A","B","C","D","E"]
+          .map(k=>{
+
+            const o=
+              opts[k]||{};
+
+            const selected=
+              !!o.selected;
+
+            const correct=
+              !!o.correct;
+
+            return `
+
+              <div>
+
+                <b>${k}.</b>
+                ${esc(o.text||"")}
+
+                —
+                আপনার:
+
+                <span class="${
+                  selected===correct
+                  ?
+                  "correct-text"
+                  :
+                  "wrong-text"
+                }">
+
+                  ${
+                    selected
+                    ?
+                    "TRUE"
+                    :
+                    "FALSE"
+                  }
+
+                </span>
+
+                |
+
+                সঠিক:
+
+                <span class="correct-text">
+
+                  ${
+                    correct
+                    ?
+                    "TRUE"
+                    :
+                    "FALSE"
+                  }
+
+                </span>
+
+              </div>
+
+            `;
+
+          })
+          .join("")
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
 }
+
+window.studentLogin=
+  studentLogin;
+
+window.submitExam=
+  submitExam;
+
+window.setAnswer=
+  setAnswer;
 
 init();
