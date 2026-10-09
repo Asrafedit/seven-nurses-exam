@@ -1,38 +1,57 @@
 self.addEventListener(
-"install",
-()=>self.skipWaiting()
+  "install",
+  ()=>{
+    self.skipWaiting();
+  }
 );
 
 self.addEventListener(
-"activate",
-e=>e.waitUntil(
-self.clients.claim()
-)
+  "activate",
+  e=>{
+    e.waitUntil(
+      self.clients.claim()
+    );
+  }
 );
 
 self.addEventListener(
-"push",
-e=>{
+  "push",
+  e=>{
 
-let d={
-title:"SEVEN NURSES",
-body:"New notification"
-};
+    let d={};
 
-try{
-d=e.data.json();
-}
-catch{}
+    try{
 
-e.waitUntil(
-self.registration.showNotification(
-d.title||"SEVEN NURSES",
-{
-body:d.body||"",
-icon:d.icon||"/favicon.ico"
-}
-)
-);
+      d=e.data
+        ?
+        e.data.json()
+        :
+        {};
 
-}
+    }
+    catch(_){}
+
+    e.waitUntil(
+
+      self.registration.showNotification(
+        d.title||
+        "SEVEN NURSES",
+        {
+          body:
+            d.body||
+            "New notification",
+
+          icon:
+            d.icon||
+            "/favicon.ico",
+
+          data:
+            d.data||
+            {}
+        }
+      )
+
+    );
+
+  }
 );
