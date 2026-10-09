@@ -5,983 +5,600 @@
 
 <meta charset="utf-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
 
-<title>SEVEN NURSES - Admin Panel</title>
+<title>
+SEVEN NURSES - Admin Panel
+</title>
 
-<link rel="stylesheet" href="/style.css">
+<link
+rel="stylesheet"
+href="/style.css"
+>
 
 </head>
 
+
 <body>
 
-<div class="app-container">
+<div class="admin-shell">
+
 
 <header class="header">
 
-<img id="logo" class="logo">
+  <div class="brand">
 
-<div class="head-main">
+    <div class="logo-wrap">
 
-<div id="title" class="head-title">
-SEVEN NURSES
-</div>
+      <img
+        id="adminLogo"
+        class="logo"
+        alt="Logo"
+      >
 
-<div id="sub" class="head-sub">
-ADMIN PANEL
-</div>
+    </div>
 
-</div>
+    <div>
+
+      <div class="head-title">
+        SEVEN NURSES
+      </div>
+
+      <div class="head-sub">
+        ADMIN PANEL
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <button
+    id="logout"
+    class="btn btn-red btn-mini"
+    hidden
+  >
+    Logout
+  </button>
 
 </header>
 
-<main>
 
-<section id="login" class="card">
+<main class="admin-main">
 
-<h2 class="center">
-Admin Login
-</h2>
 
-<label>Admin Email</label>
+<section
+id="loginBox"
+class="card"
+>
 
-<input id="email" type="email">
+  <div class="section-title">
+    Admin Login
+  </div>
 
-<label>Password</label>
+  <div class="title-line"></div>
 
-<input id="password" type="password">
 
-<button
-class="btn btn-blue"
-onclick="login()">
-Login
-</button>
+  <label for="email">
+    Admin Email
+  </label>
 
-<button
-class="btn btn-gray"
-onclick="location.href='/'">
-Student Login
-</button>
+  <input
+    id="email"
+    type="email"
+    autocomplete="username"
+    placeholder="Admin Gmail"
+  >
+
+
+  <label for="password">
+    Password
+  </label>
+
+  <input
+    id="password"
+    type="password"
+    autocomplete="current-password"
+    placeholder="Password"
+  >
+
+
+  <div
+    id="loginMsg"
+    class="login-note"
+  >
+    Firebase Authentication দিয়ে Admin Login করুন।
+  </div>
+
+
+  <button
+    id="loginBtn"
+    class="btn btn-blue"
+  >
+    Login
+  </button>
+
+
+  <button
+    class="btn btn-gray"
+    onclick="location.href='/'"
+  >
+    Student Login
+  </button>
 
 </section>
 
-<section id="panel" class="hidden">
 
-<div class="admin-nav">
+<section id="panel" hidden>
 
-<button data-tab="dashboard"
-onclick="tab('dashboard')">
+
+<div class="admin-grid">
+
+  <button
+    class="admin-tab active"
+    onclick="showAdminTab('dashboardTab',this)"
+  >
+    Dashboard
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('studentsTab',this)"
+  >
+    Students
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('examsTab',this)"
+  >
+    Exams
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('questionsTab',this)"
+  >
+    Questions
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('resultsTab',this)"
+  >
+    Results
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('notificationsTab',this)"
+  >
+    Notifications
+  </button>
+
+  <button
+    class="admin-tab"
+    onclick="showAdminTab('settingsTab',this)"
+  >
+    Settings
+  </button>
+
+</div>
+
+
+<section
+id="dashboardTab"
+class="admin-card admin-tab-content"
+>
+
+<h3>
 Dashboard
-</button>
+</h3>
 
-<button data-tab="questions"
-onclick="tab('questions')">
-Questions
-</button>
+<div
+id="dashboardStats"
+class="stat-grid"
+></div>
 
-<button data-tab="results"
-onclick="tab('results')">
-Results
-</button>
 
-<button data-tab="settings"
-onclick="tab('settings')">
-Settings
-</button>
+<div class="admin-card">
 
-</div>
+<h3>
+Recent Notifications
+</h3>
 
-<div id="dashboard"
-class="tab card">
-</div>
+<div
+id="dashboardNotifications"
+class="notice-list"
+></div>
 
-<div id="questions"
-class="tab card hidden">
-</div>
-
-<div id="results"
-class="tab card hidden">
-</div>
-
-<div id="settings"
-class="tab card hidden">
 </div>
 
 </section>
 
-</main>
 
-<div id="toast" class="toast"></div>
+<section
+id="studentsTab"
+class="admin-card admin-tab-content hidden"
+>
 
-</div>
-
-<script type="module">
-
-import {
-initializeApp
-}
-from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-
-import {
-getAuth,
-signInWithEmailAndPassword,
-updatePassword
-}
-from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-
-
-const cfg={
-apiKey:"AIzaSyArek6tP3kPlGpngJ1gn6MNpFzOh28JpiQ",
-authDomain:"seven-nurses8.firebaseapp.com",
-projectId:"seven-nurses8",
-storageBucket:"seven-nurses8.firebasestorage.app",
-messagingSenderId:"912003149859",
-appId:"1:912003149859:web:d4a4f41a6060b37275c196",
-measurementId:"G-YS5KRB087J"
-};
-
-const auth=getAuth(initializeApp(cfg));
-
-const $=id=>document.getElementById(id);
-
-const esc=v=>
-String(v??"").replace(
-/[&<>"']/g,
-m=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[m])
-);
-
-
-function toast(t){
-
-const x=$("toast");
-
-x.textContent=t;
-
-x.style.display="block";
-
-setTimeout(
-()=>x.style.display="none",
-2500
-);
-
-}
-
-
-async function api(path,opt={}){
-
-const u=
-opt.token||
-localStorage.getItem("sn_admin_token");
-
-const h={
-"Content-Type":"application/json"
-};
-
-if(u)
-h.Authorization="Bearer "+u;
-
-const r=await fetch(
-path,
-{
-...opt,
-headers:h
-}
-);
-
-const raw=await r.text();
-
-let d={};
-
-try{
-d=JSON.parse(raw);
-}
-catch{
-d={error:raw};
-}
-
-if(!r.ok)
-throw Error(
-d.error||
-d.message||
-("HTTP "+r.status)
-);
-
-return d;
-}
-
-
-async function login(){
-
-try{
-
-const c=
-await signInWithEmailAndPassword(
-auth,
-$("email").value.trim(),
-$("password").value
-);
-
-localStorage.setItem(
-"sn_admin_token",
-await c.user.getIdToken(true)
-);
-
-$("login").classList.add("hidden");
-
-$("panel").classList.remove("hidden");
-
-await loadAll();
-
-tab("dashboard");
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-let data={};
-
-
-async function loadAll(){
-
-try{
-
-data.bootstrap=
-await api("/api/bootstrap");
-
-data.stats=
-await api("/api/admin/stats");
-
-data.exams=
-await api("/api/admin/exams");
-
-data.students=
-await api("/api/admin/students");
-
-data.results=
-await api("/api/admin/results");
-
-data.notifications=
-await api("/api/admin/notifications");
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-function tab(id){
-
-document
-.querySelectorAll(".tab")
-.forEach(x=>x.classList.add("hidden"));
-
-$(id).classList.remove("hidden");
-
-document
-.querySelectorAll(".admin-nav button")
-.forEach(
-b=>b.classList.toggle(
-"active",
-b.dataset.tab===id
-)
-);
-
-if(id==="dashboard")
-renderDashboard();
-
-if(id==="questions")
-renderQuestions();
-
-if(id==="results")
-renderResults();
-
-if(id==="settings")
-renderSettings();
-
-}
-
-
-function renderDashboard(){
-
-$("dashboard").innerHTML=`
-
-<h3>Dashboard</h3>
-
-<div class="stat-grid">
-
-<div class="stat">
-<b>
-${data.stats?.students??
-data.students?.students?.length??0}
-</b>
+<h3>
 Students
-</div>
+</h3>
 
-<div class="stat">
-<b>
-${data.stats?.exams??
-data.exams?.exams?.length??0}
-</b>
-Exams
-</div>
-
-<div class="stat">
-<b>
-${data.stats?.results??
-data.results?.results?.length??0}
-</b>
-Results
-</div>
-
-<div class="stat">
-<b>
-${data.notifications?.notifications?.length??0}
-</b>
-Notifications
-</div>
-
-</div>
-
-<div class="setting-box">
-
-<h4>Recent Notifications</h4>
-
-${
-(data.notifications?.notifications||[])
-.slice(0,10)
-.map(n=>`
-
-<div class="item">
-
-<div class="item-main">
-
-<div class="item-title">
-${esc(n.title||"Result Submitted")}
-</div>
-
-<div class="item-sub">
-${esc(n.body||"")}
-</div>
-
-</div>
-
-</div>
-
-`)
-.join("")
-||
-"<p class='small'>No notifications.</p>"
-}
-
-</div>
-
-`;
-
-}
-
-
-async function renderQuestions(){
-
-let ex=
-(data.exams?.exams||[]);
-
-$("questions").innerHTML=`
-
-<h3>Question Management</h3>
-
-<label>Examination</label>
-
-<select id="qExam">
-
-${ex.map(e=>`
-
-<option value="${esc(e.id)}">
-${esc(e.title||e.name)}
-</option>
-
-`).join("")}
-
-</select>
-
-<div id="qForm"></div>
-
-<div id="qList"
-class="setting-box">
-</div>
-
-`;
-
-buildQForm();
-
-$("qExam").onchange=buildQForm;
-
-}
-
-
-function buildQForm(){
-
-let id=$("qExam").value;
-
-$("qForm").innerHTML=`
-
-<div class="setting-box">
-
-<h4>Add 5-Statement Question</h4>
-
-<label>Question</label>
-
-<textarea
-id="qt"
-rows="3">
-</textarea>
-
-${["A","B","C","D","E"].map(k=>`
-
-<label>
-Statement ${k}
-</label>
+<div class="form-grid">
 
 <input
-id="q${k}"
-placeholder="Statement ${k}">
-
-<select id="a${k}">
-
-<option value="true">
-TRUE
-</option>
-
-<option value="false">
-FALSE
-</option>
-
-</select>
-
-`).join("")}
+id="studentName"
+class="full"
+placeholder="Registered Student Name"
+>
 
 <button
 class="btn btn-green"
-onclick="saveQ()">
-Add Question
+onclick="saveStudent()"
+>
+Add Student
 </button>
 
 </div>
 
-`;
-
-loadQList(id);
-
-}
-
-
-async function loadQList(id){
-
-try{
-
-const d=
-await api(
-"/api/admin/questions/"
-+encodeURIComponent(id)
-);
-
-$("qList").innerHTML=
-
-(d.questions||[])
-.map((q,i)=>`
-
-<div class="item">
-
-<div class="item-main">
-
-<div class="item-title">
-
-Q${i+1}.
-${esc(q.question||q.title)}
-
-</div>
-
-</div>
-
-<button
-class="btn btn-red btn-small"
-onclick="delQ('${q.id}')">
-Delete
-</button>
-
-</div>
-
-`)
-.join("")
-||
-"<p class='small'>No questions.</p>";
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-async function saveQ(){
-
-const examId=$("qExam").value;
-
-const opts={};
-
-for(
-const k of ["A","B","C","D","E"]
-){
-
-opts[k]={
-text:$("q"+k).value.trim(),
-correct:$("a"+k).value==="true"
-};
-
-}
-
-if(
-!$("qt").value.trim()||
-Object.values(opts).some(x=>!x.text)
-)
-return toast(
-"সব প্রশ্ন ও Statement পূরণ করুন।"
-);
-
-try{
-
-await api(
-"/api/admin/questions",
-{
-method:"POST",
-body:JSON.stringify({
-examId,
-question:$("qt").value.trim(),
-options:opts,
-mark:1
-})
-}
-);
-
-toast("Question added");
-
-buildQForm();
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-async function delQ(id){
-
-if(!confirm("Delete this question?"))
-return;
-
-try{
-
-await api(
-"/api/admin/questions/"
-+encodeURIComponent(id),
-{
-method:"DELETE"
-}
-);
-
-buildQForm();
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-function renderResults(){
-
-const rs=
-data.results?.results||[];
-
-$("results").innerHTML=`
-
-<h3>
-Student Results & History
-</h3>
-
-<button
-class="btn btn-red"
-onclick="clearResults()">
-Clear All History
-</button>
 
 <div
-class="table-wrap"
-style="margin-top:10px">
+id="students"
+style="margin-top:10px"
+></div>
 
-<table>
+</section>
 
-<thead>
 
-<tr>
+<section
+id="examsTab"
+class="admin-card admin-tab-content hidden"
+>
 
-<th>Rank</th>
-<th>Name</th>
-<th>Exam</th>
-<th>Score</th>
-<th>Grade</th>
-<th>Status</th>
-<th>Date</th>
+<h3>
+Examinations
+</h3>
 
-</tr>
+<div class="form-grid">
 
-</thead>
+<input
+id="examTitleInput"
+class="full"
+placeholder="Exam Title"
+>
 
-<tbody>
+<input
+id="examDuration"
+type="number"
+min="1"
+value="30"
+placeholder="Duration (minutes)"
+>
 
-${rs.map(r=>`
+<input
+id="examPass"
+type="number"
+min="0"
+max="100"
+value="40"
+placeholder="Pass Mark %"
+>
 
-<tr>
-
-<td>${esc(r.rank)}</td>
-
-<td>
-${esc(r.studentName||r.name)}
-</td>
-
-<td>
-${esc(r.examTitle||r.examName)}
-</td>
-
-<td>
-${esc(r.score)}/${esc(r.total)}
-</td>
-
-<td>
-${esc(r.grade)}
-</td>
-
-<td>
-${esc(r.status)}
-</td>
-
-<td>
-${esc(r.submittedAt||r.date)}
-</td>
-
-</tr>
-
-`).join("")}
-
-</tbody>
-
-</table>
+<button
+class="btn btn-green"
+onclick="saveExam()"
+>
+Create Examination
+</button>
 
 </div>
 
-`;
 
-}
+<div
+id="exams"
+style="margin-top:10px"
+></div>
 
-
-async function clearResults(){
-
-if(!confirm("সব Result History মুছে ফেলবেন?"))
-return;
-
-try{
-
-await api(
-"/api/admin/results",
-{
-method:"DELETE"
-}
-);
-
-await loadAll();
-
-renderResults();
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
+</section>
 
 
-function renderSettings(){
+<section
+id="questionsTab"
+class="admin-card admin-tab-content hidden"
+>
 
-const s=
-data.bootstrap?.settings||{};
+<h3>
+Question Management
+</h3>
 
-$("settings").innerHTML=`
+
+<label for="examSelect">
+Select Examination
+</label>
+
+
+<select
+id="examSelect"
+onchange="loadQuestions()"
+></select>
+
+
+<div
+id="questionForm"
+class="admin-card"
+></div>
+
+
+<div
+id="questions"
+></div>
+
+</section>
+
+
+<section
+id="resultsTab"
+class="admin-card admin-tab-content hidden"
+>
+
+<h3>
+Results & History
+</h3>
+
+
+<div
+id="results"
+class="table-wrap"
+></div>
+
+</section>
+
+
+<section
+id="notificationsTab"
+class="admin-card admin-tab-content hidden"
+>
+
+<h3>
+Notifications
+</h3>
+
+
+<div
+id="notifications"
+class="notice-list"
+></div>
+
+</section>
+
+
+<section
+id="settingsTab"
+class="admin-card admin-tab-content hidden"
+>
 
 <h3>
 System Settings
 </h3>
 
-<div class="setting-box">
 
-<h4>
-System Information
-</h4>
+<div class="admin-card">
+
+
+<div class="form-grid">
+
+
+<div>
 
 <label>
 Site Name
 </label>
 
-<input
-id="sName"
-value="${esc(s.siteName||"SEVEN NURSES")}">
+<input id="siteName">
+
+</div>
+
+
+<div>
+
+<label>
+Header Title
+</label>
+
+<input id="headerTitle">
+
+</div>
+
+
+<div>
 
 <label>
 Subtitle
 </label>
 
-<input
-id="sSub"
-value="${esc(s.subtitle||"ONLINE EXAM SYSTEM")}">
+<input id="subtitle">
+
+</div>
+
+
+<div>
 
 <label>
 Logo URL
 </label>
 
-<input
-id="sLogo"
-value="${esc(s.logoUrl||"")}">
+<input id="logoUrl">
+
+</div>
+
+
+<div>
 
 <label>
-Header Background URL
+Background URL
+</label>
+
+<input id="backgroundUrl">
+
+</div>
+
+
+<div>
+
+<label>
+Common Exam PIN
 </label>
 
 <input
-id="sHead"
-value="${esc(s.headerBackgroundUrl||"")}">
+id="commonExamPin"
+inputmode="numeric"
+>
 
-<label>
-Whole-site Background URL
-</label>
+</div>
 
-<input
-id="sBg"
-value="${esc(s.backgroundUrl||"")}">
+
+<div class="full">
 
 <label>
 Notice
 </label>
 
-<textarea id="sNotice">
-${esc(s.notice||"")}
-</textarea>
+<textarea
+id="notice"
+rows="3"
+></textarea>
+
+</div>
+
+
+<div class="full">
 
 <label>
-Footer
+Footer Text
 </label>
 
-<input
-id="sFoot"
-value="${esc(s.footerText||"")}">
+<input id="footerText">
 
-<label>
-Common Student Exam PIN
-</label>
+</div>
 
-<input
-id="sPin"
-value="${esc(s.commonExamPin||"")}">
+
+</div>
+
 
 <button
 class="btn btn-green"
-onclick="saveSettings()">
+onclick="saveSettings()"
+>
 Save Settings
 </button>
 
 </div>
 
 
-<div class="setting-box">
+<div class="admin-card">
 
-<h4>
-Admin Password
-</h4>
+<h3>
+Change Admin Password
+</h3>
 
-<p class="small">
-Firebase Authentication-এর password ব্যবহার করা হবে।
-</p>
 
-<label>
-New Password
-</label>
+<input
+id="oldPass"
+type="password"
+placeholder="Current Password"
+>
+
 
 <input
 id="newPass"
-type="password">
+type="password"
+placeholder="New Password"
+>
+
+
+<input
+id="newPass2"
+type="password"
+placeholder="Confirm New Password"
+>
+
 
 <button
 class="btn btn-blue"
-onclick="changePass()">
-Update Password
+onclick="changePassword()"
+>
+Change Password
 </button>
 
-</div>
 
-
-<div class="setting-box">
-
-<h4>
-Students
-</h4>
-
-${
-(data.students?.students||[])
-.map(x=>`
-
-<div class="item">
-
-<div class="item-main">
-
-<div class="item-title">
-${esc(x.name)}
-</div>
-
-<div class="item-sub">
-${x.active===false
-?"Inactive"
-:"Active"}
-</div>
+<div
+id="passMsg"
+class="login-note"
+></div>
 
 </div>
 
+
+</section>
+
+
+</section>
+
+
+</main>
+
 </div>
 
-`)
-.join("")
-||
-"<p class='small'>No students.</p>"
-}
 
-</div>
+<script>
 
-`;
+function showAdminTab(id,btn){
 
-}
+  document
+    .querySelectorAll(
+      '.admin-tab-content'
+    )
+    .forEach(
+      x=>x.classList.add('hidden')
+    );
 
 
-async function saveSettings(){
+  document
+    .getElementById(id)
+    .classList.remove('hidden');
 
-const body={
 
-siteName:$("sName").value.trim(),
+  document
+    .querySelectorAll(
+      '.admin-tab'
+    )
+    .forEach(
+      x=>x.classList.remove('active')
+    );
 
-subtitle:$("sSub").value.trim(),
 
-logoUrl:$("sLogo").value.trim(),
-
-headerBackgroundUrl:
-$("sHead").value.trim(),
-
-backgroundUrl:
-$("sBg").value.trim(),
-
-notice:$("sNotice").value,
-
-footerText:$("sFoot").value.trim(),
-
-commonExamPin:
-$("sPin").value.trim()
-
-};
-
-try{
-
-await api(
-"/api/admin/settings",
-{
-method:"PUT",
-body:JSON.stringify(body)
-}
-);
-
-toast("Settings saved");
-
-await loadAll();
-
-renderSettings();
-
-}
-catch(e){
-
-toast(e.message);
+  if(btn){
+    btn.classList.add('active');
+  }
 
 }
 
-}
-
-
-async function changePass(){
-
-const p=$("newPass").value;
-
-if(!p||p.length<6)
-return toast(
-"Password কমপক্ষে 6 characters দিন।"
-);
-
-try{
-
-await auth.currentUser.updatePassword(p);
-
-toast("Password changed");
-
-$("newPass").value="";
-
-}
-catch(e){
-
-toast(e.message);
-
-}
-
-}
-
-
-window.login=login;
-window.tab=tab;
-window.saveQ=saveQ;
-window.delQ=delQ;
-window.clearResults=clearResults;
-window.saveSettings=saveSettings;
-window.changePass=changePass;
+window.showAdminTab=
+  showAdminTab;
 
 </script>
 
+
+<script
+type="module"
+src="/admin.js"
+></script>
+
+
 </body>
-  </html>
+    </html>
