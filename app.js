@@ -1,56 +1,63 @@
-let boot=null;
-let exams=[];
-let questions=[];
-let answers={};
-let currentExam=null;
-let student=null;
-let timerId=null;
-let secondsLeft=0;
-let submitted=false;
+let boot = null;
+let exams = [];
+let questions = [];
+let answers = {};
+let currentExam = null;
+let student = null;
+let timerId = null;
+let secondsLeft = 0;
+let submitted = false;
 
-const $=id=>document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-function esc(v){
-  return String(v??"").replace(/[&<>"']/g,m=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
   }[m]));
 }
 
-function toast(msg){
+function toast(msg) {
 
-  const el=$("toast");
+  const el = $("toast");
 
-  el.textContent=msg;
+  if (!el) {
+    alert(msg);
+    return;
+  }
 
-  el.style.display="block";
+  el.textContent = msg;
+
+  el.style.display = "block";
 
   clearTimeout(window.__toast);
 
-  window.__toast=setTimeout(
-    ()=>el.style.display="none",
+  window.__toast = setTimeout(
+    () => el.style.display = "none",
     2800
   );
 
 }
 
-async function api(path,opt={}){
+async function api(path, opt = {}) {
 
-  const token=localStorage.getItem("sn_student_token");
+  const token =
+    localStorage.getItem("sn_student_token");
 
-  const headers={
-    "Content-Type":"application/json",
-    ...(opt.headers||{})
+  const headers = {
+    "Content-Type": "application/json",
+    ...(opt.headers || {})
   };
 
-  if(token){
-    headers.Authorization="Bearer "+token;
+  if (token) {
+    headers.Authorization =
+      "Bearer " + token;
   }
 
-  const r=await fetch(
+  const r = await fetch(
     path,
     {
       ...opt,
@@ -58,148 +65,227 @@ async function api(path,opt={}){
     }
   );
 
-  const raw=await r.text();
+  const raw = await r.text();
 
-  let data={};
+  let data = {};
 
-  try{
-    data=JSON.parse(raw);
+  try {
+
+    data = JSON.parse(raw);
+
   }
-  catch{
-    data={
-      error:raw||("HTTP "+r.status)
+  catch {
+
+    data = {
+      error: raw || ("HTTP " + r.status)
     };
+
   }
 
-  if(!r.ok){
+  if (!r.ok) {
+
     throw new Error(
-      data.error||
-      data.message||
-      ("HTTP "+r.status)
+      data.error ||
+      data.message ||
+      ("HTTP " + r.status)
     );
+
   }
 
   return data;
+
 }
 
-async function init(){
+async function init() {
 
-  try{
+  try {
 
-    boot=await api("/api/bootstrap");
+    boot =
+      await api("/api/bootstrap");
 
     applyBootstrap(boot);
 
     await loadExams();
 
   }
-  catch(e){
+  catch (e) {
 
     toast(
-      "সিস্টেম লোড হয়নি: "+e.message
+      "System could not be loaded: " +
+      e.message
     );
 
-    $("examSelect").innerHTML=
-      '<option value="">পরীক্ষা লোড করা যায়নি</option>';
+    const select =
+      $("examSelect");
+
+    if (select) {
+
+      select.innerHTML =
+        '<option value="">Unable to load examinations</option>';
+
+    }
 
   }
 
 }
 
-function applyBootstrap(s){
+function applyBootstrap(s) {
 
-  $("siteTitle").textContent=
-    s.siteName||
-    s.headerTitle||
-    "SEVEN NURSES";
+  if ($("siteTitle")) {
 
-  $("siteSub").textContent=
-    s.subtitle||
-    "ONLINE EXAM SYSTEM";
-
-  $("footer").textContent=
-    s.footerText||
-    "© SEVEN NURSES";
-
-  const notice=s.notice||"";
-
-  $("notice").textContent=notice;
-
-  $("notice").classList.toggle(
-    "hidden",
-    !notice
-  );
-
-  if(s.logoUrl){
-
-    $("logo").src=s.logoUrl;
-
-    $("logo").style.display="block";
-
-  }
-  else{
-
-    $("logo").style.display="none";
+    $("siteTitle").textContent =
+      s.siteName ||
+      s.headerTitle ||
+      "SEVEN NURSES";
 
   }
 
-  if(s.backgroundUrl){
+  if ($("siteSub")) {
 
-    document.body.style.backgroundImage=
+    $("siteSub").textContent =
+      s.subtitle ||
+      "ONLINE EXAM SYSTEM";
+
+  }
+
+  if ($("footer")) {
+
+    $("footer").textContent =
+      s.footerText ||
+      "© SEVEN NURSES";
+
+  }
+
+  const notice =
+    s.notice || "";
+
+  if ($("notice")) {
+
+    $("notice").textContent =
+      notice;
+
+    $("notice").classList.toggle(
+      "hidden",
+      !notice
+    );
+
+  }
+
+  /*
+   * Logo
+   *
+   * Clicking the logo opens the
+   * configured Logo URL / file.
+   */
+
+  if (s.logoUrl && $("logo")) {
+
+    const logo =
+      $("logo");
+
+    logo.src =
+      s.logoUrl;
+
+    logo.style.display =
+      "block";
+
+    logo.style.cursor =
+      "pointer";
+
+    logo.title =
+      "Open logo link";
+
+    logo.onclick = () => {
+
+      window.open(
+        s.logoUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+    };
+
+  }
+  else if ($("logo")) {
+
+    $("logo").style.display =
+      "none";
+
+  }
+
+  if (s.backgroundUrl) {
+
+    document.body.style.backgroundImage =
       `url("${String(
         s.backgroundUrl
-      ).replace(/"/g,'&quot;')}")`;
+      ).replace(/"/g, "&quot;")}")`;
 
-    document.body.style.backgroundSize="cover";
+    document.body.style.backgroundSize =
+      "cover";
 
-    document.body.style.backgroundAttachment="fixed";
+    document.body.style.backgroundAttachment =
+      "fixed";
 
   }
 
 }
 
-async function loadExams(){
+async function loadExams() {
 
-  $("examSelect").innerHTML=
-    '<option value="">Login করার পর পরীক্ষা নির্বাচন করুন</option>';
+  const select =
+    $("examSelect");
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Login to select an examination</option>';
 
 }
 
-async function studentLogin(){
+async function studentLogin() {
 
-  const name=$("studentName")
-    .value
-    .trim();
+  const name =
+    $("studentName")
+      .value
+      .trim();
 
-  const pin=$("pin")
-    .value
-    .trim();
+  const pin =
+    $("pin")
+      .value
+      .trim();
 
-  if(!name||!pin){
+  if (!name || !pin) {
 
     return toast(
-      "নাম এবং Exam PIN দিন।"
+      "Enter your name and Exam PIN."
     );
 
   }
 
-  const btn=$("startBtn");
+  const btn =
+    $("startBtn");
 
-  btn.disabled=true;
+  btn.disabled =
+    true;
 
-  btn.textContent="Checking...";
+  btn.textContent =
+    "Checking...";
 
-  try{
+  try {
 
-    const login=
+    const login =
       await api(
         "/api/student/login",
         {
-          method:"POST",
-          body:JSON.stringify({
-            name,
-            pin
-          })
+          method: "POST",
+
+          body:
+            JSON.stringify({
+              name,
+              pin
+            })
         }
       );
 
@@ -211,61 +297,74 @@ async function studentLogin(){
     localStorage.setItem(
       "sn_student",
       JSON.stringify(
-        login.student||{}
+        login.student || {}
       )
     );
 
-    student=
-      login.student||
-      {name};
+    student =
+      login.student ||
+      { name };
 
     await loadStudentExams();
 
   }
-  catch(e){
+  catch (e) {
 
-    toast(e.message);
+    toast(
+      e.message
+    );
 
-    btn.disabled=false;
+    btn.disabled =
+      false;
 
-    btn.textContent=
+    btn.textContent =
       "Start Examination";
 
   }
 
 }
 
-async function loadStudentExams(){
+async function loadStudentExams() {
 
-  try{
+  try {
 
-    exams=
+    exams =
       await api(
         "/api/student/exams"
       );
 
-    if(!Array.isArray(exams)){
-      exams=[];
+    if (!Array.isArray(exams)) {
+
+      exams = [];
+
     }
 
-    $("examSelect").innerHTML=
+    const select =
+      $("examSelect");
+
+    if (!select) {
+      return;
+    }
+
+    select.innerHTML =
       exams.length
-      ?
-      exams.map(e=>
-        `<option value="${esc(e.id)}">
-          ${esc(e.title)} — ${esc(e.duration)} min
-        </option>`
-      ).join("")
-      :
-      '<option value="">কোনো Active Examination নেই</option>';
+        ?
+        exams.map(
+          e =>
+            `<option value="${esc(e.id)}">
+              ${esc(e.title)} — ${esc(e.duration)} min
+            </option>`
+        ).join("")
+        :
+        '<option value="">No Active Examination</option>';
 
-    const id=
-      $("examSelect").value;
+    const id =
+      select.value;
 
-    if(!id){
+    if (!id) {
 
       return toast(
-        "কোনো Active Examination পাওয়া যায়নি।"
+        "No Active Examination found."
       );
 
     }
@@ -273,167 +372,131 @@ async function loadStudentExams(){
     await startExam(id);
 
   }
-  catch(e){
+  catch (e) {
 
-    toast(e.message);
+    toast(
+      e.message
+    );
 
-    $("startBtn").disabled=false;
+    if ($("startBtn")) {
 
-    $("startBtn").textContent=
-      "Start Examination";
+      $("startBtn").disabled =
+        false;
+
+      $("startBtn").textContent =
+        "Start Examination";
+
+    }
 
   }
 
 }
 
-async function startExam(id){
+async function startExam(id) {
 
-  const data=
+  const data =
     await api(
-      "/api/student/exam/"
-      +encodeURIComponent(id)
+      "/api/student/exam/" +
+      encodeURIComponent(id)
     );
 
-  currentExam=
-    data.exam||
+  currentExam =
+    data.exam ||
     exams.find(
-      x=>x.id===id
-    )||
+      x => x.id === id
+    ) ||
     {
       id,
-      title:id,
-      duration:30
+      title: id,
+      duration: 30
     };
 
-  questions=
+  questions =
     Array.isArray(data.questions)
-    ?
-    data.questions
-    :
-    [];
+      ?
+      data.questions
+      :
+      [];
 
-  answers={};
+  answers = {};
 
-  submitted=false;
+  submitted = false;
 
-  if(!questions.length){
+  if (!questions.length) {
 
     return toast(
-      "এই পরীক্ষায় কোনো প্রশ্ন নেই।"
+      "There are no questions in this examination."
     );
 
   }
 
-  $("login").classList.add("hidden");
+  $("login")
+    .classList
+    .add("hidden");
 
-  $("exam").classList.remove("hidden");
+  $("exam")
+    .classList
+    .remove("hidden");
 
-  $("result").classList.add("hidden");
+  $("result")
+    .classList
+    .add("hidden");
 
-  $("examName").textContent=
-    currentExam.title||
+  $("examName").textContent =
+    currentExam.title ||
     "Examination";
 
-  $("questionCounter").textContent=
+  $("questionCounter").textContent =
     `${questions.length} Questions`;
 
   renderQuestions();
 
-  const duration=
+  const duration =
     Number(
-      currentExam.duration||30
+      currentExam.duration || 30
     );
 
   startTimer(
-    Math.max(1,duration)*60
+    Math.max(1, duration) * 60
   );
 
 }
 
-function renderQuestions(){
+function renderQuestions() {
 
-  $("questions").innerHTML=
+  $("questions").innerHTML =
     questions.map(
-      (q,i)=>{
+      (q, i) => {
 
-        const opts=
-          q.options||{};
+        const opts =
+          q.options || {};
 
-        return `
-          <div class="question-box">
+        /*
+         * New MCQ question
+         */
 
-            <div class="question-heading">
-              Q${i+1}. ${esc(q.question||"")}
-            </div>
+        if (
+          String(q.type || "")
+            .toLowerCase() === "mcq"
+        ) {
 
-            ${
-              q.imageUrl
-              ?
-              `<img
-                class="question-image"
-                src="${esc(q.imageUrl)}"
-                alt="Question image"
-              >`
-              :
-              ""
-            }
+          return renderMCQ(
+            q,
+            i,
+            opts
+          );
 
-            ${
-              ["A","B","C","D","E"]
-              .map(k=>{
+        }
 
-                const text=
-                  opts[k]?.text||"";
+        /*
+         * Existing True / False question
+         */
 
-                return `
-                  <div class="statement">
-
-                    <div class="statement-text">
-                      <b>${k}.</b>
-                      ${esc(text)}
-                    </div>
-
-                    <div class="tf-row">
-
-                      <label class="tf-label">
-
-                        <input
-                          type="radio"
-                          name="q_${esc(q.id)}_${k}"
-                          onchange="setAnswer('${esc(q.id)}','${k}',true)"
-                        >
-
-                        <span class="true-choice">
-                          TRUE
-                        </span>
-
-                      </label>
-
-                      <label class="tf-label">
-
-                        <input
-                          type="radio"
-                          name="q_${esc(q.id)}_${k}"
-                          onchange="setAnswer('${esc(q.id)}','${k}',false)"
-                        >
-
-                        <span class="false-choice">
-                          FALSE
-                        </span>
-
-                      </label>
-
-                    </div>
-
-                  </div>
-                `;
-
-              })
-              .join("")
-            }
-
-          </div>
-        `;
+        return renderTrueFalse(
+          q,
+          i,
+          opts
+        );
 
       }
     )
@@ -441,41 +504,242 @@ function renderQuestions(){
 
 }
 
+function renderMCQ(q, i, opts) {
+
+  const optionKeys =
+    ["A", "B", "C", "D"];
+
+  return `
+
+    <div class="question-box">
+
+      <div class="question-heading">
+        Q${i + 1}. ${esc(q.question || "")}
+      </div>
+
+      ${
+        q.imageUrl
+          ?
+          `<img
+            class="question-image"
+            src="${esc(q.imageUrl)}"
+            alt="Question image"
+          >`
+          :
+          ""
+      }
+
+      <div class="mcq-options">
+
+        ${
+          optionKeys
+            .map(k => {
+
+              const text =
+                opts[k]?.text || "";
+
+              return `
+
+                <label
+                  class="mcq-option"
+                  style="
+                    display:block;
+                    cursor:pointer;
+                    margin:10px 0;
+                  "
+                >
+
+                  <input
+                    type="radio"
+                    name="q_${esc(q.id)}"
+                    value="${k}"
+                    onchange="
+                      setMCQAnswer(
+                        '${esc(q.id)}',
+                        '${k}'
+                      )
+                    "
+                  >
+
+                  <span>
+                    <b>${k}.</b>
+                    ${esc(text)}
+                  </span>
+
+                </label>
+
+              `;
+
+            })
+            .join("")
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function renderTrueFalse(q, i, opts) {
+
+  return `
+
+    <div class="question-box">
+
+      <div class="question-heading">
+        Q${i + 1}. ${esc(q.question || "")}
+      </div>
+
+      ${
+        q.imageUrl
+          ?
+          `<img
+            class="question-image"
+            src="${esc(q.imageUrl)}"
+            alt="Question image"
+          >`
+          :
+          ""
+      }
+
+      ${
+        ["A", "B", "C", "D", "E"]
+          .map(k => {
+
+            const text =
+              opts[k]?.text || "";
+
+            return `
+
+              <div class="statement">
+
+                <div class="statement-text">
+
+                  <b>${k}.</b>
+                  ${esc(text)}
+
+                </div>
+
+                <div class="tf-row">
+
+                  <label
+                    class="tf-label"
+                  >
+
+                    <input
+                      type="radio"
+                      name="q_${esc(q.id)}_${k}"
+                      onchange="
+                        setAnswer(
+                          '${esc(q.id)}',
+                          '${k}',
+                          true
+                        )
+                      "
+                    >
+
+                    <span class="true-choice">
+                      TRUE
+                    </span>
+
+                  </label>
+
+                  <label
+                    class="tf-label"
+                  >
+
+                    <input
+                      type="radio"
+                      name="q_${esc(q.id)}_${k}"
+                      onchange="
+                        setAnswer(
+                          '${esc(q.id)}',
+                          '${k}',
+                          false
+                        )
+                      "
+                    >
+
+                    <span class="false-choice">
+                      FALSE
+                    </span>
+
+                  </label>
+
+                </div>
+
+              </div>
+
+            `;
+
+          })
+          .join("")
+      }
+
+    </div>
+
+  `;
+
+}
+
 function setAnswer(
   qid,
   key,
   value
-){
+) {
 
-  if(!answers[qid]){
-    answers[qid]={};
+  if (!answers[qid]) {
+
+    answers[qid] = {};
+
   }
 
-  answers[qid][key]=value;
+  answers[qid][key] =
+    value;
 
 }
 
-function startTimer(totalSeconds){
+function setMCQAnswer(
+  qid,
+  value
+) {
 
-  clearInterval(timerId);
+  answers[qid] =
+    value;
 
-  secondsLeft=totalSeconds;
+}
+
+function startTimer(totalSeconds) {
+
+  clearInterval(
+    timerId
+  );
+
+  secondsLeft =
+    totalSeconds;
 
   paintTimer();
 
-  timerId=
+  timerId =
     setInterval(
-      ()=>{
+      () => {
+
         secondsLeft--;
 
         paintTimer();
 
-        if(secondsLeft<=0){
+        if (
+          secondsLeft <= 0
+        ) {
 
-          clearInterval(timerId);
+          clearInterval(
+            timerId
+          );
 
           toast(
-            "সময় শেষ। পরীক্ষা Submit হচ্ছে..."
+            "Time is over. Submitting examination..."
           );
 
           submitExam(true);
@@ -488,72 +752,86 @@ function startTimer(totalSeconds){
 
 }
 
-function paintTimer(){
+function paintTimer() {
 
-  const m=
+  const m =
     Math.floor(
-      secondsLeft/60
+      secondsLeft / 60
     );
 
-  const s=
-    secondsLeft%60;
+  const s =
+    secondsLeft % 60;
 
-  $("timer").textContent=
-    `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  $("timer").textContent =
+    `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
-  $("timer").classList.remove(
-    "hidden"
-  );
+  $("timer")
+    .classList
+    .remove("hidden");
 
 }
 
-async function submitExam(autoSubmit){
+async function submitExam(
+  autoSubmit
+) {
 
-  if(submitted){
+  if (submitted) {
+
     return;
+
   }
 
-  if(
+  if (
     !autoSubmit &&
     !confirm(
-      "আপনি কি পরীক্ষা Submit করতে চান?"
+      "Are you sure you want to submit the examination?"
     )
-  ){
+  ) {
+
     return;
+
   }
 
-  submitted=true;
+  submitted = true;
 
-  clearInterval(timerId);
+  clearInterval(
+    timerId
+  );
 
-  try{
+  try {
 
-    const result=
+    const result =
       await api(
         "/api/student/submit",
         {
-          method:"POST",
-          body:JSON.stringify({
-            examId:currentExam.id,
-            answers
-          })
+          method: "POST",
+
+          body:
+            JSON.stringify({
+              examId:
+                currentExam.id,
+
+              answers
+            })
         }
       );
 
     showResult(result);
 
   }
-  catch(e){
+  catch (e) {
 
-    submitted=false;
+    submitted = false;
 
-    toast(e.message);
+    toast(
+      e.message
+    );
 
   }
 
 }
 
-function showResult(r){
+function showResult(r) {
 
   $("timer")
     .classList
@@ -567,19 +845,19 @@ function showResult(r){
     .classList
     .remove("hidden");
 
-  const status=
+  const status =
     String(
-      r.status||""
+      r.status || ""
     ).toUpperCase();
 
-  const review=
+  const review =
     Array.isArray(r.review)
-    ?
-    r.review
-    :
-    [];
+      ?
+      r.review
+      :
+      [];
 
-  $("result").innerHTML=`
+  $("result").innerHTML = `
 
     <div class="card result-card">
 
@@ -594,44 +872,91 @@ function showResult(r){
       </div>
 
       <div class="${
-        status==="PASS"
-        ?"pass"
-        :
-        "fail"
+        status === "PASS"
+          ? "pass"
+          : "fail"
       }">
+
         ${esc(status)}
+
       </div>
 
       <div class="stats">
 
         <div class="stat">
-          <b>${esc(r.percentage)}%</b>
-          <span>Percentage</span>
+
+          <b>
+            ${esc(r.percentage)}%
+          </b>
+
+          <span>
+            Percentage
+          </span>
+
         </div>
 
         <div class="stat">
-          <b>${esc(r.grade)}</b>
-          <span>Grade</span>
+
+          <b>
+            ${esc(r.grade)}
+          </b>
+
+          <span>
+            Grade
+          </span>
+
         </div>
 
         <div class="stat">
-          <b>${esc(r.passMark)}</b>
-          <span>Pass Mark</span>
+
+          <b>
+            ${esc(r.passMark)}
+          </b>
+
+          <span>
+            Pass Mark
+          </span>
+
         </div>
 
         <div class="stat">
-          <b>${esc(r.rank||"-")}</b>
-          <span>Rank</span>
+
+          <b>
+            ${esc(r.rank || "-")}
+          </b>
+
+          <span>
+            Rank
+          </span>
+
         </div>
 
         <div class="stat">
-          <b>${esc(r.totalExaminees||"-")}</b>
-          <span>Total Examinees</span>
+
+          <b>
+            ${esc(
+              r.totalExaminees || "-"
+            )}
+          </b>
+
+          <span>
+            Total Examinees
+          </span>
+
         </div>
 
         <div class="stat">
-          <b>${esc(student?.name||"")}</b>
-          <span>Student</span>
+
+          <b>
+            ${esc(
+              student?.name || ""
+            )}
+          </b>
+
+          <span>
+            Student
+          </span>
+
         </div>
 
       </div>
@@ -646,12 +971,16 @@ function showResult(r){
 
       ${
         review.length
-        ?
-        review.map(
-          renderReview
-        ).join("")
-        :
-        '<div class="empty">কোনো review পাওয়া যায়নি।</div>'
+          ?
+          review
+            .map(renderReview)
+            .join("")
+          :
+          `
+            <div class="empty">
+              No review available.
+            </div>
+          `
       }
 
     </div>
@@ -667,94 +996,193 @@ function showResult(r){
 
 }
 
-function renderReview(item){
+function renderReview(item) {
 
-  const good=
+  const good =
     !!item.isCorrect;
 
-  const opts=
-    item.options||{};
+  const opts =
+    item.options || {};
+
+  /*
+   * MCQ review
+   */
+
+  if (
+    String(item.type || "")
+      .toLowerCase() === "mcq"
+  ) {
+
+    const selected =
+      item.selectedAnswer ||
+      item.answer ||
+      "";
+
+    const correct =
+      item.correctAnswer ||
+      Object.keys(opts)
+        .find(
+          k =>
+            opts[k]?.correct === true
+        ) ||
+      "";
+
+    return `
+
+      <div class="review-item ${
+        good
+          ? "correct"
+          : "wrong"
+      }">
+
+        <div class="review-q">
+
+          Q${esc(item.number)}.
+          ${esc(item.question)}
+
+        </div>
+
+        <div class="review-opt">
+
+          ${
+            ["A", "B", "C", "D"]
+              .map(k => {
+
+                const o =
+                  opts[k] || {};
+
+                const isSelected =
+                  selected === k;
+
+                const isCorrect =
+                  correct === k;
+
+                return `
+
+                  <div>
+
+                    <b>${k}.</b>
+                    ${esc(o.text || "")}
+
+                    ${
+                      isSelected
+                        ?
+                        `
+                          <strong>
+                            — Your Answer
+                          </strong>
+                        `
+                        :
+                        ""
+                    }
+
+                    ${
+                      isCorrect
+                        ?
+                        `
+                          <span class="correct-text">
+                            — Correct Answer
+                          </span>
+                        `
+                        :
+                        ""
+                    }
+
+                  </div>
+
+                `;
+
+              })
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+  /*
+   * True / False review
+   */
 
   return `
 
     <div class="review-item ${
       good
-      ?
-      "correct"
-      :
-      "wrong"
+        ? "correct"
+        : "wrong"
     }">
 
       <div class="review-q">
+
         Q${esc(item.number)}.
         ${esc(item.question)}
+
       </div>
 
       <div class="review-opt">
 
         ${
-          ["A","B","C","D","E"]
-          .map(k=>{
+          ["A", "B", "C", "D", "E"]
+            .map(k => {
 
-            const o=
-              opts[k]||{};
+              const o =
+                opts[k] || {};
 
-            const selected=
-              !!o.selected;
+              const selected =
+                !!o.selected;
 
-            const correct=
-              !!o.correct;
+              const correct =
+                !!o.correct;
 
-            return `
+              return `
 
-              <div>
+                <div>
 
-                <b>${k}.</b>
-                ${esc(o.text||"")}
+                  <b>${k}.</b>
+                  ${esc(o.text || "")}
 
-                —
-                আপনার:
+                  —
 
-                <span class="${
-                  selected===correct
-                  ?
-                  "correct-text"
-                  :
-                  "wrong-text"
-                }">
+                  Your Answer:
 
-                  ${
-                    selected
-                    ?
-                    "TRUE"
-                    :
-                    "FALSE"
-                  }
+                  <span class="${
+                    selected === correct
+                      ? "correct-text"
+                      : "wrong-text"
+                  }">
 
-                </span>
+                    ${
+                      selected
+                        ? "TRUE"
+                        : "FALSE"
+                    }
 
-                |
+                  </span>
 
-                সঠিক:
+                  |
 
-                <span class="correct-text">
+                  Correct:
 
-                  ${
-                    correct
-                    ?
-                    "TRUE"
-                    :
-                    "FALSE"
-                  }
+                  <span class="correct-text">
 
-                </span>
+                    ${
+                      correct
+                        ? "TRUE"
+                        : "FALSE"
+                    }
 
-              </div>
+                  </span>
 
-            `;
+                </div>
 
-          })
-          .join("")
+              `;
+
+            })
+            .join("")
         }
 
       </div>
@@ -765,13 +1193,16 @@ function renderReview(item){
 
 }
 
-window.studentLogin=
+window.studentLogin =
   studentLogin;
 
-window.submitExam=
+window.submitExam =
   submitExam;
 
-window.setAnswer=
+window.setAnswer =
   setAnswer;
+
+window.setMCQAnswer =
+  setMCQAnswer;
 
 init();
