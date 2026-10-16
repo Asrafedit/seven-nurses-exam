@@ -1,94 +1,96 @@
 import {
   auth,
   FCM_VAPID_KEY
-}
-from "./firebase-config.js";
-
+} from "./firebase-config.js";
 
 import {
-
   signInWithEmailAndPassword,
-
   signOut,
-
   onAuthStateChanged,
-
   reauthenticateWithCredential,
-
   EmailAuthProvider,
-
   updatePassword
-
-}
-from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 
 const $ =
   id => document.getElementById(id);
 
 
-function esc(v){
+// ==================================================
+// ESCAPE HTML
+// ==================================================
+
+function esc(v) {
 
   return String(v ?? "")
     .replace(
       /[&<>"']/g,
       m => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
       }[m])
     );
 
 }
 
 
-function msg(text,error=false){
+// ==================================================
+// MESSAGE
+// ==================================================
 
-  const el=$("loginMsg");
+function msg(text, error = false) {
 
-  if(!el)return;
+  const el = $("loginMsg");
 
-  el.textContent=text;
+  if (!el) return;
 
-  el.style.background=
+  el.textContent = text;
+
+  el.style.background =
     error
-    ? "#fff3f4"
-    : "#f4f8fb";
+      ? "#fff3f4"
+      : "#f4f8fb";
 
-  el.style.color=
+  el.style.color =
     error
-    ? "#b4232d"
-    : "#315a78";
+      ? "#b4232d"
+      : "#315a78";
 
 }
 
 
-async function api(path,opt={}){
+// ==================================================
+// API
+// ==================================================
 
-  const u=auth.currentUser;
+async function api(path, opt = {}) {
 
-  const token=
+  const u = auth.currentUser;
+
+  const token =
     u
-    ? await u.getIdToken(true)
-    : "";
+      ? await u.getIdToken(true)
+      : "";
 
-  const headers={
+  const headers = {
     "Content-Type":
       "application/json",
 
-    ...(opt.headers||{})
+    ...(opt.headers || {})
   };
 
-  if(token){
+  if (token) {
 
-    headers.Authorization=
-      "Bearer "+token;
+    headers.Authorization =
+      "Bearer " + token;
 
   }
 
-  const r=
+  const r =
     await fetch(
       path,
       {
@@ -97,32 +99,33 @@ async function api(path,opt={}){
       }
     );
 
-  const raw=
+  const raw =
     await r.text();
 
-  let data={};
+  let data = {};
 
-  try{
+  try {
 
-    data=JSON.parse(raw);
+    data =
+      JSON.parse(raw);
 
   }
-  catch{
+  catch {
 
-    data={
+    data = {
       error:
         raw ||
-        ("HTTP "+r.status)
+        ("HTTP " + r.status)
     };
 
   }
 
-  if(!r.ok){
+  if (!r.ok) {
 
     throw new Error(
       data.error ||
       data.message ||
-      ("HTTP "+r.status)
+      ("HTTP " + r.status)
     );
 
   }
@@ -136,74 +139,86 @@ async function api(path,opt={}){
 // LOGIN
 // ==================================================
 
-$("loginBtn").onclick =
-  async()=>{
+if ($("loginBtn")) {
 
-    const email=
-      $("email")
-        .value
-        .trim();
+  $("loginBtn").onclick =
+    async () => {
 
-    const password=
-      $("password")
-        .value;
+      const email =
+        $("email")
+          .value
+          .trim();
 
-
-    if(!email || !password){
-
-      return msg(
-        "Enter email and password.",
-        true
-      );
-
-    }
+      const password =
+        $("password")
+          .value;
 
 
-    const btn=
-      $("loginBtn");
+      if (!email || !password) {
 
-    btn.disabled=true;
+        return msg(
+          "Enter email and password.",
+          true
+        );
 
-    btn.textContent=
-      "Signing in...";
-
-
-    try{
-
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      msg(
-        "Login successful."
-      );
-
-    }
-    catch(e){
-
-      msg(
-        e.message ||
-        "Login failed.",
-        true
-      );
-
-    }
-    finally{
-
-      btn.disabled=false;
-
-      btn.textContent=
-        "Login";
-
-    }
-
-  };
+      }
 
 
-$("logout").onclick =
-  ()=>signOut(auth);
+      const btn =
+        $("loginBtn");
+
+      btn.disabled = true;
+
+      btn.textContent =
+        "Signing in...";
+
+
+      try {
+
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        msg(
+          "Login successful."
+        );
+
+      }
+      catch (e) {
+
+        msg(
+          e.message ||
+          "Login failed.",
+          true
+        );
+
+      }
+      finally {
+
+        btn.disabled = false;
+
+        btn.textContent =
+          "Login";
+
+      }
+
+    };
+
+}
+
+
+// ==================================================
+// LOGOUT
+// ==================================================
+
+if ($("logout")) {
+
+  $("logout").onclick =
+    () => signOut(auth);
+
+}
 
 
 // ==================================================
@@ -212,36 +227,42 @@ $("logout").onclick =
 
 onAuthStateChanged(
   auth,
-  async user=>{
+  async user => {
 
-    if(!user){
+    if (!user) {
 
-      $("loginBox").hidden=false;
+      if ($("loginBox"))
+        $("loginBox").hidden = false;
 
-      $("panel").hidden=true;
+      if ($("panel"))
+        $("panel").hidden = true;
 
-      $("logout").hidden=true;
+      if ($("logout"))
+        $("logout").hidden = true;
 
       return;
 
     }
 
 
-    $("loginBox").hidden=true;
+    if ($("loginBox"))
+      $("loginBox").hidden = true;
 
-    $("panel").hidden=false;
+    if ($("panel"))
+      $("panel").hidden = false;
 
-    $("logout").hidden=false;
+    if ($("logout"))
+      $("logout").hidden = false;
 
 
-    try{
+    try {
 
       await loadAll();
 
       await registerPush();
 
     }
-    catch(e){
+    catch (e) {
 
       msg(
         e.message,
@@ -255,10 +276,27 @@ onAuthStateChanged(
 
 
 // ==================================================
+// STATE
+// ==================================================
+
+let state = {
+
+  exams: [],
+
+  students: [],
+
+  results: [],
+
+  notifications: []
+
+};
+
+
+// ==================================================
 // LOAD ALL
 // ==================================================
 
-async function loadAll(){
+async function loadAll() {
 
   const [
     settings,
@@ -292,11 +330,16 @@ async function loadAll(){
     ]);
 
 
-  state={
+  state = {
+
     students,
+
     exams,
+
     results,
+
     notifications
+
   };
 
 
@@ -320,24 +363,12 @@ async function loadAll(){
 
 
 // ==================================================
-// STATE
-// ==================================================
-
-let state={
-  exams:[],
-  students:[],
-  results:[],
-  notifications:[]
-};
-
-
-// ==================================================
 // SETTINGS
 // ==================================================
 
-function fillSettings(s){
+function fillSettings(s) {
 
-  for(
+  for (
     const k of [
       "siteName",
       "headerTitle",
@@ -348,11 +379,11 @@ function fillSettings(s){
       "footerText",
       "commonExamPin"
     ]
-  ){
+  ) {
 
-    if($(k)){
+    if ($(k)) {
 
-      $(k).value=
+      $(k).value =
         s?.[k] ?? "";
 
     }
@@ -360,15 +391,15 @@ function fillSettings(s){
   }
 
 
-  if(
+  if (
     s?.logoUrl &&
     $("adminLogo")
-  ){
+  ) {
 
-    $("adminLogo").src=
+    $("adminLogo").src =
       s.logoUrl;
 
-    $("adminLogo").style.display=
+    $("adminLogo").style.display =
       "block";
 
   }
@@ -377,83 +408,90 @@ function fillSettings(s){
 
 
 // ==================================================
-// LOGO FILE PICKER
+// LOGO PICKER
 // ==================================================
 
-if($("adminLogo")){
+if ($("adminLogo")) {
 
-  $("adminLogo").onclick=()=>{
+  $("adminLogo").onclick =
+    () => {
 
-    $("logoFile").click();
+      if ($("logoFile"))
+        $("logoFile").click();
 
-  };
+    };
 
 }
 
 
-if($("logoFile")){
+if ($("logoFile")) {
 
-  $("logoFile").onchange=()=>{
+  $("logoFile").onchange =
+    () => {
 
-    const file=
-      $("logoFile").files?.[0];
+      const file =
+        $("logoFile")
+          .files?.[0];
 
-    if(!file)return;
-
-
-    if(
-      !file.type.startsWith(
-        "image/"
-      )
-    ){
-
-      alert(
-        "Please select an image file."
-      );
-
-      return;
-
-    }
+      if (!file) return;
 
 
-    if(
-      file.size >
-      1024 * 1024
-    ){
+      if (
+        !file.type.startsWith(
+          "image/"
+        )
+      ) {
 
-      alert(
-        "Logo must be smaller than 1 MB."
-      );
+        alert(
+          "Please select an image file."
+        );
 
-      return;
+        return;
 
-    }
-
-
-    const reader=
-      new FileReader();
+      }
 
 
-    reader.onload=()=>{
+      if (
+        file.size >
+        1024 * 1024
+      ) {
 
-      const dataUrl=
-        reader.result;
+        alert(
+          "Logo must be smaller than 1 MB."
+        );
 
-      $("adminLogo").src=
-        dataUrl;
+        return;
 
-      $("adminLogo").style.display=
-        "block";
+      }
 
-      $("logoUrl").value=
-        dataUrl;
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        () => {
+
+          const dataUrl =
+            reader.result;
+
+          $("adminLogo").src =
+            dataUrl;
+
+          $("adminLogo")
+            .style
+            .display =
+            "block";
+
+          $("logoUrl").value =
+            dataUrl;
+
+        };
+
+
+      reader.readAsDataURL(file);
 
     };
-
-
-    reader.readAsDataURL(file);
-
-  };
 
 }
 
@@ -462,9 +500,9 @@ if($("logoFile")){
 // DASHBOARD
 // ==================================================
 
-function renderDashboard(){
+function renderDashboard() {
 
-  const stats=[
+  const stats = [
 
     [
       "Students",
@@ -489,63 +527,71 @@ function renderDashboard(){
   ];
 
 
-  $("dashboardStats")
-    .innerHTML=
-      stats
-      .map(
-        x=>`
+  if ($("dashboardStats")) {
 
-          <div class="stat">
+    $("dashboardStats")
+      .innerHTML =
+        stats
+          .map(
+            x => `
 
-            <b>
-              ${esc(x[1])}
-            </b>
+              <div class="stat">
 
-            <span>
-              ${x[0]}
-            </span>
+                <b>
+                  ${esc(x[1])}
+                </b>
 
-          </div>
+                <span>
+                  ${x[0]}
+                </span>
 
-        `
-      )
-      .join("");
-
-
-  $("dashboardNotifications")
-    .innerHTML=
-      state.notifications
-      .slice(0,8)
-      .map(
-        n=>`
-
-          <div class="admin-item">
-
-            <div class="admin-item-main">
-
-              <div class="admin-item-title">
-                ${esc(
-                  n.title ||
-                  "New Notification"
-                )}
               </div>
 
-              <div class="admin-item-sub">
-                ${esc(
-                  n.body ||
-                  ""
-                )}
+            `
+          )
+          .join("");
+
+  }
+
+
+  if ($("dashboardNotifications")) {
+
+    $("dashboardNotifications")
+      .innerHTML =
+        state.notifications
+          .slice(0, 8)
+          .map(
+            n => `
+
+              <div class="admin-item">
+
+                <div class="admin-item-main">
+
+                  <div class="admin-item-title">
+                    ${esc(
+                      n.title ||
+                      "New Notification"
+                    )}
+                  </div>
+
+                  <div class="admin-item-sub">
+                    ${esc(
+                      n.body ||
+                      ""
+                    )}
+                  </div>
+
+                </div>
+
               </div>
 
-            </div>
+            `
+          )
+          .join("")
+          ||
+          '<div class="empty">No notifications.</div>';
 
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No notifications.</div>';
+  }
 
 }
 
@@ -554,46 +600,51 @@ function renderDashboard(){
 // STUDENTS
 // ==================================================
 
-function renderStudents(){
+function renderStudents() {
+
+  if (!$("students")) return;
+
 
   $("students")
-    .innerHTML=
+    .innerHTML =
       state.students
-      .map(
-        s=>`
+        .map(
+          s => `
 
-          <div class="admin-item">
+            <div class="admin-item">
 
-            <div class="admin-item-main">
+              <div class="admin-item-main">
 
-              <div class="admin-item-title">
-                ${esc(s.name)}
+                <div class="admin-item-title">
+                  ${esc(s.name)}
+                </div>
+
+                <div class="admin-item-sub">
+
+                  ${
+                    s.active === false
+                      ? "Inactive"
+                      : "Active"
+                  }
+
+                </div>
+
               </div>
 
-              <div class="admin-item-sub">
-                ${
-                  s.active===false
-                  ? "Inactive"
-                  : "Active"
-                }
-              </div>
+              <button
+                class="btn btn-red btn-mini"
+                onclick="deleteStudent('${esc(s.id)}')"
+              >
+                Delete
+              </button>
 
             </div>
 
-            <button
-              class="btn btn-red btn-mini"
-              onclick="deleteStudent('${esc(s.id)}')"
-            >
-              Delete
-            </button>
-
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No students.</div>';
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No students.</div>';
 
 }
 
@@ -602,105 +653,293 @@ function renderStudents(){
 // EXAMS
 // ==================================================
 
-function renderExams(){
+function renderExams() {
+
+  if (!$("exams")) return;
+
 
   $("exams")
-    .innerHTML=
+    .innerHTML =
       state.exams
-      .map(
-        e=>`
+        .map(
+          e => {
 
-          <div class="admin-item">
+            const active =
+              e.active !== false;
 
-            <div class="admin-item-main">
 
-              <div class="admin-item-title">
-                ${esc(e.title)}
+            return `
+
+              <div class="admin-item">
+
+                <div class="admin-item-main">
+
+                  <div class="admin-item-title">
+
+                    ${esc(e.title)}
+
+                  </div>
+
+                  <div class="admin-item-sub">
+
+                    ${esc(e.duration)}
+                    minutes · Pass
+                    ${esc(e.passMark)}%
+
+                    ·
+
+                    ${
+                      active
+                        ? "🟢 Running"
+                        : "🔴 Closed"
+                    }
+
+                  </div>
+
+                </div>
+
+
+                <div
+                  style="
+                    display:flex;
+                    gap:6px;
+                    flex-wrap:wrap;
+                    justify-content:flex-end;
+                  "
+                >
+
+                  <button
+                    class="btn ${
+                      active
+                        ? "btn-red"
+                        : "btn-green"
+                    } btn-mini"
+                    onclick="toggleExam('${esc(e.id)}')"
+                  >
+
+                    ${
+                      active
+                        ? "Close Exam"
+                        : "Start Exam"
+                    }
+
+                  </button>
+
+
+                  <button
+                    class="btn btn-red btn-mini"
+                    onclick="deleteExam('${esc(e.id)}')"
+                  >
+
+                    Delete
+
+                  </button>
+
+                </div>
+
               </div>
 
-              <div class="admin-item-sub">
-                ${esc(e.duration)}
-                minutes · Pass
-                ${esc(e.passMark)}%
-              </div>
+            `;
 
-            </div>
-
-            <button
-              class="btn btn-red btn-mini"
-              onclick="deleteExam('${esc(e.id)}')"
-            >
-              Delete
-            </button>
-
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No examinations.</div>';
+          }
+        )
+        .join("")
+        ||
+        '<div class="empty">No examinations.</div>';
 
 }
+
+
+// ==================================================
+// TOGGLE EXAM
+// ==================================================
+
+window.toggleExam =
+  async id => {
+
+    const exam =
+      state.exams.find(
+        x => x.id === id
+      );
+
+
+    if (!exam) {
+
+      return alert(
+        "Exam not found."
+      );
+
+    }
+
+
+    const currentlyActive =
+      exam.active !== false;
+
+
+    const newStatus =
+      !currentlyActive;
+
+
+    const actionText =
+      newStatus
+        ? "start"
+        : "close";
+
+
+    const ok =
+      confirm(
+        `Are you sure you want to ${actionText} "${exam.title}"?`
+      );
+
+
+    if (!ok) return;
+
+
+    try {
+
+      await api(
+        "/api/admin/exams",
+        {
+
+          method: "POST",
+
+          body:
+            JSON.stringify({
+
+              id: exam.id,
+
+              title:
+                exam.title,
+
+              duration:
+                Number(
+                  exam.duration
+                ) || 30,
+
+              passMark:
+                Number(
+                  exam.passMark
+                ) || 40,
+
+              active:
+                newStatus,
+
+              order:
+                Number(
+                  exam.order
+                ) || 0,
+
+              totalQuestions:
+                Number(
+                  exam.totalQuestions
+                ) || 0
+
+            })
+
+        }
+      );
+
+
+      await loadAll();
+
+
+      alert(
+        newStatus
+          ? "Exam started successfully."
+          : "Exam closed successfully."
+      );
+
+    }
+    catch (e) {
+
+      alert(
+        e.message ||
+        "Could not change exam status."
+      );
+
+    }
+
+  };
 
 
 // ==================================================
 // RESULTS
 // ==================================================
 
-function renderResults(){
+function renderResults() {
 
-  const rows=
+  if (!$("results")) return;
+
+
+  const rows =
     state.results
-    .map(
-      r=>`
+      .map(
+        r => `
 
-        <tr>
+          <tr>
 
-          <td>
-            ${esc(r.rank || "-")}
-          </td>
+            <td>
+              ${esc(r.rank || "-")}
+            </td>
 
-          <td>
-            ${esc(r.studentName)}
-          </td>
+            <td>
+              ${esc(r.studentName)}
+            </td>
 
-          <td>
-            ${esc(r.examTitle)}
-          </td>
+            <td>
+              ${esc(r.examTitle)}
+            </td>
 
-          <td>
-            ${esc(r.score)}/${esc(r.total)}
-          </td>
+            <td>
+              ${esc(r.score)}/${esc(r.total)}
+            </td>
 
-          <td>
-            ${esc(r.grade)}
-          </td>
+            <td>
+              ${esc(r.grade)}
+            </td>
 
-          <td>
-            ${esc(r.status)}
-          </td>
+            <td>
+              ${esc(r.status)}
+            </td>
 
-          <td>
+            <td>
 
-            <button
-              class="btn btn-blue btn-mini"
-              onclick="viewResult('${esc(r.id)}')"
-            >
-              View
-            </button>
+              <div
+                style="
+                  display:flex;
+                  gap:5px;
+                  flex-wrap:wrap;
+                "
+              >
 
-          </td>
+                <button
+                  class="btn btn-blue btn-mini"
+                  onclick="viewResult('${esc(r.id)}')"
+                >
+                  View
+                </button>
 
-        </tr>
 
-      `
-    )
-    .join("");
+                <button
+                  class="btn btn-red btn-mini"
+                  onclick="deleteResult('${esc(r.id)}')"
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        `
+      )
+      .join("");
 
 
   $("results")
-    .innerHTML=`
+    .innerHTML = `
 
       <table>
 
@@ -709,27 +948,41 @@ function renderResults(){
           <tr>
 
             <th>Rank</th>
+
             <th>Name</th>
+
             <th>Exam</th>
+
             <th>Score</th>
+
             <th>Grade</th>
+
             <th>Status</th>
-            <th></th>
+
+            <th>Action</th>
 
           </tr>
 
         </thead>
 
+
         <tbody>
 
           ${
             rows ||
+
             `
+
               <tr>
+
                 <td colspan="7">
+
                   No results.
+
                 </td>
+
               </tr>
+
             `
           }
 
@@ -743,44 +996,114 @@ function renderResults(){
 
 
 // ==================================================
+// DELETE RESULT / HISTORY
+// ==================================================
+
+window.deleteResult =
+  async id => {
+
+    const result =
+      state.results.find(
+        x => x.id === id
+      );
+
+
+    const studentName =
+      result?.studentName ||
+      "this student";
+
+
+    const examTitle =
+      result?.examTitle ||
+      "this exam";
+
+
+    const ok =
+      confirm(
+        `Delete result history of ${studentName} for ${examTitle}?\n\nThis action cannot be undone.`
+      );
+
+
+    if (!ok) return;
+
+
+    try {
+
+      await api(
+        "/api/admin/results/" +
+        encodeURIComponent(id),
+        {
+          method: "DELETE"
+        }
+      );
+
+
+      await loadAll();
+
+
+      alert(
+        "Result deleted successfully."
+      );
+
+    }
+    catch (e) {
+
+      alert(
+        e.message ||
+        "Result delete failed."
+      );
+
+    }
+
+  };
+
+
+// ==================================================
 // NOTIFICATIONS
 // ==================================================
 
-function renderNotifications(){
+function renderNotifications() {
+
+  if (!$("notifications")) return;
+
 
   $("notifications")
-    .innerHTML=
+    .innerHTML =
       state.notifications
-      .map(
-        n=>`
+        .map(
+          n => `
 
-          <div class="admin-item">
+            <div class="admin-item">
 
-            <div class="admin-item-main">
+              <div class="admin-item-main">
 
-              <div class="admin-item-title">
-                ${esc(
-                  n.title ||
-                  "Submission"
-                )}
-              </div>
+                <div class="admin-item-title">
 
-              <div class="admin-item-sub">
-                ${esc(
-                  n.body ||
-                  ""
-                )}
+                  ${esc(
+                    n.title ||
+                    "Submission"
+                  )}
+
+                </div>
+
+                <div class="admin-item-sub">
+
+                  ${esc(
+                    n.body ||
+                    ""
+                  )}
+
+                </div>
+
               </div>
 
             </div>
 
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No notifications.</div>';
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No notifications.</div>';
 
 }
 
@@ -789,25 +1112,30 @@ function renderNotifications(){
 // EXAM SELECT
 // ==================================================
 
-function populateExamSelect(){
+function populateExamSelect() {
+
+  if (!$("examSelect")) return;
+
 
   $("examSelect")
-    .innerHTML=
+    .innerHTML =
       state.exams
-      .map(
-        e=>`
+        .map(
+          e => `
 
-          <option
-            value="${esc(e.id)}"
-          >
-            ${esc(e.title)}
-          </option>
+            <option
+              value="${esc(e.id)}"
+            >
 
-        `
-      )
-      .join("")
-      ||
-      '<option value="">No examination</option>';
+              ${esc(e.title)}
+
+            </option>
+
+          `
+        )
+        .join("")
+        ||
+        '<option value="">No examination</option>';
 
 }
 
@@ -816,16 +1144,16 @@ function populateExamSelect(){
 // SAVE STUDENT
 // ==================================================
 
-window.saveStudent=
-  async()=>{
+window.saveStudent =
+  async () => {
 
-    const name=
+    const name =
       $("studentName")
         .value
         .trim();
 
 
-    if(!name){
+    if (!name) {
 
       return alert(
         "Enter student name."
@@ -834,29 +1162,31 @@ window.saveStudent=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/students",
         {
-          method:"POST",
+
+          method: "POST",
 
           body:
             JSON.stringify({
               name
             })
+
         }
       );
 
 
       $("studentName")
-        .value="";
+        .value = "";
 
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -869,32 +1199,35 @@ window.saveStudent=
 // DELETE STUDENT
 // ==================================================
 
-window.deleteStudent=
-  async id=>{
+window.deleteStudent =
+  async id => {
 
-    if(
+    if (
       !confirm(
         "Delete this student?"
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/students/"
-        +encodeURIComponent(id),
+        "/api/admin/students/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
+
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -907,26 +1240,30 @@ window.deleteStudent=
 // SAVE EXAM
 // ==================================================
 
-window.saveExam=
-  async()=>{
+window.saveExam =
+  async () => {
 
-    const title=
+    const title =
       $("examTitleInput")
         .value
         .trim();
 
-    const duration=
-      Number(
-        $("examDuration").value || 30
-      );
 
-    const passMark=
+    const duration =
       Number(
-        $("examPass").value || 40
+        $("examDuration").value ||
+        30
       );
 
 
-    if(!title){
+    const passMark =
+      Number(
+        $("examPass").value ||
+        40
+      );
+
+
+    if (!title) {
 
       return alert(
         "Enter exam title."
@@ -935,31 +1272,39 @@ window.saveExam=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/exams",
         {
-          method:"POST",
+
+          method: "POST",
 
           body:
             JSON.stringify({
+
               title,
+
               duration,
-              passMark
+
+              passMark,
+
+              active: true
+
             })
+
         }
       );
 
 
       $("examTitleInput")
-        .value="";
+        .value = "";
 
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -972,32 +1317,35 @@ window.saveExam=
 // DELETE EXAM
 // ==================================================
 
-window.deleteExam=
-  async id=>{
+window.deleteExam =
+  async id => {
 
-    if(
+    if (
       !confirm(
-        "Delete this examination?"
+        "Delete this examination?\n\nAll questions belonging to this exam will also be deleted."
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/exams/"
-        +encodeURIComponent(id),
+        "/api/admin/exams/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
+
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -1010,219 +1358,266 @@ window.deleteExam=
 // QUESTION MANAGEMENT
 // ==================================================
 
-window.loadQuestions=
-  async()=>{
+window.loadQuestions =
+  async () => {
 
-    const id=
-      $("examSelect").value;
+    const id =
+      $("examSelect")?.value;
 
 
-    if(!id){
+    if (!id) {
 
-      $("questionForm")
-        .innerHTML="";
+      if ($("questionForm"))
+        $("questionForm")
+          .innerHTML = "";
 
-      $("questions")
-        .innerHTML=
-          '<div class="empty">Select an examination.</div>';
+
+      if ($("questions"))
+        $("questions")
+          .innerHTML =
+            '<div class="empty">Select an examination.</div>';
 
       return;
 
     }
 
 
-    try{
+    try {
 
-      const qs=
+      const qs =
         await api(
-          "/api/admin/questions/"
-          +encodeURIComponent(id)
+          "/api/admin/questions/" +
+          encodeURIComponent(id)
         );
 
 
-      const arr=
+      const arr =
         Array.isArray(qs)
-        ? qs
-        : (qs.questions || []);
+          ? qs
+          : (
+              qs.questions ||
+              []
+            );
 
 
-      $("questions")
-        .innerHTML=
-          arr
-          .map(
-            q=>{
+      if ($("questions")) {
 
-              const type=
-                q.type ||
-                "tf";
+        $("questions")
+          .innerHTML =
+            arr
+              .map(
+                q => {
 
-              let summary="";
-
-
-              if(type==="mcq"){
-
-                summary=
-                  ["A","B","C","D","E"]
-                  .map(
-                    k=>
-                      `${k}: ${
-                        q.options?.[k]?.correct
-                        ? "CORRECT"
-                        : "WRONG"
-                      }`
-                  )
-                  .join(" · ");
-
-              }
-              else{
-
-                summary=
-                  ["A","B","C","D","E"]
-                  .map(
-                    k=>
-                      `${k}: ${
-                        q.options?.[k]?.correct
-                        ? "TRUE"
-                        : "FALSE"
-                      }`
-                  )
-                  .join(" · ");
-
-              }
+                  const type =
+                    q.type ||
+                    "tf";
 
 
-              return `
+                  let summary = "";
 
-                <div class="admin-item">
 
-                  <div class="admin-item-main">
+                  if (
+                    type === "mcq"
+                  ) {
 
-                    <div class="admin-item-title">
+                    summary =
+                      [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E"
+                      ]
+                        .map(
+                          k =>
+                            `${k}: ${
+                              q.options?.[k]?.correct
+                                ? "CORRECT"
+                                : "WRONG"
+                            }`
+                        )
+                        .join(" · ");
 
-                      Q${esc(q.order || "")}
-                      ·
-                      ${esc(q.question)}
+                  }
+                  else {
+
+                    summary =
+                      [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E"
+                      ]
+                        .map(
+                          k =>
+                            `${k}: ${
+                              q.options?.[k]?.correct
+                                ? "TRUE"
+                                : "FALSE"
+                            }`
+                        )
+                        .join(" · ");
+
+                  }
+
+
+                  return `
+
+                    <div class="admin-item">
+
+                      <div class="admin-item-main">
+
+                        <div class="admin-item-title">
+
+                          Q${esc(
+                            q.order || ""
+                          )}
+
+                          ·
+
+                          ${esc(
+                            q.question
+                          )}
+
+                        </div>
+
+
+                        <div class="admin-item-sub">
+
+                          Type:
+
+                          ${
+                            type === "mcq"
+                              ? "Multiple Choice"
+                              : "True / False"
+                          }
+
+                          ·
+
+                          ${summary}
+
+                        </div>
+
+                      </div>
+
+
+                      <button
+                        class="btn btn-red btn-mini"
+                        onclick="deleteQuestion('${esc(q.id)}')"
+                      >
+
+                        Delete
+
+                      </button>
 
                     </div>
 
-                    <div class="admin-item-sub">
+                  `;
 
-                      Type:
-                      ${
-                        type==="mcq"
-                        ? "Multiple Choice"
-                        : "True / False"
-                      }
+                }
+              )
+              .join("")
+              ||
+              '<div class="empty">No questions.</div>';
 
-                      ·
-
-                      ${summary}
-
-                    </div>
-
-                  </div>
+      }
 
 
-                  <button
-                    class="btn btn-red btn-mini"
-                    onclick="deleteQuestion('${esc(q.id)}')"
-                  >
-                    Delete
-                  </button>
-
-                </div>
-
-              `;
-
-            }
-          )
-          .join("")
-          ||
-          '<div class="empty">No questions.</div>';
-
-
-      const next=
+      const next =
         arr.length + 1;
 
 
-      $("questionForm")
-        .innerHTML=`
+      if ($("questionForm")) {
 
-          <h3>
-            Add Question
-          </h3>
+        $("questionForm")
+          .innerHTML = `
 
-
-          <label>
-            Question Type
-          </label>
+            <h3>
+              Add Question
+            </h3>
 
 
-          <select
-            id="questionType"
-            onchange="changeQuestionType()"
-          >
-
-            <option value="tf">
-              True / False
-            </option>
-
-            <option value="mcq">
-              Multiple Choice
-            </option>
-
-          </select>
+            <label>
+              Question Type
+            </label>
 
 
-          <input
-            id="qtext"
-            placeholder="Question"
-          >
+            <select
+              id="questionType"
+              onchange="changeQuestionType()"
+            >
+
+              <option value="tf">
+                True / False
+              </option>
+
+              <option value="mcq">
+                Multiple Choice
+              </option>
+
+            </select>
 
 
-          <input
-            id="qimage"
-            placeholder="Image URL (optional)"
-          >
+            <input
+              id="qtext"
+              placeholder="Question"
+            >
 
 
-          <div
-            id="questionOptions"
-          ></div>
+            <input
+              id="qimage"
+              placeholder="Image URL (optional)"
+            >
 
 
-          <input
-            id="qorder"
-            type="number"
-            min="1"
-            value="${next}"
-            placeholder="Order"
-          >
+            <div
+              id="questionOptions"
+            ></div>
 
 
-          <button
-            class="btn btn-green"
-            onclick="saveQuestion()"
-          >
-            Add Question
-          </button>
+            <input
+              id="qorder"
+              type="number"
+              min="1"
+              value="${next}"
+              placeholder="Order"
+            >
 
-        `;
+
+            <button
+              class="btn btn-green"
+              onclick="saveQuestion()"
+            >
+
+              Add Question
+
+            </button>
+
+          `;
 
 
-      changeQuestionType();
+        changeQuestionType();
+
+      }
 
     }
-    catch(e){
+    catch (e) {
 
-      $("questions")
-        .innerHTML=`
+      if ($("questions")) {
 
-          <div class="empty">
-            ${esc(e.message)}
-          </div>
+        $("questions")
+          .innerHTML = `
 
-        `;
+            <div class="empty">
+
+              ${esc(e.message)}
+
+            </div>
+
+          `;
+
+      }
 
     }
 
@@ -1230,25 +1625,27 @@ window.loadQuestions=
 
 
 // ==================================================
-// QUESTION TYPE UI
+// QUESTION TYPE
 // ==================================================
 
-window.changeQuestionType=
-  ()=>{
+window.changeQuestionType =
+  () => {
 
-    const type=
+    const type =
       $("questionType")?.value ||
       "tf";
 
-    const box=
+
+    const box =
       $("questionOptions");
 
-    if(!box)return;
+
+    if (!box) return;
 
 
-    if(type==="mcq"){
+    if (type === "mcq") {
 
-      box.innerHTML=`
+      box.innerHTML = `
 
         <h4>
           Multiple Choice Options
@@ -1256,48 +1653,58 @@ window.changeQuestionType=
 
 
         ${
-          ["A","B","C","D","E"]
-          .map(
-            k=>`
+          [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ]
+            .map(
+              k => `
 
-              <div
-                class="form-grid"
-                style="margin-bottom:8px"
-              >
-
-                <input
-                  id="t${k}"
-                  class="full"
-                  placeholder="Option ${k}"
+                <div
+                  class="form-grid"
+                  style="margin-bottom:8px"
                 >
 
-                <label>
                   <input
-                    type="radio"
-                    name="mcqCorrect"
-                    value="${k}"
-                    ${
-                      k==="A"
-                      ? "checked"
-                      : ""
-                    }
+                    id="t${k}"
+                    class="full"
+                    placeholder="Option ${k}"
                   >
-                  Correct Answer
-                </label>
 
-              </div>
 
-            `
-          )
-          .join("")
+                  <label>
+
+                    <input
+                      type="radio"
+                      name="mcqCorrect"
+                      value="${k}"
+                      ${
+                        k === "A"
+                          ? "checked"
+                          : ""
+                      }
+                    >
+
+                    Correct Answer
+
+                  </label>
+
+                </div>
+
+              `
+            )
+            .join("")
         }
 
       `;
 
     }
-    else{
+    else {
 
-      box.innerHTML=`
+      box.innerHTML = `
 
         <h4>
           Five Statements
@@ -1305,38 +1712,45 @@ window.changeQuestionType=
 
 
         ${
-          ["A","B","C","D","E"]
-          .map(
-            k=>`
+          [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+          ]
+            .map(
+              k => `
 
-              <div
-                class="form-grid"
-                style="margin-bottom:8px"
-              >
-
-                <input
-                  id="t${k}"
-                  class="full"
-                  placeholder="Statement ${k}"
+                <div
+                  class="form-grid"
+                  style="margin-bottom:8px"
                 >
 
-                <select id="c${k}">
+                  <input
+                    id="t${k}"
+                    class="full"
+                    placeholder="Statement ${k}"
+                  >
 
-                  <option value="true">
-                    TRUE
-                  </option>
 
-                  <option value="false">
-                    FALSE
-                  </option>
+                  <select id="c${k}">
 
-                </select>
+                    <option value="true">
+                      TRUE
+                    </option>
 
-              </div>
+                    <option value="false">
+                      FALSE
+                    </option>
 
-            `
-          )
-          .join("")
+                  </select>
+
+                </div>
+
+              `
+            )
+            .join("")
         }
 
       `;
@@ -1350,30 +1764,30 @@ window.changeQuestionType=
 // SAVE QUESTION
 // ==================================================
 
-window.saveQuestion=
-  async()=>{
+window.saveQuestion =
+  async () => {
 
-    const examId=
+    const examId =
       $("examSelect").value;
 
 
-    const type=
+    const type =
       $("questionType")?.value ||
       "tf";
 
 
-    const options={};
+    const options = {};
 
 
-    if(type==="mcq"){
+    if (type === "mcq") {
 
-      const selected=
+      const selected =
         document.querySelector(
           'input[name="mcqCorrect"]:checked'
         )?.value;
 
 
-      for(
+      for (
         const k of [
           "A",
           "B",
@@ -1381,26 +1795,26 @@ window.saveQuestion=
           "D",
           "E"
         ]
-      ){
+      ) {
 
-        options[k]={
+        options[k] = {
 
           text:
-            $("t"+k)
+            $("t" + k)
               .value
               .trim(),
 
           correct:
-            k===selected
+            k === selected
 
         };
 
       }
 
     }
-    else{
+    else {
 
-      for(
+      for (
         const k of [
           "A",
           "B",
@@ -1408,18 +1822,18 @@ window.saveQuestion=
           "D",
           "E"
         ]
-      ){
+      ) {
 
-        options[k]={
+        options[k] = {
 
           text:
-            $("t"+k)
+            $("t" + k)
               .value
               .trim(),
 
           correct:
-            $("c"+k)
-              .value==="true"
+            $("c" + k)
+              .value === "true"
 
         };
 
@@ -1428,16 +1842,16 @@ window.saveQuestion=
     }
 
 
-    if(
+    if (
       !$("qtext")
         .value
         .trim()
       ||
       Object.values(options)
         .some(
-          x=>!x.text
+          x => !x.text
         )
-    ){
+    ) {
 
       return alert(
         "Question and all options/statements are required."
@@ -1446,12 +1860,13 @@ window.saveQuestion=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/questions",
         {
-          method:"POST",
+
+          method: "POST",
 
           body:
             JSON.stringify({
@@ -1479,6 +1894,7 @@ window.saveQuestion=
               options
 
             })
+
         }
       );
 
@@ -1486,7 +1902,7 @@ window.saveQuestion=
       await loadQuestions();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -1499,25 +1915,27 @@ window.saveQuestion=
 // DELETE QUESTION
 // ==================================================
 
-window.deleteQuestion=
-  async id=>{
+window.deleteQuestion =
+  async id => {
 
-    if(
+    if (
       !confirm(
         "Delete this question?"
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/questions/"
-        +encodeURIComponent(id),
+        "/api/admin/questions/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
 
@@ -1525,7 +1943,7 @@ window.deleteQuestion=
       await loadQuestions();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -1538,179 +1956,161 @@ window.deleteQuestion=
 // VIEW RESULT
 // ==================================================
 
-window.viewResult=
-  async id=>{
+window.viewResult =
+  async id => {
 
-    try{
+    try {
 
-      const r=
+      const r =
         await api(
-          "/api/admin/results/"
-          +encodeURIComponent(id)
+          "/api/admin/results/" +
+          encodeURIComponent(id)
         );
 
 
-      const review=
+      const review =
         r.review || [];
 
 
-      const html=
+      const html =
         review
-        .map(
-          x=>{
+          .map(
+            x => {
 
-            const type=
-              x.type ||
-              "tf";
-
-
-            let optionsHtml="";
+              const type =
+                x.type ||
+                "tf";
 
 
-            if(type==="mcq"){
-
-              optionsHtml=
-                ["A","B","C","D","E"]
-                .map(
-                  k=>{
-
-                    const o=
-                      x.options?.[k] ||
-                      {};
-
-                    return `
-
-                      <div
-                        style="
-                          font-size:12px;
-                          margin-top:5px
-                        "
-                      >
-
-                        <b>${k}.</b>
-                        ${esc(o.text || "")}
-
-                        —
-
-                        Selected:
-                        ${
-                          o.selected
-                          ? "YES"
-                          : "NO"
-                        }
-
-                        ,
-
-                        Correct:
-                        ${
-                          o.correct
-                          ? "YES"
-                          : "NO"
-                        }
-
-                      </div>
-
-                    `;
-
-                  }
-                )
-                .join("");
-
-            }
-            else{
-
-              optionsHtml=
-                ["A","B","C","D","E"]
-                .map(
-                  k=>{
-
-                    const o=
-                      x.options?.[k] ||
-                      {};
-
-                    return `
-
-                      <div
-                        style="
-                          font-size:12px;
-                          margin-top:5px
-                        "
-                      >
-
-                        <b>${k}.</b>
-                        ${esc(o.text || "")}
-
-                        —
-
-                        Selected:
-                        ${
-                          o.selected
-                          ? "TRUE"
-                          : "FALSE"
-                        }
-
-                        ,
-
-                        Correct:
-                        ${
-                          o.correct
-                          ? "TRUE"
-                          : "FALSE"
-                        }
-
-                      </div>
-
-                    `;
-
-                  }
-                )
-                .join("");
-
-            }
+              let optionsHtml =
+                "";
 
 
-            return `
+              optionsHtml =
+                [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "E"
+                ]
+                  .map(
+                    k => {
 
-              <div
-                style="
-                  border:1px solid #ddd;
-                  border-radius:7px;
-                  padding:8px;
-                  margin:7px 0
-                "
-              >
+                      const o =
+                        x.options?.[k] ||
+                        {};
 
-                <b>
-                  Q${esc(x.number)}.
-                  ${esc(x.question)}
-                </b>
 
-                <div>
-                  Type:
-                  ${
-                    type==="mcq"
-                    ? "Multiple Choice"
-                    : "True / False"
-                  }
+                      return `
+
+                        <div
+                          style="
+                            font-size:12px;
+                            margin-top:5px
+                          "
+                        >
+
+                          <b>
+                            ${k}.
+                          </b>
+
+                          ${esc(
+                            o.text || ""
+                          )}
+
+                          —
+
+                          Selected:
+
+                          ${
+                            o.selected
+                              ? "YES"
+                              : "NO"
+                          }
+
+                          ,
+
+                          Correct:
+
+                          ${
+                            o.correct
+                              ? "YES"
+                              : "NO"
+                          }
+
+                        </div>
+
+                      `;
+
+                    }
+                  )
+                  .join("");
+
+
+              return `
+
+                <div
+                  style="
+                    border:1px solid #ddd;
+                    border-radius:7px;
+                    padding:8px;
+                    margin:7px 0
+                  "
+                >
+
+                  <b>
+
+                    Q${esc(
+                      x.number
+                    )}.
+
+                    ${esc(
+                      x.question
+                    )}
+
+                  </b>
+
+
+                  <div>
+
+                    Type:
+
+                    ${
+                      type === "mcq"
+                        ? "Multiple Choice"
+                        : "True / False"
+                    }
+
+                  </div>
+
+
+                  ${optionsHtml}
+
                 </div>
 
-                ${optionsHtml}
+              `;
 
-              </div>
-
-            `;
-
-          }
-        )
-        .join("");
+            }
+          )
+          .join("");
 
 
-      const box=
+      const box =
         window.open(
           "",
           "_blank",
           "width=600,height=750"
         );
+
+
+      if (!box) {
+
+        return alert(
+          "Please allow pop-ups to view the result."
+        );
+
+      }
 
 
       box.document.write(`
@@ -1723,20 +2123,28 @@ window.viewResult=
             SEVEN NURSES Result
           </title>
 
+
           <style>
 
             body{
+
               font-family:Arial;
-              padding:16px
+
+              padding:16px;
+
             }
 
+
             h2{
-              color:#0056b3
+
+              color:#0056b3;
+
             }
 
           </style>
 
         </head>
+
 
         <body>
 
@@ -1746,33 +2154,48 @@ window.viewResult=
 
 
           <b>Student:</b>
-          ${esc(r.studentName)}
+
+          ${esc(
+            r.studentName
+          )}
 
           <br>
 
 
           <b>Exam:</b>
-          ${esc(r.examTitle)}
+
+          ${esc(
+            r.examTitle
+          )}
 
           <br>
 
 
           <b>Score:</b>
+
           ${esc(r.score)}
           /
           ${esc(r.total)}
 
           ·
+
           ${esc(r.grade)}
 
           ·
+
           ${esc(r.status)}
 
           ·
+
           Rank
-          ${esc(r.rank || "-")}
+
+          ${esc(
+            r.rank || "-"
+          )}
+
 
           <hr>
+
 
           ${html}
 
@@ -1786,7 +2209,7 @@ window.viewResult=
       box.document.close();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -1799,13 +2222,13 @@ window.viewResult=
 // SAVE SETTINGS
 // ==================================================
 
-window.saveSettings=
-  async()=>{
+window.saveSettings =
+  async () => {
 
-    const b={};
+    const b = {};
 
 
-    for(
+    for (
       const k of [
         "siteName",
         "headerTitle",
@@ -1816,25 +2239,31 @@ window.saveSettings=
         "footerText",
         "commonExamPin"
       ]
-    ){
+    ) {
 
-      b[k]=
-        $(k)
-          .value
-          .trim();
+      if ($(k)) {
+
+        b[k] =
+          $(k)
+            .value
+            .trim();
+
+      }
 
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/settings",
         {
-          method:"PUT",
+
+          method: "PUT",
 
           body:
             JSON.stringify(b)
+
         }
       );
 
@@ -1847,7 +2276,7 @@ window.saveSettings=
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
       alert(e.message);
 
@@ -1860,40 +2289,40 @@ window.saveSettings=
 // CHANGE PASSWORD
 // ==================================================
 
-window.changePassword=
-  async()=>{
+window.changePassword =
+  async () => {
 
-    const oldP=
+    const oldP =
       $("oldPass").value;
 
-    const newP=
+    const newP =
       $("newPass").value;
 
-    const newP2=
+    const newP2 =
       $("newPass2").value;
 
 
-    if(newP.length<6){
+    if (newP.length < 6) {
 
       return $("passMsg")
-        .textContent=
+        .textContent =
           "New password must be at least 6 characters.";
 
     }
 
 
-    if(newP!==newP2){
+    if (newP !== newP2) {
 
       return $("passMsg")
-        .textContent=
+        .textContent =
           "New passwords do not match.";
 
     }
 
 
-    try{
+    try {
 
-      const cred=
+      const cred =
         EmailAuthProvider.credential(
           auth.currentUser.email,
           oldP
@@ -1913,19 +2342,20 @@ window.changePassword=
 
 
       $("passMsg")
-        .textContent=
+        .textContent =
           "Password changed successfully.";
 
 
-      $("oldPass").value=
-      $("newPass").value=
-      $("newPass2").value="";
+      $("oldPass").value =
+      $("newPass").value =
+      $("newPass2").value =
+        "";
 
     }
-    catch(e){
+    catch (e) {
 
       $("passMsg")
-        .textContent=
+        .textContent =
           e.message ||
           "Password change failed.";
 
@@ -1938,35 +2368,35 @@ window.changePassword=
 // ADMIN PUSH NOTIFICATION
 // ==================================================
 
-async function registerPush(){
+async function registerPush() {
 
-  try{
+  try {
 
-    if(
+    if (
       !("serviceWorker" in navigator)
-    ){
+    ) {
 
       return;
 
     }
 
 
-    const mod=
+    const mod =
       await import(
         "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js"
       );
 
 
-    if(
+    if (
       !mod.isSupported()
-    ){
+    ) {
 
       return;
 
     }
 
 
-    const registration=
+    const registration =
       await navigator
         .serviceWorker
         .register(
@@ -1974,41 +2404,45 @@ async function registerPush(){
         );
 
 
-    const messaging=
+    const messaging =
       mod.getMessaging();
 
 
-    const token=
+    const token =
       await mod.getToken(
         messaging,
         {
+
           vapidKey:
             FCM_VAPID_KEY,
 
           serviceWorkerRegistration:
             registration
+
         }
       );
 
 
-    if(token){
+    if (token) {
 
       await api(
         "/api/admin/fcm-token",
         {
-          method:"POST",
+
+          method: "POST",
 
           body:
             JSON.stringify({
               token
             })
+
         }
       );
 
     }
 
   }
-  catch(e){
+  catch (e) {
 
     console.log(
       "FCM skipped:",
@@ -2017,4 +2451,4 @@ async function registerPush(){
 
   }
 
-}
+            }
