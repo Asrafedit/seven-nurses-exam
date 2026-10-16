@@ -17,4 +17,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
 
-export { app, auth, analytics, firebaseConfig };
+// Keep this export because admin.js imports it.
+const FCM_VAPID_KEY = "";
+
+export {
+  app,
+  auth,
+  analytics,
+  firebaseConfig,
+  FCM_VAPID_KEY
+};
