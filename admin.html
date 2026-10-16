@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="bn">
+<html lang="en">
 
 <head>
 
@@ -21,11 +21,9 @@ href="/style.css"
 
 </head>
 
-
 <body>
 
 <div class="admin-shell">
-
 
 <header class="header">
 
@@ -33,10 +31,19 @@ href="/style.css"
 
     <div class="logo-wrap">
 
+      <input
+        id="logoFile"
+        type="file"
+        accept="image/*"
+        hidden
+      >
+
       <img
         id="adminLogo"
         class="logo"
         alt="Logo"
+        title="Click to change logo"
+        style="cursor:pointer"
       >
 
     </div>
@@ -110,7 +117,7 @@ class="card"
     id="loginMsg"
     class="login-note"
   >
-    Firebase Authentication দিয়ে Admin Login করুন।
+    Sign in with Firebase Authentication.
   </div>
 
 
