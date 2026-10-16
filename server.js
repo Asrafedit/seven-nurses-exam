@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json({ limit: '2mb' }));
 
 // ==================================================
-// Firebase Admin
+// FIREBASE ADMIN
 // ==================================================
 
 let serviceAccount;
@@ -44,7 +44,7 @@ const ADMIN_UID =
 const ROOT = __dirname;
 
 // ==================================================
-// Helpers
+// HELPERS
 // ==================================================
 
 const clean = (v) =>
@@ -62,10 +62,11 @@ const vals = (x) =>
   );
 
 // ==================================================
-// Student Token
+// STUDENT TOKEN
 // ==================================================
 
 function studentToken(student) {
+
   return jwt.sign(
     {
       type: 'student',
@@ -77,10 +78,11 @@ function studentToken(student) {
       expiresIn: '12h'
     }
   );
+
 }
 
 // ==================================================
-// Student Authentication
+// STUDENT AUTH
 // ==================================================
 
 function requireStudent(
@@ -88,6 +90,7 @@ function requireStudent(
   res,
   next
 ) {
+
   try {
 
     const token =
@@ -108,16 +111,20 @@ function requireStudent(
       decoded.type !==
       'student'
     ) {
+
       throw new Error(
         'Invalid student'
       );
+
     }
 
-    req.student = decoded;
+    req.student =
+      decoded;
 
     next();
 
-  } catch (e) {
+  }
+  catch (e) {
 
     res.status(401).json({
       error:
@@ -125,10 +132,11 @@ function requireStudent(
     });
 
   }
+
 }
 
 // ==================================================
-// Admin Authentication
+// ADMIN AUTH
 // ==================================================
 
 async function requireAdmin(
@@ -151,7 +159,9 @@ async function requireAdmin(
     const decoded =
       await admin
         .auth()
-        .verifyIdToken(token);
+        .verifyIdToken(
+          token
+        );
 
     if (
       decoded.uid !==
@@ -167,11 +177,13 @@ async function requireAdmin(
 
     }
 
-    req.admin = decoded;
+    req.admin =
+      decoded;
 
     next();
 
-  } catch (e) {
+  }
+  catch (e) {
 
     res.status(401).json({
       error:
@@ -183,7 +195,7 @@ async function requireAdmin(
 }
 
 // ==================================================
-// Admin FCM Tokens
+// ADMIN FCM TOKENS
 // ==================================================
 
 async function getAdminTokens() {
@@ -202,7 +214,7 @@ async function getAdminTokens() {
 }
 
 // ==================================================
-// Push Notification
+// PUSH NOTIFICATION
 // ==================================================
 
 async function pushAdmin(
@@ -246,15 +258,18 @@ async function pushAdmin(
           ),
 
         webpush: {
+
           fcmOptions: {
             link:
               '/admin.html'
           }
+
         }
 
       });
 
-  } catch (e) {
+  }
+  catch (e) {
 
     console.error(
       'FCM error:',
@@ -315,7 +330,8 @@ app.get(
 
       });
 
-    } catch (e) {
+    }
+    catch (e) {
 
       console.error(e);
 
@@ -340,10 +356,14 @@ app.post(
     try {
 
       const name =
-        clean(req.body.name);
+        clean(
+          req.body.name
+        );
 
       const pin =
-        clean(req.body.pin);
+        clean(
+          req.body.pin
+        );
 
       if (!name || !pin) {
 
@@ -393,25 +413,28 @@ app.post(
 
       let student = null;
 
-      snap.forEach((v) => {
+      snap.forEach(
+        (v) => {
 
-        if (
-          v.val()?.active !==
-          false
-        ) {
+          if (
+            v.val()?.active !==
+            false
+          ) {
 
-          student = {
+            student = {
 
-            id: v.key,
+              id:
+                v.key,
 
-            name:
-              v.val().name
+              name:
+                v.val().name
 
-          };
+            };
+
+          }
 
         }
-
-      });
+      );
 
       if (!student) {
 
@@ -427,13 +450,16 @@ app.post(
       res.json({
 
         token:
-          studentToken(student),
+          studentToken(
+            student
+          ),
 
         student
 
       });
 
-    } catch (e) {
+    }
+    catch (e) {
 
       console.error(e);
 
@@ -449,6 +475,7 @@ app.post(
 
 // ==================================================
 // STUDENT EXAMS
+// ONLY ACTIVE EXAMS
 // ==================================================
 
 app.get(
@@ -467,7 +494,7 @@ app.get(
           ).val()
         )
           .filter(
-            e =>
+            (e) =>
               e.active !==
               false
           )
@@ -479,7 +506,7 @@ app.get(
 
       res.json(
         exams.map(
-          e => ({
+          (e) => ({
 
             id:
               e.id,
@@ -498,19 +525,23 @@ app.get(
               0,
 
             order:
-              e.order || 0
+              e.order || 0,
+
+            active:
+              e.active !== false
 
           })
         )
       );
 
-    } catch (e) {
+    }
+    catch (e) {
 
       console.error(e);
 
       res.status(500).json({
         error:
-          'Exam loading failed'
+          'Failed to load examinations'
       });
 
     }
@@ -520,6 +551,8 @@ app.get(
 
 // ==================================================
 // STUDENT EXAM QUESTIONS
+// CORRECT ANSWERS HIDDEN
+// SUPPORT TRUE/FALSE + MCQ
 // ==================================================
 
 app.get(
@@ -540,15 +573,14 @@ app.get(
 
       if (
         !exam ||
-        exam.active ===
-          false
+        exam.active === false
       ) {
 
         return res
           .status(404)
           .json({
             error:
-              'Exam not found'
+              'Exam is not active'
           });
 
       }
@@ -566,130 +598,12 @@ app.get(
               )
               .once('value')
           ).val()
-        ).sort(
-          (a, b) =>
-            (a.order || 0) -
-            (b.order || 0)
-        );
-
-      const safeQuestions =
-        questions.map(
-          q => {
-
-            const type =
-              q.type ||
-              'tf';
-
-            // ------------------------------------------
-            // Multiple Choice
-            // ------------------------------------------
-
-            if (
-              type === 'mcq'
-            ) {
-
-              return {
-
-                id:
-                  q.id,
-
-                type:
-                  'mcq',
-
-                question:
-                  q.question,
-
-                imageUrl:
-                  q.imageUrl ||
-                  '',
-
-                order:
-                  q.order || 0,
-
-                options:
-                  Object.fromEntries(
-
-                    [
-                      'A',
-                      'B',
-                      'C',
-                      'D',
-                      'E'
-                    ].map(
-                      k => [
-
-                        k,
-
-                        {
-                          text:
-                            q.options
-                              ?.[k]
-                              ?.text ||
-                            ''
-                        }
-
-                      ]
-                    )
-
-                  )
-
-              };
-
-            }
-
-            // ------------------------------------------
-            // True / False
-            // ------------------------------------------
-
-            return {
-
-              id:
-                q.id,
-
-              type:
-                'tf',
-
-              question:
-                q.question,
-
-              imageUrl:
-                q.imageUrl ||
-                '',
-
-              order:
-                q.order || 0,
-
-              options:
-                Object.fromEntries(
-
-                  [
-                    'A',
-                    'B',
-                    'C',
-                    'D',
-                    'E'
-                  ].map(
-                    k => [
-
-                      k,
-
-                      {
-                        text:
-                          q.options
-                            ?.[k]
-                            ?.text ||
-                          ''
-                      }
-
-                    ]
-                  )
-
-                )
-
-            };
-
-          }
-        );
+        )
+          .sort(
+            (a, b) =>
+              (a.order || 0) -
+              (b.order || 0)
+          );
 
       res.json({
 
@@ -715,17 +629,118 @@ app.get(
         },
 
         questions:
-          safeQuestions
+
+          questions.map(
+            (q) => {
+
+              const type =
+                q.type ||
+                'tf';
+
+              if (
+                type === 'mcq'
+              ) {
+
+                return {
+
+                  id:
+                    q.id,
+
+                  type:
+                    'mcq',
+
+                  question:
+                    q.question,
+
+                  imageUrl:
+                    q.imageUrl ||
+                    '',
+
+                  order:
+                    q.order ||
+                    0,
+
+                  options:
+                    Object.fromEntries(
+                      [
+                        'A',
+                        'B',
+                        'C',
+                        'D'
+                      ].map(
+                        (k) => [
+                          k,
+                          {
+                            text:
+                              q.options
+                                ?.[k]
+                                ?.text ||
+                              ''
+                          }
+                        ]
+                      )
+                    )
+
+                };
+
+              }
+
+              return {
+
+                id:
+                  q.id,
+
+                type:
+                  'tf',
+
+                question:
+                  q.question,
+
+                imageUrl:
+                  q.imageUrl ||
+                  '',
+
+                order:
+                  q.order ||
+                  0,
+
+                options:
+                  Object.fromEntries(
+                    [
+                      'A',
+                      'B',
+                      'C',
+                      'D',
+                      'E'
+                    ].map(
+                      (k) => [
+                        k,
+                        {
+                          text:
+                            q.options
+                              ?.[k]
+                              ?.text ||
+                            ''
+                        }
+                      ]
+                    )
+                  )
+
+              };
+
+            }
+          )
 
       });
 
-    } catch (e) {
+    }
+    catch (e) {
 
       console.error(e);
 
       res.status(500).json({
         error:
-          'Question loading failed'
+          'Failed to load exam'
       });
 
     }
@@ -747,7 +762,8 @@ app.post(
       const {
         examId,
         answers
-      } = req.body || {};
+      } =
+        req.body || {};
 
       const exam =
         (
@@ -769,6 +785,19 @@ app.post(
 
       }
 
+      if (
+        exam.active === false
+      ) {
+
+        return res
+          .status(403)
+          .json({
+            error:
+              'This examination is closed'
+          });
+
+      }
+
       const questions =
         vals(
           (
@@ -777,14 +806,17 @@ app.post(
               .orderByChild(
                 'examId'
               )
-              .equalTo(examId)
+              .equalTo(
+                examId
+              )
               .once('value')
           ).val()
-        ).sort(
-          (a, b) =>
-            (a.order || 0) -
-            (b.order || 0)
-        );
+        )
+          .sort(
+            (a, b) =>
+              (a.order || 0) -
+              (b.order || 0)
+          );
 
       let score = 0;
 
@@ -799,40 +831,38 @@ app.post(
               q.type ||
               'tf';
 
-            let isCorrect =
-              false;
-
-            // ==========================================
-            // MCQ CHECK
-            // ==========================================
+            // =====================
+            // MCQ
+            // =====================
 
             if (
               type === 'mcq'
             ) {
 
-              const correctAnswer =
+              const selected =
+                clean(
+                  given
+                ).toUpperCase();
+
+              const correct =
                 Object.keys(
-                  q.options || {}
+                  q.options ||
+                  {}
                 ).find(
-                  key =>
-                    q.options?.[key]
-                      ?.correct === true
-                );
+                  (key) =>
+                    q.options
+                      ?.[key]
+                      ?.correct ===
+                    true
+                ) || '';
 
-              const selectedAnswer =
-                typeof given ===
-                'string'
-                  ? given
-                  : given?.selected;
+              const isCorrect =
+                selected ===
+                correct;
 
-              isCorrect =
-                Boolean(
-                  selectedAnswer
-                ) &&
-                selectedAnswer ===
-                  correctAnswer;
-
-              if (isCorrect) {
+              if (
+                isCorrect
+              ) {
                 score++;
               }
 
@@ -849,54 +879,38 @@ app.post(
 
                 options:
                   Object.fromEntries(
-
                     [
                       'A',
                       'B',
                       'C',
-                      'D',
-                      'E'
+                      'D'
                     ].map(
-                      k => {
+                      (k) => {
 
                         const o =
-                          q.options?.[k] ||
+                          q.options
+                            ?.[k] ||
                           {};
 
                         return [
-
                           k,
-
                           {
-
                             text:
                               o.text ||
                               '',
 
                             selected:
-                              selectedAnswer ===
+                              selected ===
                               k,
 
                             correct:
-                              o.correct ===
-                              true
-
+                              !!o.correct
                           }
-
                         ];
 
                       }
                     )
-
                   ),
-
-                selectedAnswer:
-                  selectedAnswer ||
-                  '',
-
-                correctAnswer:
-                  correctAnswer ||
-                  '',
 
                 isCorrect
 
@@ -904,17 +918,17 @@ app.post(
 
             }
 
-            // ==========================================
-            // TRUE / FALSE CHECK
-            // ==========================================
+            // =====================
+            // TRUE / FALSE
+            // =====================
 
             const givenTF =
               given || {};
 
+            const correct = {};
+
             let allCorrect =
               true;
-
-            const correct = {};
 
             for (
               const k of [
@@ -945,7 +959,9 @@ app.post(
 
             }
 
-            if (allCorrect) {
+            if (
+              allCorrect
+            ) {
               score++;
             }
 
@@ -962,7 +978,6 @@ app.post(
 
               options:
                 Object.fromEntries(
-
                   [
                     'A',
                     'B',
@@ -970,7 +985,7 @@ app.post(
                     'D',
                     'E'
                   ].map(
-                    k => [
+                    (k) => [
 
                       k,
 
@@ -994,7 +1009,6 @@ app.post(
 
                     ]
                   )
-
                 ),
 
               isCorrect:
@@ -1042,25 +1056,21 @@ app.post(
           ? 'PASS'
           : 'FAIL';
 
-      // ==========================================
-      // IDs
-      // ==========================================
-
       const submissionId =
         db
-          .ref('submissions')
+          .ref(
+            'submissions'
+          )
           .push()
           .key;
 
       const resultId =
         db
-          .ref('results')
+          .ref(
+            'results'
+          )
           .push()
           .key;
-
-      // ==========================================
-      // Result Base
-      // ==========================================
 
       const base = {
 
@@ -1095,10 +1105,6 @@ app.post(
 
       };
 
-      // ==========================================
-      // Save Submission
-      // ==========================================
-
       await db
         .ref(
           `submissions/${submissionId}`
@@ -1111,19 +1117,15 @@ app.post(
 
         });
 
-      // ==========================================
-      // Save Result
-      // ==========================================
-
       await db
         .ref(
           `results/${resultId}`
         )
         .set(base);
 
-      // ==========================================
-      // Rank
-      // ==========================================
+      // =========================
+      // RANK
+      // =========================
 
       const all =
         vals(
@@ -1133,20 +1135,23 @@ app.post(
               .orderByChild(
                 'examId'
               )
-              .equalTo(examId)
+              .equalTo(
+                examId
+              )
               .once('value')
           ).val()
-        ).sort(
-          (a, b) =>
-            b.score -
-              a.score ||
-            a.submittedAt -
-              b.submittedAt
-        );
+        )
+          .sort(
+            (a, b) =>
+              b.score -
+                a.score ||
+              a.submittedAt -
+                b.submittedAt
+          );
 
       const rank =
         all.findIndex(
-          r =>
+          (r) =>
             r.id ===
             resultId
         ) + 1;
@@ -1160,9 +1165,9 @@ app.post(
         )
         .set(rank);
 
-      // ==========================================
-      // Admin Notification
-      // ==========================================
+      // =========================
+      // ADMIN NOTIFICATION
+      // =========================
 
       const notificationId =
         db
@@ -1215,10 +1220,6 @@ app.post(
 
         });
 
-      // ==========================================
-      // Push Admin Notification
-      // ==========================================
-
       await pushAdmin(
 
         'New Exam Submission',
@@ -1262,7 +1263,8 @@ app.post(
 
       });
 
-    } catch (e) {
+    }
+    catch (e) {
 
       console.error(e);
 
@@ -1285,46 +1287,45 @@ app.get(
   requireStudent,
   async (req, res) => {
 
-    try {
+    const result =
+      (
+        await db
+          .ref(
+            `results/${req.params.id}`
+          )
+          .once('value')
+      ).val();
 
-      const result =
+    if (
+      !result ||
+      result.studentId !==
+      req.student.studentId
+    ) {
+
+      return res
+        .status(404)
+        .json({
+          error:
+            'Result not found'
+        });
+
+    }
+
+    const all =
+      vals(
         (
           await db
-            .ref(
-              `results/${req.params.id}`
+            .ref('results')
+            .orderByChild(
+              'examId'
+            )
+            .equalTo(
+              result.examId
             )
             .once('value')
-        ).val();
-
-      if (
-        !result ||
-        result.studentId !==
-          req.student.studentId
-      ) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'Result not found'
-          });
-
-      }
-
-      const all =
-        vals(
-          (
-            await db
-              .ref('results')
-              .orderByChild(
-                'examId'
-              )
-              .equalTo(
-                result.examId
-              )
-              .once('value')
-          ).val()
-        ).sort(
+        ).val()
+      )
+        .sort(
           (a, b) =>
             b.score -
               a.score ||
@@ -1332,34 +1333,23 @@ app.get(
               b.submittedAt
         );
 
-      const rank =
-        all.findIndex(
-          x =>
-            x.id ===
-            req.params.id
-        ) + 1;
+    const rank =
+      all.findIndex(
+        (x) =>
+          x.id ===
+          req.params.id
+      ) + 1;
 
-      res.json({
+    res.json({
 
-        ...result,
+      ...result,
 
-        rank,
+      rank,
 
-        totalExaminees:
-          all.length
+      totalExaminees:
+        all.length
 
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Result loading failed'
-      });
-
-    }
+    });
 
   }
 );
@@ -1373,37 +1363,23 @@ app.get(
   requireStudent,
   async (req, res) => {
 
-    try {
+    const x =
+      (
+        await db
+          .ref(
+            `notifications/students/${req.student.studentId}`
+          )
+          .once('value')
+      ).val() || {};
 
-      const x =
-        (
-          await db
-            .ref(
-              `notifications/students/${req.student.studentId}`
-            )
-            .once('value')
-        ).val() || {};
-
-      res.json(
-
-        vals(x).sort(
+    res.json(
+      vals(x)
+        .sort(
           (a, b) =>
             (b.createdAt || 0) -
             (a.createdAt || 0)
         )
-
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Notification loading failed'
-      });
-
-    }
+    );
 
   }
 );
@@ -1417,37 +1393,24 @@ app.post(
   requireStudent,
   async (req, res) => {
 
-    try {
+    const token =
+      clean(
+        req.body.token
+      );
 
-      const token =
-        clean(
-          req.body.token
-        );
+    if (token) {
 
-      if (token) {
-
-        await db
-          .ref(
-            `students/${req.student.studentId}/fcmTokens`
-          )
-          .push(token);
-
-      }
-
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'FCM token save failed'
-      });
+      await db
+        .ref(
+          `students/${req.student.studentId}/fcmTokens`
+        )
+        .push(token);
 
     }
+
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -1461,52 +1424,39 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const [
+      students,
+      exams,
+      results
+    ] =
+      await Promise.all([
 
-      const [
-        students,
-        exams,
-        results
-      ] =
-        await Promise.all([
+        db
+          .ref('students')
+          .once('value'),
 
-          db
-            .ref('students')
-            .once('value'),
+        db
+          .ref('exams')
+          .once('value'),
 
-          db
-            .ref('exams')
-            .once('value'),
+        db
+          .ref('results')
+          .once('value')
 
-          db
-            .ref('results')
-            .once('value')
+      ]);
 
-        ]);
+    res.json({
 
-      res.json({
+      students:
+        students.numChildren(),
 
-        students:
-          students.numChildren(),
+      exams:
+        exams.numChildren(),
 
-        exams:
-          exams.numChildren(),
+      results:
+        results.numChildren()
 
-        results:
-          results.numChildren()
-
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Stats failed'
-      });
-
-    }
+    });
 
   }
 );
@@ -1520,28 +1470,15 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    res.json(
 
-      res.json(
+      (
+        await db
+          .ref('settings')
+          .once('value')
+      ).val() || {}
 
-        (
-          await db
-            .ref('settings')
-            .once('value')
-        ).val() || {}
-
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Settings loading failed'
-      });
-
-    }
+    );
 
   }
 );
@@ -1551,66 +1488,54 @@ app.put(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const allowed = [
 
-      const allowed = [
+      'siteName',
 
-        'siteName',
+      'headerTitle',
 
-        'headerTitle',
+      'subtitle',
 
-        'subtitle',
+      'logoUrl',
 
-        'logoUrl',
+      'backgroundUrl',
 
-        'backgroundUrl',
+      'notice',
 
-        'notice',
+      'footerText',
 
-        'footerText',
+      'commonExamPin',
 
-        'commonExamPin',
+      'passMarkDefault'
 
-        'passMarkDefault'
+    ];
 
-      ];
+    const out = {};
 
-      const out = {};
+    for (
+      const key
+      of allowed
+    ) {
 
-      for (
-        const key of allowed
+      if (
+        req.body?.[key] !==
+        undefined
       ) {
 
-        if (
-          req.body?.[key] !==
-          undefined
-        ) {
-
-          out[key] =
-            req.body[key];
-
-        }
+        out[key] =
+          req.body[key];
 
       }
 
-      await db
-        .ref('settings')
-        .update(out);
-
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Settings save failed'
-      });
-
     }
+
+    await db
+      .ref('settings')
+      .update(out);
+
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -1624,35 +1549,25 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    res.json(
 
-      res.json(
+      vals(
 
-        vals(
-          (
-            await db
-              .ref('students')
-              .once('value')
-          ).val()
-        ).sort(
+        (
+          await db
+            .ref('students')
+            .once('value')
+        ).val()
+
+      )
+        .sort(
           (a, b) =>
             a.name.localeCompare(
               b.name
             )
         )
 
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Students loading failed'
-      });
-
-    }
+    );
 
   }
 );
@@ -1662,62 +1577,49 @@ app.post(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const name =
+      clean(
+        req.body.name
+      );
 
-      const name =
-        clean(
-          req.body.name
-        );
+    if (!name) {
 
-      if (!name) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              'Name required'
-          });
-
-      }
-
-      const id =
-        req.body.id ||
-        db
-          .ref('students')
-          .push()
-          .key;
-
-      await db
-        .ref(
-          `students/${id}`
-        )
-        .update({
-
-          name,
-
-          nameLower:
-            name.toLowerCase(),
-
-          active:
-            req.body.active !==
-            false
-
+      return res
+        .status(400)
+        .json({
+          error:
+            'Name required'
         });
 
-      res.json({
-        id
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Student save failed'
-      });
-
     }
+
+    const id =
+      req.body.id ||
+      db
+        .ref('students')
+        .push()
+        .key;
+
+    await db
+      .ref(
+        `students/${id}`
+      )
+      .update({
+
+        name,
+
+        nameLower:
+          name.toLowerCase(),
+
+        active:
+          req.body.active !==
+          false
+
+      });
+
+    res.json({
+      id
+    });
 
   }
 );
@@ -1727,28 +1629,15 @@ app.delete(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    await db
+      .ref(
+        `students/${req.params.id}`
+      )
+      .remove();
 
-      await db
-        .ref(
-          `students/${req.params.id}`
-        )
-        .remove();
-
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Student delete failed'
-      });
-
-    }
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -1762,163 +1651,263 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    res.json(
 
-      res.json(
+      vals(
 
-        vals(
-          (
-            await db
-              .ref('exams')
-              .once('value')
-          ).val()
-        ).sort(
+        (
+          await db
+            .ref('exams')
+            .once('value')
+        ).val()
+
+      )
+        .sort(
           (a, b) =>
             (a.order || 0) -
             (b.order || 0)
         )
 
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Exams loading failed'
-      });
-
-    }
+    );
 
   }
 );
+
+// ==================================================
+// CREATE EXAM
+// ==================================================
 
 app.post(
   '/api/admin/exams',
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const b =
+      req.body || {};
 
-      const b =
-        req.body || {};
+    const id =
+      b.id ||
+      db
+        .ref('exams')
+        .push()
+        .key;
 
-      const id =
-        b.id ||
-        db
-          .ref('exams')
-          .push()
-          .key;
+    await db
+      .ref(
+        `exams/${id}`
+      )
+      .set({
 
+        title:
+          clean(
+            b.title
+          ),
+
+        duration:
+          Number(
+            b.duration
+          ) || 30,
+
+        passMark:
+          Number(
+            b.passMark ??
+            40
+          ),
+
+        active:
+          b.active !== false,
+
+        order:
+          Number(
+            b.order
+          ) || 0,
+
+        totalQuestions:
+          Number(
+            b.totalQuestions
+          ) || 0
+
+      });
+
+    res.json({
+      id
+    });
+
+  }
+);
+
+// ==================================================
+// UPDATE EXAM
+// TURN EXAM ON/OFF
+// ==================================================
+
+app.put(
+  '/api/admin/exams/:id',
+  requireAdmin,
+  async (req, res) => {
+
+    const id =
+      req.params.id;
+
+    const snap =
       await db
         .ref(
           `exams/${id}`
         )
-        .set({
+        .once('value');
 
-          title:
-            clean(b.title),
+    if (!snap.exists()) {
 
-          duration:
-            Number(
-              b.duration
-            ) || 30,
-
-          passMark:
-            Number(
-              b.passMark ??
-              40
-            ),
-
-          active:
-            b.active !== false,
-
-          order:
-            Number(
-              b.order
-            ) || 0,
-
-          totalQuestions:
-            Number(
-              b.totalQuestions
-            ) || 0
-
+      return res
+        .status(404)
+        .json({
+          error:
+            'Examination not found'
         });
-
-      res.json({
-        id
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Exam save failed'
-      });
 
     }
 
+    const b =
+      req.body || {};
+
+    const update = {};
+
+    if (
+      b.title !==
+      undefined
+    ) {
+
+      update.title =
+        clean(
+          b.title
+        );
+
+    }
+
+    if (
+      b.duration !==
+      undefined
+    ) {
+
+      update.duration =
+        Number(
+          b.duration
+        ) || 30;
+
+    }
+
+    if (
+      b.passMark !==
+      undefined
+    ) {
+
+      update.passMark =
+        Number(
+          b.passMark
+        );
+
+    }
+
+    if (
+      b.active !==
+      undefined
+    ) {
+
+      update.active =
+        Boolean(
+          b.active
+        );
+
+    }
+
+    if (
+      b.order !==
+      undefined
+    ) {
+
+      update.order =
+        Number(
+          b.order
+        ) || 0;
+
+    }
+
+    if (
+      b.totalQuestions !==
+      undefined
+    ) {
+
+      update.totalQuestions =
+        Number(
+          b.totalQuestions
+        ) || 0;
+
+    }
+
+    await db
+      .ref(
+        `exams/${id}`
+      )
+      .update(update);
+
+    res.json({
+      ok: true,
+      id
+    });
+
   }
 );
+
+// ==================================================
+// DELETE EXAM
+// ALSO DELETE QUESTIONS
+// ==================================================
 
 app.delete(
   '/api/admin/exams/:id',
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const examId =
+      req.params.id;
 
-      await db
-        .ref(
-          `exams/${req.params.id}`
-        )
-        .remove();
+    await db
+      .ref(
+        `exams/${examId}`
+      )
+      .remove();
 
-      const questions =
-        (
-          await db
-            .ref('questions')
-            .orderByChild(
-              'examId'
+    const questions =
+      (
+        await db
+          .ref('questions')
+          .orderByChild(
+            'examId'
+          )
+          .equalTo(
+            examId
+          )
+          .once('value')
+      ).val() || {};
+
+    await Promise.all(
+
+      Object.keys(
+        questions
+      ).map(
+        (id) =>
+          db
+            .ref(
+              `questions/${id}`
             )
-            .equalTo(
-              req.params.id
-            )
-            .once('value')
-        ).val() || {};
+            .remove()
+      )
 
-      await Promise.all(
+    );
 
-        Object.keys(
-          questions
-        ).map(
-          id =>
-            db
-              .ref(
-                `questions/${id}`
-              )
-              .remove()
-        )
-
-      );
-
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Exam delete failed'
-      });
-
-    }
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -1932,50 +1921,36 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const questions =
+      (
+        await db
+          .ref('questions')
+          .orderByChild(
+            'examId'
+          )
+          .equalTo(
+            req.params.examId
+          )
+          .once('value')
+      ).val();
 
-      const questions =
-        (
-          await db
-            .ref('questions')
-            .orderByChild(
-              'examId'
-            )
-            .equalTo(
-              req.params.examId
-            )
-            .once('value')
-        ).val();
+    res.json(
 
-      res.json(
-
-        vals(questions).sort(
+      vals(questions)
+        .sort(
           (a, b) =>
             (a.order || 0) -
             (b.order || 0)
         )
 
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Questions loading failed'
-      });
-
-    }
+    );
 
   }
 );
 
 // ==================================================
-// ADMIN ADD QUESTION
-// Supports:
-// 1. tf
-// 2. mcq
+// ADD QUESTION
+// TRUE/FALSE + MCQ
 // ==================================================
 
 app.post(
@@ -1983,169 +1958,130 @@ app.post(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const b =
+      req.body || {};
 
-      const b =
-        req.body || {};
+    const id =
+      b.id ||
+      db
+        .ref('questions')
+        .push()
+        .key;
 
-      const id =
-        b.id ||
-        db
-          .ref('questions')
-          .push()
-          .key;
+    const type =
+      b.type === 'mcq'
+        ? 'mcq'
+        : 'tf';
 
-      const type =
-        b.type === 'mcq'
-          ? 'mcq'
-          : 'tf';
+    const keys =
+      type === 'mcq'
+        ? [
+            'A',
+            'B',
+            'C',
+            'D'
+          ]
+        : [
+            'A',
+            'B',
+            'C',
+            'D',
+            'E'
+          ];
 
-      const options = {};
+    const options = {};
 
-      for (
-        const k of [
-          'A',
-          'B',
-          'C',
-          'D',
-          'E'
-        ]
-      ) {
+    for (
+      const k of keys
+    ) {
 
-        options[k] = {
+      options[k] = {
 
-          text:
-            clean(
-              b.options?.[k]?.text
-            ),
+        text:
+          clean(
+            b.options?.[
+              k
+            ]?.text
+          ),
 
-          correct:
-            Boolean(
-              b.options?.[k]?.correct
-            )
-
-        };
-
-      }
-
-      // ------------------------------------------
-      // MCQ validation
-      // ------------------------------------------
-
-      if (
-        type === 'mcq'
-      ) {
-
-        const correctCount =
-          Object.values(
-            options
-          ).filter(
-            x =>
-              x.correct ===
-              true
-          ).length;
-
-        if (
-          correctCount !== 1
-        ) {
-
-          return res
-            .status(400)
-            .json({
-
-              error:
-                'MCQ must have exactly one correct option'
-
-            });
-
-        }
-
-      }
-
-      // ------------------------------------------
-      // Save
-      // ------------------------------------------
-
-      await db
-        .ref(
-          `questions/${id}`
-        )
-        .set({
-
-          examId:
-            b.examId,
-
-          type,
-
-          question:
-            clean(
-              b.question
-            ),
-
-          imageUrl:
-            clean(
-              b.imageUrl
-            ),
-
-          order:
-            Number(
-              b.order
-            ) || 0,
-
-          mark:
-            Number(
-              b.mark
-            ) || 1,
-
-          options
-
-        });
-
-      // ------------------------------------------
-      // Update exam question count
-      // ------------------------------------------
-
-      const questionSnap =
-        await db
-          .ref('questions')
-          .orderByChild(
-            'examId'
+        correct:
+          Boolean(
+            b.options?.[
+              k
+            ]?.correct
           )
-          .equalTo(
-            b.examId
-          )
-          .once('value');
 
-      await db
-        .ref(
-          `exams/${b.examId}/totalQuestions`
-        )
-        .set(
-          questionSnap.numChildren()
-        );
-
-      res.json({
-        id
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-
-        error:
-          'Question save failed'
-
-      });
+      };
 
     }
+
+    await db
+      .ref(
+        `questions/${id}`
+      )
+      .set({
+
+        examId:
+          b.examId,
+
+        type,
+
+        question:
+          clean(
+            b.question
+          ),
+
+        imageUrl:
+          clean(
+            b.imageUrl
+          ),
+
+        order:
+          Number(
+            b.order
+          ) || 0,
+
+        mark:
+          Number(
+            b.mark
+          ) || 1,
+
+        options
+
+      });
+
+    // Update exam question count
+
+    const snap =
+      await db
+        .ref(
+          `questions`
+        )
+        .orderByChild(
+          'examId'
+        )
+        .equalTo(
+          b.examId
+        )
+        .once('value');
+
+    await db
+      .ref(
+        `exams/${b.examId}/totalQuestions`
+      )
+      .set(
+        snap.numChildren()
+      );
+
+    res.json({
+      id
+    });
 
   }
 );
 
 // ==================================================
-// ADMIN DELETE QUESTION
+// DELETE QUESTION
 // ==================================================
 
 app.delete(
@@ -2153,37 +2089,30 @@ app.delete(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const questionId =
+      req.params.id;
 
-      const question =
-        (
-          await db
-            .ref(
-              `questions/${req.params.id}`
-            )
-            .once('value')
-        ).val();
-
-      if (!question) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              'Question not found'
-          });
-
-      }
-
+    const snap =
       await db
         .ref(
-          `questions/${req.params.id}`
+          `questions/${questionId}`
         )
-        .remove();
+        .once('value');
 
-      // Update question count
+    const question =
+      snap.val();
 
-      const questionSnap =
+    await db
+      .ref(
+        `questions/${questionId}`
+      )
+      .remove();
+
+    if (
+      question?.examId
+    ) {
+
+      const qs =
         await db
           .ref('questions')
           .orderByChild(
@@ -2199,25 +2128,14 @@ app.delete(
           `exams/${question.examId}/totalQuestions`
         )
         .set(
-          questionSnap.numChildren()
+          qs.numChildren()
         );
 
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-
-        error:
-          'Question delete failed'
-
-      });
-
     }
+
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -2231,98 +2149,245 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const results =
+      vals(
 
-      const results =
-        vals(
-          (
-            await db
-              .ref('results')
-              .once('value')
-          ).val()
-        ).sort(
+        (
+          await db
+            .ref('results')
+            .once('value')
+        ).val()
+
+      )
+        .sort(
           (a, b) =>
-            (b.submittedAt ||
-              0) -
-            (a.submittedAt ||
-              0)
+            (
+              b.submittedAt ||
+              0
+            ) -
+            (
+              a.submittedAt ||
+              0
+            )
         );
 
-      res.json(
+    res.json(
 
-        results.map(
-          r => ({
+      results.map(
+        (r) => ({
 
-            ...r,
+          ...r,
 
-            review:
-              undefined
+          review:
+            undefined
 
-          })
-        )
+        })
+      )
 
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Results loading failed'
-      });
-
-    }
+    );
 
   }
 );
+
+// ==================================================
+// VIEW SINGLE RESULT
+// ==================================================
 
 app.get(
   '/api/admin/results/:id',
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const result =
+      (
+        await db
+          .ref(
+            `results/${req.params.id}`
+          )
+          .once('value')
+      ).val();
 
-      const result =
-        (
-          await db
-            .ref(
-              `results/${req.params.id}`
-            )
-            .once('value')
-        ).val();
+    if (!result) {
 
-      if (!result) {
+      return res
+        .status(404)
+        .json({
+          error:
+            'Not found'
+        });
 
-        return res
-          .status(404)
-          .json({
-            error:
-              'Not found'
-          });
+    }
+
+    res.json(result);
+
+  }
+);
+
+// ==================================================
+// DELETE RESULT / HISTORY
+// ==================================================
+
+app.delete(
+  '/api/admin/results/:id',
+  requireAdmin,
+  async (req, res) => {
+
+    const resultId =
+      req.params.id;
+
+    const resultSnap =
+      await db
+        .ref(
+          `results/${resultId}`
+        )
+        .once('value');
+
+    const result =
+      resultSnap.val();
+
+    if (!result) {
+
+      return res
+        .status(404)
+        .json({
+          error:
+            'Result not found'
+        });
+
+    }
+
+    // Delete result
+
+    await db
+      .ref(
+        `results/${resultId}`
+      )
+      .remove();
+
+    // Delete matching submission(s)
+
+    const submissionsSnap =
+      await db
+        .ref('submissions')
+        .orderByChild(
+          'studentId'
+        )
+        .equalTo(
+          result.studentId
+        )
+        .once('value');
+
+    const submissions =
+      submissionsSnap.val() ||
+      {};
+
+    const updates = {};
+
+    for (
+      const [
+        id,
+        submission
+      ]
+      of Object.entries(
+        submissions
+      )
+    ) {
+
+      if (
+
+        submission?.examId ===
+        result.examId &&
+
+        submission?.submittedAt ===
+        result.submittedAt
+
+      ) {
+
+        updates[
+          `submissions/${id}`
+        ] = null;
 
       }
 
-      res.json(result);
+    }
 
-    } catch (e) {
+    if (
+      Object.keys(
+        updates
+      ).length
+    ) {
 
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Result loading failed'
-      });
+      await db
+        .ref()
+        .update(
+          updates
+        );
 
     }
+
+    // Delete related admin notification
+
+    const notificationsSnap =
+      await db
+        .ref(
+          'notifications/admins'
+        )
+        .once('value');
+
+    const notifications =
+      notificationsSnap.val() ||
+      {};
+
+    const notificationUpdates = {};
+
+    for (
+      const [
+        id,
+        notification
+      ]
+      of Object.entries(
+        notifications
+      )
+    ) {
+
+      if (
+        notification?.resultId ===
+        resultId
+      ) {
+
+        notificationUpdates[
+          `notifications/admins/${id}`
+        ] = null;
+
+      }
+
+    }
+
+    if (
+      Object.keys(
+        notificationUpdates
+      ).length
+    ) {
+
+      await db
+        .ref()
+        .update(
+          notificationUpdates
+        );
+
+    }
+
+    res.json({
+      ok: true,
+      message:
+        'Result deleted successfully'
+    });
 
   }
 );
 
 // ==================================================
 // ADMIN NOTIFICATIONS
-// Existing notification system kept
 // ==================================================
 
 app.get(
@@ -2330,39 +2395,31 @@ app.get(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const x =
+      (
+        await db
+          .ref(
+            'notifications/admins'
+          )
+          .once('value')
+      ).val() || {};
 
-      const x =
-        (
-          await db
-            .ref(
-              'notifications/admins'
-            )
-            .once('value')
-        ).val() || {};
+    res.json(
 
-      res.json(
-
-        vals(x).sort(
+      vals(x)
+        .sort(
           (a, b) =>
-            (b.createdAt ||
-              0) -
-            (a.createdAt ||
-              0)
+            (
+              b.createdAt ||
+              0
+            ) -
+            (
+              a.createdAt ||
+              0
+            )
         )
 
-      );
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'Notifications loading failed'
-      });
-
-    }
+    );
 
   }
 );
@@ -2376,37 +2433,24 @@ app.post(
   requireAdmin,
   async (req, res) => {
 
-    try {
+    const token =
+      clean(
+        req.body.token
+      );
 
-      const token =
-        clean(
-          req.body.token
-        );
+    if (token) {
 
-      if (token) {
-
-        await db
-          .ref(
-            `admins/${ADMIN_UID}/fcmTokens`
-          )
-          .push(token);
-
-      }
-
-      res.json({
-        ok: true
-      });
-
-    } catch (e) {
-
-      console.error(e);
-
-      res.status(500).json({
-        error:
-          'FCM token save failed'
-      });
+      await db
+        .ref(
+          `admins/${ADMIN_UID}/fcmTokens`
+        )
+        .push(token);
 
     }
+
+    res.json({
+      ok: true
+    });
 
   }
 );
@@ -2463,7 +2507,7 @@ app.get(
 );
 
 // ==================================================
-// Unknown API
+// UNKNOWN API
 // ==================================================
 
 app.use(
@@ -2478,10 +2522,8 @@ app.use(
       return res
         .status(404)
         .json({
-
           error:
             'API endpoint not found'
-
         });
 
     }
