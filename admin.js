@@ -4,42 +4,32 @@ import {
 }
 from "./firebase-config.js";
 
-
 import {
-
   signInWithEmailAndPassword,
-
   signOut,
-
   onAuthStateChanged,
-
   reauthenticateWithCredential,
-
   EmailAuthProvider,
-
   updatePassword
-
 }
 from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 
-const $=
-  id=>document.getElementById(id);
+const $ =
+  id => document.getElementById(id);
 
 
-function esc(v){
+function esc(v) {
 
-  return String(v??"")
+  return String(v ?? "")
     .replace(
       /[&<>"']/g,
-      m=>({
-
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-
+      m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
       }[m])
     );
 
@@ -48,62 +38,58 @@ function esc(v){
 
 function msg(
   text,
-  error=false
-){
+  error = false
+) {
 
-  const el=$("loginMsg");
+  const el =
+    $("loginMsg");
 
-  if(!el)return;
+  if (!el) return;
 
-  el.textContent=text;
+  el.textContent =
+    text;
 
-  el.style.background=
+  el.style.background =
     error
-    ?
-    "#fff3f4"
-    :
-    "#f4f8fb";
+      ? "#fff3f4"
+      : "#f4f8fb";
 
-  el.style.color=
+  el.style.color =
     error
-    ?
-    "#b4232d"
-    :
-    "#315a78";
+      ? "#b4232d"
+      : "#315a78";
 
 }
 
 
 async function api(
   path,
-  opt={}
-){
+  opt = {}
+) {
 
-  const u=
+  const u =
     auth.currentUser;
 
-  const token=
+  const token =
     u
-    ?
-    await u.getIdToken(true)
-    :
-    "";
+      ? await u.getIdToken(true)
+      : "";
 
-  const headers={
+  const headers = {
     "Content-Type":
       "application/json",
 
-    ...(opt.headers||{})
+    ...(opt.headers || {})
   };
 
-  if(token){
+  if (token) {
 
-    headers.Authorization=
-      "Bearer "+token;
+    headers.Authorization =
+      "Bearer " + token;
 
   }
 
-  const r=
+  const r =
     await fetch(
       path,
       {
@@ -113,36 +99,36 @@ async function api(
     );
 
 
-  const raw=
+  const raw =
     await r.text();
 
 
-  let data={};
+  let data = {};
 
 
-  try{
+  try {
 
-    data=
+    data =
       JSON.parse(raw);
 
   }
-  catch{
+  catch {
 
-    data={
+    data = {
       error:
-        raw||
-        ("HTTP "+r.status)
+        raw ||
+        ("HTTP " + r.status)
     };
 
   }
 
 
-  if(!r.ok){
+  if (!r.ok) {
 
     throw new Error(
-      data.error||
-      data.message||
-      ("HTTP "+r.status)
+      data.error ||
+      data.message ||
+      ("HTTP " + r.status)
     );
 
   }
@@ -153,31 +139,35 @@ async function api(
 }
 
 
-let state={
-  exams:[],
-  students:[],
-  results:[],
-  notifications:[]
+let state = {
+  exams: [],
+  students: [],
+  results: [],
+  notifications: []
 };
 
 
-$("loginBtn").onclick=
-  async()=>{
+/* =========================
+   ADMIN LOGIN
+========================= */
 
-    const email=
+$("loginBtn").onclick =
+  async () => {
+
+    const email =
       $("email")
         .value
         .trim();
 
-    const password=
+    const password =
       $("password")
         .value;
 
 
-    if(
-      !email||
+    if (
+      !email ||
       !password
-    ){
+    ) {
 
       return msg(
         "Email এবং Password দিন।",
@@ -187,17 +177,17 @@ $("loginBtn").onclick=
     }
 
 
-    const btn=
+    const btn =
       $("loginBtn");
 
 
-    btn.disabled=true;
+    btn.disabled = true;
 
-    btn.textContent=
+    btn.textContent =
       "Signing in...";
 
 
-    try{
+    try {
 
       await signInWithEmailAndPassword(
         auth,
@@ -210,20 +200,21 @@ $("loginBtn").onclick=
       );
 
     }
-    catch(e){
+    catch (e) {
 
       msg(
-        e.message||
+        e.message ||
         "Login failed",
         true
       );
 
     }
-    finally{
+    finally {
 
-      btn.disabled=false;
+      btn.disabled =
+        false;
 
-      btn.textContent=
+      btn.textContent =
         "Login";
 
     }
@@ -231,24 +222,32 @@ $("loginBtn").onclick=
   };
 
 
-$("logout").onclick=
-  ()=>signOut(auth);
+/* =========================
+   LOGOUT
+========================= */
 
+$("logout").onclick =
+  () => signOut(auth);
+
+
+/* =========================
+   AUTH STATE
+========================= */
 
 onAuthStateChanged(
   auth,
-  async user=>{
+  async user => {
 
-    if(!user){
+    if (!user) {
 
       $("loginBox")
-        .hidden=false;
+        .hidden = false;
 
       $("panel")
-        .hidden=true;
+        .hidden = true;
 
       $("logout")
-        .hidden=true;
+        .hidden = true;
 
       return;
 
@@ -256,23 +255,28 @@ onAuthStateChanged(
 
 
     $("loginBox")
-      .hidden=true;
+      .hidden = true;
 
     $("panel")
-      .hidden=false;
+      .hidden = false;
 
     $("logout")
-      .hidden=false;
+      .hidden = false;
 
 
-    try{
+    try {
 
       await loadAll();
+
+      /*
+       * Existing notification / FCM
+       * system remains active.
+       */
 
       await registerPush();
 
     }
-    catch(e){
+    catch (e) {
 
       msg(
         e.message,
@@ -285,7 +289,11 @@ onAuthStateChanged(
 );
 
 
-async function loadAll(){
+/* =========================
+   LOAD ALL DATA
+========================= */
+
+async function loadAll() {
 
   const [
     settings,
@@ -293,7 +301,7 @@ async function loadAll(){
     exams,
     results,
     notifications
-  ]=
+  ] =
     await Promise.all([
 
       api(
@@ -319,7 +327,7 @@ async function loadAll(){
     ]);
 
 
-  state={
+  state = {
     students,
     exams,
     results,
@@ -327,7 +335,9 @@ async function loadAll(){
   };
 
 
-  fillSettings(settings);
+  fillSettings(
+    settings
+  );
 
   renderStudents();
 
@@ -346,9 +356,13 @@ async function loadAll(){
 }
 
 
-function fillSettings(s){
+/* =========================
+   SETTINGS
+========================= */
 
-  for(
+function fillSettings(s) {
+
+  for (
     const k
     of [
       "siteName",
@@ -360,12 +374,12 @@ function fillSettings(s){
       "footerText",
       "commonExamPin"
     ]
-  ){
+  ) {
 
-    if($(k)){
+    if ($(k)) {
 
-      $(k).value=
-        s?.[k]??"";
+      $(k).value =
+        s?.[k] ?? "";
 
     }
 
@@ -374,9 +388,13 @@ function fillSettings(s){
 }
 
 
-function renderDashboard(){
+/* =========================
+   DASHBOARD
+========================= */
 
-  const stats=[
+function renderDashboard() {
+
+  const stats = [
 
     [
       "Students",
@@ -402,207 +420,221 @@ function renderDashboard(){
 
 
   $("dashboardStats")
-    .innerHTML=
+    .innerHTML =
       stats
+        .map(
+          x => `
+
+            <div class="stat">
+
+              <b>
+                ${esc(x[1])}
+              </b>
+
+              <span>
+                ${x[0]}
+              </span>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+
+  $("dashboardNotifications")
+    .innerHTML =
+      state.notifications
+        .slice(0, 8)
+        .map(
+          n => `
+
+            <div class="admin-item">
+
+              <div class="admin-item-main">
+
+                <div class="admin-item-title">
+                  ${esc(
+                    n.title ||
+                    "New Notification"
+                  )}
+                </div>
+
+                <div class="admin-item-sub">
+                  ${esc(
+                    n.body ||
+                    ""
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No notifications.</div>';
+
+}
+
+
+/* =========================
+   STUDENTS
+========================= */
+
+function renderStudents() {
+
+  $("students")
+    .innerHTML =
+      state.students
+        .map(
+          s => `
+
+            <div class="admin-item">
+
+              <div class="admin-item-main">
+
+                <div class="admin-item-title">
+                  ${esc(s.name)}
+                </div>
+
+                <div class="admin-item-sub">
+
+                  ${
+                    s.active === false
+                      ? "Inactive"
+                      : "Active"
+                  }
+
+                </div>
+
+              </div>
+
+              <button
+                class="btn btn-red btn-mini"
+                onclick="deleteStudent('${esc(s.id)}')"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No students.</div>';
+
+}
+
+
+/* =========================
+   EXAMS
+========================= */
+
+function renderExams() {
+
+  $("exams")
+    .innerHTML =
+      state.exams
+        .map(
+          e => `
+
+            <div class="admin-item">
+
+              <div class="admin-item-main">
+
+                <div class="admin-item-title">
+                  ${esc(e.title)}
+                </div>
+
+                <div class="admin-item-sub">
+
+                  ${esc(e.duration)}
+                  minutes · Pass
+                  ${esc(e.passMark)}%
+
+                </div>
+
+              </div>
+
+              <button
+                class="btn btn-red btn-mini"
+                onclick="deleteExam('${esc(e.id)}')"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No examinations.</div>';
+
+}
+
+
+/* =========================
+   RESULTS
+========================= */
+
+function renderResults() {
+
+  const rows =
+    state.results
       .map(
-        x=>`
+        r => `
 
-          <div class="stat">
+          <tr>
 
-            <b>
-              ${esc(x[1])}
-            </b>
+            <td>
+              ${esc(r.rank || "-")}
+            </td>
 
-            <span>
-              ${x[0]}
-            </span>
+            <td>
+              ${esc(r.studentName)}
+            </td>
 
-          </div>
+            <td>
+              ${esc(r.examTitle)}
+            </td>
+
+            <td>
+              ${esc(r.score)}/${esc(r.total)}
+            </td>
+
+            <td>
+              ${esc(r.grade)}
+            </td>
+
+            <td>
+              ${esc(r.status)}
+            </td>
+
+            <td>
+
+              <button
+                class="btn btn-blue btn-mini"
+                onclick="viewResult('${esc(r.id)}')"
+              >
+                View
+              </button>
+
+            </td>
+
+          </tr>
 
         `
       )
       .join("");
 
 
-  $("dashboardNotifications")
-    .innerHTML=
-      state.notifications
-      .slice(0,8)
-      .map(
-        n=>`
-
-          <div class="admin-item">
-
-            <div class="admin-item-main">
-
-              <div class="admin-item-title">
-                ${esc(
-                  n.title||
-                  "New Notification"
-                )}
-              </div>
-
-              <div class="admin-item-sub">
-                ${esc(
-                  n.body||
-                  ""
-                )}
-              </div>
-
-            </div>
-
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No notifications.</div>';
-
-}
-
-
-function renderStudents(){
-
-  $("students")
-    .innerHTML=
-      state.students
-      .map(
-        s=>`
-
-          <div class="admin-item">
-
-            <div class="admin-item-main">
-
-              <div class="admin-item-title">
-                ${esc(s.name)}
-              </div>
-
-              <div class="admin-item-sub">
-                ${
-                  s.active===false
-                  ?
-                  "Inactive"
-                  :
-                  "Active"
-                }
-              </div>
-
-            </div>
-
-            <button
-              class="btn btn-red btn-mini"
-              onclick="deleteStudent('${esc(s.id)}')"
-            >
-              Delete
-            </button>
-
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No students.</div>';
-
-}
-
-
-function renderExams(){
-
-  $("exams")
-    .innerHTML=
-      state.exams
-      .map(
-        e=>`
-
-          <div class="admin-item">
-
-            <div class="admin-item-main">
-
-              <div class="admin-item-title">
-                ${esc(e.title)}
-              </div>
-
-              <div class="admin-item-sub">
-                ${esc(e.duration)}
-                minutes · Pass
-                ${esc(e.passMark)}%
-              </div>
-
-            </div>
-
-            <button
-              class="btn btn-red btn-mini"
-              onclick="deleteExam('${esc(e.id)}')"
-            >
-              Delete
-            </button>
-
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No examinations.</div>';
-
-}
-
-
-function renderResults(){
-
-  const rows=
-    state.results
-    .map(
-      r=>`
-
-        <tr>
-
-          <td>
-            ${esc(r.rank||"-")}
-          </td>
-
-          <td>
-            ${esc(r.studentName)}
-          </td>
-
-          <td>
-            ${esc(r.examTitle)}
-          </td>
-
-          <td>
-            ${esc(r.score)}/${esc(r.total)}
-          </td>
-
-          <td>
-            ${esc(r.grade)}
-          </td>
-
-          <td>
-            ${esc(r.status)}
-          </td>
-
-          <td>
-
-            <button
-              class="btn btn-blue btn-mini"
-              onclick="viewResult('${esc(r.id)}')"
-            >
-              View
-            </button>
-
-          </td>
-
-        </tr>
-
-      `
-    )
-    .join("");
-
-
   $("results")
-    .innerHTML=`
+    .innerHTML = `
 
       <table>
 
@@ -625,12 +657,14 @@ function renderResults(){
         <tbody>
 
           ${
-            rows||
+            rows ||
             `
               <tr>
+
                 <td colspan="7">
                   No results.
                 </td>
+
               </tr>
             `
           }
@@ -644,78 +678,97 @@ function renderResults(){
 }
 
 
-function renderNotifications(){
+/* =========================
+   NOTIFICATIONS
+   KEEPING EXISTING SYSTEM
+========================= */
+
+function renderNotifications() {
 
   $("notifications")
-    .innerHTML=
+    .innerHTML =
       state.notifications
-      .map(
-        n=>`
+        .map(
+          n => `
 
-          <div class="admin-item">
+            <div class="admin-item">
 
-            <div class="admin-item-main">
+              <div class="admin-item-main">
 
-              <div class="admin-item-title">
-                ${esc(
-                  n.title||
-                  "Submission"
-                )}
-              </div>
+                <div class="admin-item-title">
 
-              <div class="admin-item-sub">
-                ${esc(
-                  n.body||
-                  ""
-                )}
+                  ${esc(
+                    n.title ||
+                    "Submission"
+                  )}
+
+                </div>
+
+                <div class="admin-item-sub">
+
+                  ${esc(
+                    n.body ||
+                    ""
+                  )}
+
+                </div>
+
               </div>
 
             </div>
 
-          </div>
-
-        `
-      )
-      .join("")
-      ||
-      '<div class="empty">No notifications.</div>';
+          `
+        )
+        .join("")
+        ||
+        '<div class="empty">No notifications.</div>';
 
 }
 
 
-function populateExamSelect(){
+/* =========================
+   EXAM SELECT
+========================= */
+
+function populateExamSelect() {
 
   $("examSelect")
-    .innerHTML=
+    .innerHTML =
       state.exams
-      .map(
-        e=>`
+        .map(
+          e => `
 
-          <option
-            value="${esc(e.id)}"
-          >
-            ${esc(e.title)}
-          </option>
+            <option
+              value="${esc(e.id)}"
+            >
 
-        `
-      )
-      .join("")
-      ||
-      '<option value="">No examination</option>';
+              ${esc(e.title)}
+
+            </option>
+
+          `
+        )
+        .join("")
+        ||
+        '<option value="">No examination</option>';
 
 }
 
 
-window.saveStudent=
-  async()=>{
+/* =========================
+   SAVE STUDENT
+========================= */
 
-    const name=
+window.saveStudent =
+  async () => {
+
+    const name =
       $("studentName")
-      .value
-      .trim();
+        .value
+        .trim();
 
 
-    if(!name){
+    if (!name) {
 
       return alert(
         "Student name দিন।"
@@ -724,12 +777,12 @@ window.saveStudent=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/students",
         {
-          method:"POST",
+          method: "POST",
 
           body:
             JSON.stringify({
@@ -740,79 +793,94 @@ window.saveStudent=
 
 
       $("studentName")
-        .value="";
+        .value = "";
 
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.deleteStudent=
-  async id=>{
+/* =========================
+   DELETE STUDENT
+========================= */
 
-    if(
+window.deleteStudent =
+  async id => {
+
+    if (
       !confirm(
         "এই student delete করবেন?"
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/students/"
-        +encodeURIComponent(id),
+        "/api/admin/students/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
+
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.saveExam=
-  async()=>{
+/* =========================
+   SAVE EXAM
+========================= */
 
-    const title=
+window.saveExam =
+  async () => {
+
+    const title =
       $("examTitleInput")
-      .value
-      .trim();
+        .value
+        .trim();
 
-    const duration=
+    const duration =
       Number(
         $("examDuration")
-        .value||
+          .value ||
         30
       );
 
-    const passMark=
+    const passMark =
       Number(
         $("examPass")
-        .value||
+          .value ||
         40
       );
 
 
-    if(!title){
+    if (!title) {
 
       return alert(
         "Exam title দিন।"
@@ -821,12 +889,12 @@ window.saveExam=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/exams",
         {
-          method:"POST",
+          method: "POST",
 
           body:
             JSON.stringify({
@@ -839,69 +907,84 @@ window.saveExam=
 
 
       $("examTitleInput")
-        .value="";
+        .value = "";
 
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.deleteExam=
-  async id=>{
+/* =========================
+   DELETE EXAM
+========================= */
 
-    if(
+window.deleteExam =
+  async id => {
+
+    if (
       !confirm(
         "এই examination delete করবেন?"
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/exams/"
-        +encodeURIComponent(id),
+        "/api/admin/exams/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
+
 
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.loadQuestions=
-  async()=>{
+/* =====================================================
+   QUESTION MANAGEMENT
+===================================================== */
 
-    const id=
+window.loadQuestions =
+  async () => {
+
+    const id =
       $("examSelect").value;
 
 
-    if(!id){
+    if (!id) {
 
       $("questionForm")
-        .innerHTML="";
+        .innerHTML = "";
 
       $("questions")
-        .innerHTML=
+        .innerHTML =
           '<div class="empty">Select an examination.</div>';
 
       return;
@@ -909,130 +992,222 @@ window.loadQuestions=
     }
 
 
-    try{
+    try {
 
-      const qs=
+      const qs =
         await api(
-          "/api/admin/questions/"
-          +encodeURIComponent(id)
+          "/api/admin/questions/" +
+          encodeURIComponent(id)
         );
 
 
-      const arr=
+      const arr =
         Array.isArray(qs)
-        ?
-        qs
-        :
-        (
-          qs.questions||
-          []
-        );
+          ? qs
+          : (
+            qs.questions ||
+            []
+          );
 
+
+      /*
+       * QUESTION LIST
+       */
 
       $("questions")
-        .innerHTML=
+        .innerHTML =
           arr
-          .map(
-            q=>`
+            .map(
+              q => {
 
-              <div class="admin-item">
+                const type =
+                  String(
+                    q.type ||
+                    "truefalse"
+                  )
+                    .toLowerCase();
 
-                <div class="admin-item-main">
 
-                  <div class="admin-item-title">
+                if (
+                  type === "mcq"
+                ) {
 
-                    Q${esc(q.order||"")}
-                    ·
-                    ${esc(q.question)}
+                  const correct =
+                    ["A", "B", "C", "D"]
+                      .find(
+                        k =>
+                          q.options?.[k]?.correct === true
+                      ) ||
+                      "-";
+
+
+                  return `
+
+                    <div class="admin-item">
+
+                      <div class="admin-item-main">
+
+                        <div class="admin-item-title">
+
+                          Q${esc(q.order || "")}
+                          ·
+                          ${esc(q.question)}
+
+                        </div>
+
+                        <div class="admin-item-sub">
+
+                          <b>
+                            MCQ
+                          </b>
+
+                          ·
+
+                          Correct Answer:
+                          ${esc(correct)}
+
+                        </div>
+
+                      </div>
+
+
+                      <button
+                        class="btn btn-red btn-mini"
+                        onclick="deleteQuestion('${esc(q.id)}')"
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+
+                  `;
+
+                }
+
+
+                return `
+
+                  <div class="admin-item">
+
+                    <div class="admin-item-main">
+
+                      <div class="admin-item-title">
+
+                        Q${esc(q.order || "")}
+                        ·
+                        ${esc(q.question)}
+
+                      </div>
+
+                      <div class="admin-item-sub">
+
+                        <b>
+                          TRUE / FALSE
+                        </b>
+
+                        ·
+
+                        A:
+                        ${
+                          q.options?.A?.correct
+                            ? "TRUE"
+                            : "FALSE"
+                        }
+
+                        ·
+
+                        B:
+                        ${
+                          q.options?.B?.correct
+                            ? "TRUE"
+                            : "FALSE"
+                        }
+
+                        ·
+
+                        C:
+                        ${
+                          q.options?.C?.correct
+                            ? "TRUE"
+                            : "FALSE"
+                        }
+
+                        ·
+
+                        D:
+                        ${
+                          q.options?.D?.correct
+                            ? "TRUE"
+                            : "FALSE"
+                        }
+
+                        ·
+
+                        E:
+                        ${
+                          q.options?.E?.correct
+                            ? "TRUE"
+                            : "FALSE"
+                        }
+
+                      </div>
+
+                    </div>
+
+
+                    <button
+                      class="btn btn-red btn-mini"
+                      onclick="deleteQuestion('${esc(q.id)}')"
+                    >
+                      Delete
+                    </button>
 
                   </div>
 
-                  <div class="admin-item-sub">
+                `;
 
-                    A:
-                    ${
-                      q.options?.A?.correct
-                      ?
-                      "TRUE"
-                      :
-                      "FALSE"
-                    }
-
-                    ·
-
-                    B:
-                    ${
-                      q.options?.B?.correct
-                      ?
-                      "TRUE"
-                      :
-                      "FALSE"
-                    }
-
-                    ·
-
-                    C:
-                    ${
-                      q.options?.C?.correct
-                      ?
-                      "TRUE"
-                      :
-                      "FALSE"
-                    }
-
-                    ·
-
-                    D:
-                    ${
-                      q.options?.D?.correct
-                      ?
-                      "TRUE"
-                      :
-                      "FALSE"
-                    }
-
-                    ·
-
-                    E:
-                    ${
-                      q.options?.E?.correct
-                      ?
-                      "TRUE"
-                      :
-                      "FALSE"
-                    }
-
-                  </div>
-
-                </div>
+              }
+            )
+            .join("")
+            ||
+            '<div class="empty">No questions.</div>';
 
 
-                <button
-                  class="btn btn-red btn-mini"
-                  onclick="deleteQuestion('${esc(q.id)}')"
-                >
-                  Delete
-                </button>
-
-              </div>
-
-            `
-          )
-          .join("")
-          ||
-          '<div class="empty">No questions.</div>';
+      const next =
+        arr.length + 1;
 
 
-      const next=
-        arr.length+1;
-
+      /*
+       * QUESTION FORM
+       */
 
       $("questionForm")
-        .innerHTML=`
+        .innerHTML = `
 
           <h3>
-            Add 5-Statement Question
+            Add Question
           </h3>
+
+
+          <label>
+            Question Type
+          </label>
+
+
+          <select
+            id="questionType"
+            onchange="changeQuestionType()"
+          >
+
+            <option value="truefalse">
+              TRUE / FALSE
+            </option>
+
+            <option value="mcq">
+              MULTIPLE CHOICE (MCQ)
+            </option>
+
+          </select>
 
 
           <input
@@ -1047,37 +1222,9 @@ window.loadQuestions=
           >
 
 
-          ${
-            ["A","B","C","D","E"]
-            .map(
-              k=>`
-
-                <div class="form-grid">
-
-                  <input
-                    id="t${k}"
-                    class="full"
-                    placeholder="Statement ${k}"
-                  >
-
-                  <select id="c${k}">
-
-                    <option value="true">
-                      TRUE
-                    </option>
-
-                    <option value="false">
-                      FALSE
-                    </option>
-
-                  </select>
-
-                </div>
-
-              `
-            )
-            .join("")
-          }
+          <div
+            id="questionOptions"
+          ></div>
 
 
           <input
@@ -1098,11 +1245,18 @@ window.loadQuestions=
 
         `;
 
+
+      /*
+       * Default = TRUE/FALSE
+       */
+
+      changeQuestionType();
+
     }
-    catch(e){
+    catch (e) {
 
       $("questions")
-        .innerHTML=
+        .innerHTML =
           `
             <div class="empty">
               ${esc(e.message)}
@@ -1114,44 +1268,403 @@ window.loadQuestions=
   };
 
 
-window.saveQuestion=
-  async()=>{
+/* =====================================================
+   CHANGE QUESTION TYPE
+===================================================== */
 
-    const examId=
+window.changeQuestionType =
+  () => {
+
+    const type =
+      $("questionType")?.value ||
+      "truefalse";
+
+    const box =
+      $("questionOptions");
+
+
+    if (!box) {
+      return;
+    }
+
+
+    /*
+     * MCQ
+     */
+
+    if (
+      type === "mcq"
+    ) {
+
+      box.innerHTML = `
+
+        <div
+          class="admin-card"
+          style="margin-top:10px"
+        >
+
+          <h3>
+            MCQ Options
+          </h3>
+
+
+          <input
+            id="tA"
+            class="full"
+            placeholder="Option A"
+          >
+
+
+          <input
+            id="tB"
+            class="full"
+            placeholder="Option B"
+          >
+
+
+          <input
+            id="tC"
+            class="full"
+            placeholder="Option C"
+          >
+
+
+          <input
+            id="tD"
+            class="full"
+            placeholder="Option D"
+          >
+
+
+          <label>
+            Correct Answer
+          </label>
+
+
+          <select id="mcqCorrect">
+
+            <option value="A">
+              A
+            </option>
+
+            <option value="B">
+              B
+            </option>
+
+            <option value="C">
+              C
+            </option>
+
+            <option value="D">
+              D
+            </option>
+
+          </select>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    /*
+     * TRUE / FALSE
+     */
+
+    box.innerHTML = `
+
+      <div
+        class="admin-card"
+        style="margin-top:10px"
+      >
+
+        <h3>
+          5-Statement Question
+        </h3>
+
+
+        ${
+          ["A", "B", "C", "D", "E"]
+            .map(
+              k => `
+
+                <div
+                  class="form-grid"
+                >
+
+                  <input
+                    id="t${k}"
+                    class="full"
+                    placeholder="Statement ${k}"
+                  >
+
+
+                  <select
+                    id="c${k}"
+                  >
+
+                    <option value="true">
+                      TRUE
+                    </option>
+
+                    <option value="false">
+                      FALSE
+                    </option>
+
+                  </select>
+
+                </div>
+
+              `
+            )
+            .join("")
+        }
+
+      </div>
+
+    `;
+
+  };
+
+
+/* =====================================================
+   SAVE QUESTION
+===================================================== */
+
+window.saveQuestion =
+  async () => {
+
+    const examId =
       $("examSelect").value;
 
 
-    const options={};
+    const type =
+      $("questionType")?.value ||
+      "truefalse";
 
 
-    for(
-      const k
-      of ["A","B","C","D","E"]
-    ){
+    if (!examId) {
 
-      options[k]={
-        text:
-          $("t"+k)
+      return alert(
+        "Select an examination."
+      );
+
+    }
+
+
+    const question =
+      $("qtext")
+        .value
+        .trim();
+
+
+    if (!question) {
+
+      return alert(
+        "Question লিখুন।"
+      );
+
+    }
+
+
+    const imageUrl =
+      $("qimage")
+        .value
+        .trim();
+
+
+    const order =
+      Number(
+        $("qorder")
+          .value ||
+        1
+      );
+
+
+    /*
+     * =========================
+     * MCQ
+     * =========================
+     */
+
+    if (
+      type === "mcq"
+    ) {
+
+      const optionA =
+        $("tA")
           .value
-          .trim(),
+          .trim();
+
+      const optionB =
+        $("tB")
+          .value
+          .trim();
+
+      const optionC =
+        $("tC")
+          .value
+          .trim();
+
+      const optionD =
+        $("tD")
+          .value
+          .trim();
+
+
+      const correct =
+        $("mcqCorrect")
+          .value;
+
+
+      if (
+        !optionA ||
+        !optionB ||
+        !optionC ||
+        !optionD
+      ) {
+
+        return alert(
+          "MCQ-এর A, B, C এবং D সবগুলো option পূরণ করুন।"
+        );
+
+      }
+
+
+      const options = {
+
+        A: {
+          text: optionA,
+          correct:
+            correct === "A"
+        },
+
+        B: {
+          text: optionB,
+          correct:
+            correct === "B"
+        },
+
+        C: {
+          text: optionC,
+          correct:
+            correct === "C"
+        },
+
+        D: {
+          text: optionD,
+          correct:
+            correct === "D"
+        }
+
+      };
+
+
+      try {
+
+        await api(
+          "/api/admin/questions",
+          {
+            method: "POST",
+
+            body:
+              JSON.stringify({
+
+                examId,
+
+                type: "mcq",
+
+                question,
+
+                imageUrl,
+
+                order,
+
+                options
+
+              })
+          }
+        );
+
+
+        await loadQuestions();
+
+      }
+      catch (e) {
+
+        alert(
+          e.message
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    /*
+     * =========================
+     * TRUE / FALSE
+     * =========================
+     */
+
+    const options = {};
+
+
+    for (
+      const k
+      of [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ]
+    ) {
+
+      const input =
+        $("t" + k);
+
+      const select =
+        $("c" + k);
+
+
+      if (!input || !select) {
+
+        return alert(
+          "Question options load হয়নি।"
+        );
+
+      }
+
+
+      options[k] = {
+
+        text:
+          input
+            .value
+            .trim(),
 
         correct:
-          $("c"+k)
-          .value==="true"
+          select
+            .value === "true"
+
       };
 
     }
 
 
-    if(
-      !$("qtext")
-      .value
-      .trim()||
+    if (
       Object.values(options)
         .some(
-          x=>!x.text
+          x => !x.text
         )
-    ){
+    ) {
 
       return alert(
         "Question এবং A-E সব Statement পূরণ করুন।"
@@ -1160,34 +1673,25 @@ window.saveQuestion=
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/questions",
         {
-          method:"POST",
+          method: "POST",
 
           body:
             JSON.stringify({
 
               examId,
 
-              question:
-                $("qtext")
-                .value
-                .trim(),
+              type: "truefalse",
 
-              imageUrl:
-                $("qimage")
-                .value
-                .trim(),
+              question,
 
-              order:
-                Number(
-                  $("qorder")
-                  .value||
-                  1
-                ),
+              imageUrl,
+
+              order,
 
               options
 
@@ -1199,34 +1703,42 @@ window.saveQuestion=
       await loadQuestions();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.deleteQuestion=
-  async id=>{
+/* =====================================================
+   DELETE QUESTION
+===================================================== */
 
-    if(
+window.deleteQuestion =
+  async id => {
+
+    if (
       !confirm(
         "এই question delete করবেন?"
       )
-    ){
+    ) {
+
       return;
+
     }
 
 
-    try{
+    try {
 
       await api(
-        "/api/admin/questions/"
-        +encodeURIComponent(id),
+        "/api/admin/questions/" +
+        encodeURIComponent(id),
         {
-          method:"DELETE"
+          method: "DELETE"
         }
       );
 
@@ -1234,108 +1746,262 @@ window.deleteQuestion=
       await loadQuestions();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.viewResult=
-  async id=>{
+/* =====================================================
+   VIEW RESULT
+===================================================== */
 
-    try{
+window.viewResult =
+  async id => {
 
-      const r=
+    try {
+
+      const r =
         await api(
-          "/api/admin/results/"
-          +encodeURIComponent(id)
+          "/api/admin/results/" +
+          encodeURIComponent(id)
         );
 
 
-      const review=
-        r.review||[];
+      const review =
+        r.review || [];
 
 
-      const html=
+      const html =
         review
-        .map(
-          x=>`
+          .map(
+            x => {
 
-            <div
-              style="
-                border:1px solid #ddd;
-                border-radius:7px;
-                padding:8px;
-                margin:7px 0
-              "
-            >
+              /*
+               * MCQ RESULT
+               */
 
-              <b>
-                Q${esc(x.number)}.
-                ${esc(x.question)}
-              </b>
+              if (
+                String(
+                  x.type || ""
+                ).toLowerCase() ===
+                "mcq"
+              ) {
+
+                const selected =
+                  x.selectedAnswer ||
+                  x.answer ||
+                  "";
+
+                const correct =
+                  x.correctAnswer ||
+                  Object.keys(
+                    x.options || {}
+                  )
+                    .find(
+                      k =>
+                        x.options?.[k]?.correct === true
+                    ) ||
+                  "";
 
 
-              ${
-                ["A","B","C","D","E"]
-                .map(
-                  k=>{
+                return `
 
-                    const o=
-                      x.options?.[k]||
-                      {};
+                  <div
+                    style="
+                      border:1px solid #ddd;
+                      border-radius:7px;
+                      padding:8px;
+                      margin:7px 0
+                    "
+                  >
 
-                    return `
+                    <b>
 
-                      <div
-                        style="
-                          font-size:11px;
-                          margin-top:4px
-                        "
-                      >
+                      Q${esc(x.number)}.
+                      ${esc(x.question)}
 
-                        ${k}.
-                        ${esc(o.text)}
+                    </b>
 
-                        —
-                        Selected:
-                        ${
-                          o.selected
-                          ?
-                          "TRUE"
-                          :
-                          "FALSE"
-                        },
 
-                        Correct:
-                        ${
-                          o.correct
-                          ?
-                          "TRUE"
-                          :
-                          "FALSE"
-                        }
+                    <div
+                      style="
+                        margin-top:6px;
+                        font-size:12px
+                      "
+                    >
 
-                      </div>
+                      ${
+                        ["A", "B", "C", "D"]
+                          .map(
+                            k => {
 
-                    `;
+                              const o =
+                                x.options?.[k] ||
+                                {};
 
-                  }
-                )
-                .join("")
+                              const isSelected =
+                                selected === k;
+
+                              const isCorrect =
+                                correct === k;
+
+
+                              return `
+
+                                <div
+                                  style="
+                                    margin:4px 0
+                                  "
+                                >
+
+                                  <b>
+                                    ${k}.
+                                  </b>
+
+                                  ${esc(
+                                    o.text || ""
+                                  )}
+
+                                  ${
+                                    isSelected
+                                      ?
+                                      `
+                                        <strong>
+                                          — Selected
+                                        </strong>
+                                      `
+                                      :
+                                      ""
+                                  }
+
+                                  ${
+                                    isCorrect
+                                      ?
+                                      `
+                                        <span
+                                          style="
+                                            color:green;
+                                            font-weight:bold
+                                          "
+                                        >
+                                          — Correct
+                                        </span>
+                                      `
+                                      :
+                                      ""
+                                  }
+
+                                </div>
+
+                              `;
+
+                            }
+                          )
+                          .join("")
+                      }
+
+                    </div>
+
+                  </div>
+
+                `;
+
               }
 
-            </div>
 
-          `
-        )
-        .join("");
+              /*
+               * TRUE / FALSE RESULT
+               */
+
+              return `
+
+                <div
+                  style="
+                    border:1px solid #ddd;
+                    border-radius:7px;
+                    padding:8px;
+                    margin:7px 0
+                  "
+                >
+
+                  <b>
+
+                    Q${esc(x.number)}.
+                    ${esc(x.question)}
+
+                  </b>
 
 
-      const box=
+                  ${
+                    [
+                      "A",
+                      "B",
+                      "C",
+                      "D",
+                      "E"
+                    ]
+                      .map(
+                        k => {
+
+                          const o =
+                            x.options?.[k] ||
+                            {};
+
+                          return `
+
+                            <div
+                              style="
+                                font-size:11px;
+                                margin-top:4px
+                              "
+                            >
+
+                              ${k}.
+                              ${esc(o.text)}
+
+                              —
+
+                              Selected:
+                              ${
+                                o.selected
+                                  ? "TRUE"
+                                  : "FALSE"
+                              }
+
+                              ,
+
+                              Correct:
+                              ${
+                                o.correct
+                                  ? "TRUE"
+                                  : "FALSE"
+                              }
+
+                            </div>
+
+                          `;
+
+                        }
+                      )
+                      .join("")
+                  }
+
+                </div>
+
+              `;
+
+            }
+          )
+          .join("");
+
+
+      const box =
         window.open(
           "",
           "_blank",
@@ -1400,7 +2066,7 @@ window.viewResult=
 
           ·
           Rank
-          ${esc(r.rank||"-")}
+          ${esc(r.rank || "-")}
 
           <hr>
 
@@ -1416,22 +2082,28 @@ window.viewResult=
       box.document.close();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.saveSettings=
-  async()=>{
+/* =====================================================
+   SAVE SETTINGS
+===================================================== */
 
-    const b={};
+window.saveSettings =
+  async () => {
+
+    const b = {};
 
 
-    for(
+    for (
       const k
       of [
         "siteName",
@@ -1443,22 +2115,22 @@ window.saveSettings=
         "footerText",
         "commonExamPin"
       ]
-    ){
+    ) {
 
-      b[k]=
+      b[k] =
         $(k)
-        .value
-        .trim();
+          .value
+          .trim();
 
     }
 
 
-    try{
+    try {
 
       await api(
         "/api/admin/settings",
         {
-          method:"PUT",
+          method: "PUT",
 
           body:
             JSON.stringify(b)
@@ -1474,51 +2146,61 @@ window.saveSettings=
       await loadAll();
 
     }
-    catch(e){
+    catch (e) {
 
-      alert(e.message);
+      alert(
+        e.message
+      );
 
     }
 
   };
 
 
-window.changePassword=
-  async()=>{
+/* =====================================================
+   CHANGE ADMIN PASSWORD
+===================================================== */
 
-    const oldP=
+window.changePassword =
+  async () => {
+
+    const oldP =
       $("oldPass").value;
 
-    const newP=
+    const newP =
       $("newPass").value;
 
-    const newP2=
+    const newP2 =
       $("newPass2").value;
 
 
-    if(newP.length<6){
+    if (
+      newP.length < 6
+    ) {
 
       return $(
         "passMsg"
-      ).textContent=
+      ).textContent =
         "New password must be at least 6 characters.";
 
     }
 
 
-    if(newP!==newP2){
+    if (
+      newP !== newP2
+    ) {
 
       return $(
         "passMsg"
-      ).textContent=
+      ).textContent =
         "New passwords do not match.";
 
     }
 
 
-    try{
+    try {
 
-      const cred=
+      const cred =
         EmailAuthProvider.credential(
           auth.currentUser.email,
           oldP
@@ -1538,20 +2220,21 @@ window.changePassword=
 
 
       $("passMsg")
-        .textContent=
+        .textContent =
           "Password changed successfully.";
 
 
-      $("oldPass").value=
-      $("newPass").value=
-      $("newPass2").value="";
+      $("oldPass").value =
+      $("newPass").value =
+      $("newPass2").value =
+        "";
 
     }
-    catch(e){
+    catch (e) {
 
       $("passMsg")
-        .textContent=
-          e.message||
+        .textContent =
+          e.message ||
           "Password change failed.";
 
     }
@@ -1559,31 +2242,40 @@ window.changePassword=
   };
 
 
-async function registerPush(){
+/* =====================================================
+   FCM / PUSH NOTIFICATION
+   EXISTING SYSTEM KEPT
+===================================================== */
 
-  try{
+async function registerPush() {
 
-    if(
+  try {
+
+    if (
       !("serviceWorker" in navigator)
-    ){
+    ) {
+
       return;
+
     }
 
 
-    const mod=
+    const mod =
       await import(
         "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js"
       );
 
 
-    if(
+    if (
       !mod.isSupported()
-    ){
+    ) {
+
       return;
+
     }
 
 
-    const registration=
+    const registration =
       await navigator
         .serviceWorker
         .register(
@@ -1591,11 +2283,11 @@ async function registerPush(){
         );
 
 
-    const messaging=
+    const messaging =
       mod.getMessaging();
 
 
-    const token=
+    const token =
       await mod.getToken(
         messaging,
         {
@@ -1608,12 +2300,12 @@ async function registerPush(){
       );
 
 
-    if(token){
+    if (token) {
 
       await api(
         "/api/admin/fcm-token",
         {
-          method:"POST",
+          method: "POST",
 
           body:
             JSON.stringify({
@@ -1625,7 +2317,7 @@ async function registerPush(){
     }
 
   }
-  catch(e){
+  catch (e) {
 
     console.log(
       "FCM skipped:",
