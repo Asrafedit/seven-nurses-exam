@@ -1,26 +1,42 @@
 /* ==========================================
    SEVEN NURSES ONLINE EXAM SYSTEM
-   Complete Responsive Stylesheet
+   Compact + Responsive + Result Review UI
    ========================================== */
 
 :root {
   --primary: #1769e0;
   --primary-dark: #104eaf;
-  --secondary: #0f766e;
-  --bg: #f3f6fb;
+
+  --bg: #f4f7fb;
   --surface: #ffffff;
   --text: #172033;
   --muted: #64748b;
-  --border: #dce4ef;
+  --border: #d9e2ef;
+
   --green: #15803d;
-  --green-bg: #dcfce7;
-  --red: #b91c1c;
-  --red-bg: #fee2e2;
+  --green-bg: #ecfdf3;
+  --green-border: #86efac;
+
+  --red: #dc2626;
+  --red-bg: #fff1f2;
+  --red-border: #fda4af;
+
   --yellow: #a16207;
-  --yellow-bg: #fef3c7;
-  --shadow: 0 5px 22px rgba(15, 23, 42, 0.08);
-  --radius: 14px;
+  --yellow-bg: #fffbeb;
+  --yellow-border: #fcd34d;
+
+  --blue-bg: #eff6ff;
+
+  --shadow:
+    0 3px 12px rgba(15, 23, 42, 0.07);
+
+  --radius: 10px;
 }
+
+
+/* ==========================================
+   RESET
+   ========================================== */
 
 * {
   box-sizing: border-box;
@@ -33,12 +49,19 @@ html {
 body {
   margin: 0;
   padding: 0;
+
   background: var(--bg);
   color: var(--text);
-  font-family: "Noto Sans Bengali", "Hind Siliguri",
-    "SolaimanLipi", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.7;
+
+  font-family:
+    "Noto Sans Bengali",
+    "Hind Siliguri",
+    "SolaimanLipi",
+    Arial,
+    sans-serif;
+
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 button,
@@ -54,7 +77,7 @@ button {
 
 button:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: .6;
 }
 
 img {
@@ -76,16 +99,24 @@ a:hover {
   display: none !important;
 }
 
-/* General layout */
+
+/* ==========================================
+   LAYOUT
+   ========================================== */
 
 .container,
 .page-container,
 .exam-container,
 .result-container,
 .admin-container {
-  width: min(1100px, calc(100% - 28px));
-  margin: 22px auto;
+  width: min(1050px, calc(100% - 24px));
+  margin: 14px auto;
 }
+
+
+/* ==========================================
+   CARDS
+   ========================================== */
 
 .card,
 .panel,
@@ -93,32 +124,47 @@ a:hover {
 .exam-card,
 .result-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 18px;
+
+  padding: 14px;
+
+  margin-bottom: 12px;
+
   box-shadow: var(--shadow);
 }
+
+
+/* ==========================================
+   HEADINGS
+   ========================================== */
 
 h1,
 h2,
 h3,
 h4 {
-  line-height: 1.45;
+  line-height: 1.4;
   margin-top: 0;
   overflow-wrap: anywhere;
 }
 
 h1 {
-  font-size: clamp(23px, 4vw, 34px);
+  font-size: 27px;
 }
 
 h2 {
-  font-size: clamp(20px, 3vw, 27px);
+  font-size: 21px;
 }
 
 h3 {
-  font-size: 20px;
+  font-size: 17px;
+}
+
+h4 {
+  font-size: 15px;
 }
 
 p {
@@ -131,7 +177,10 @@ small {
   color: var(--muted);
 }
 
-/* Header */
+
+/* ==========================================
+   HEADER
+   ========================================== */
 
 header,
 .site-header,
@@ -139,10 +188,21 @@ header,
 .top-header {
   position: relative;
   z-index: 10;
-  background: linear-gradient(135deg, #123c8c, #1769e0);
+
+  background:
+    linear-gradient(
+      135deg,
+      #123c8c,
+      #1769e0
+    );
+
   color: white;
-  padding: 18px;
-  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+
+  padding: 12px 16px;
+
+  box-shadow:
+    0 3px 12px
+    rgba(15, 23, 42, .14);
 }
 
 header h1,
@@ -151,7 +211,7 @@ header h2,
 .exam-header h1,
 .top-header h1 {
   color: white;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 header a,
@@ -163,13 +223,18 @@ header a,
 
 .logo,
 .site-logo {
-  max-width: 85px;
-  max-height: 85px;
+  max-width: 65px;
+  max-height: 65px;
+
   object-fit: contain;
-  border-radius: 12px;
+
+  border-radius: 9px;
 }
 
-/* Buttons */
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
 
 button,
 .btn,
@@ -177,18 +242,33 @@ button,
 input[type="submit"],
 input[type="button"] {
   display: inline-flex;
+
   justify-content: center;
   align-items: center;
-  gap: 7px;
-  min-height: 42px;
-  padding: 10px 17px;
+
+  gap: 5px;
+
+  min-height: 36px;
+
+  padding: 7px 12px;
+
   border: 0;
-  border-radius: 10px;
+
+  border-radius: 8px;
+
   background: var(--primary);
+
   color: white;
+
   font-weight: 700;
+
+  font-size: 13px;
+
   text-align: center;
-  transition: background 0.2s ease, transform 0.15s ease;
+
+  transition:
+    background .15s ease,
+    transform .1s ease;
 }
 
 button:hover,
@@ -202,7 +282,7 @@ input[type="button"]:hover {
 button:active,
 .btn:active,
 .button:active {
-  transform: scale(0.98);
+  transform: scale(.98);
 }
 
 .btn-secondary,
@@ -225,65 +305,99 @@ button.warning {
   background: #d97706;
 }
 
-button.outline,
-.btn-outline {
+.btn-outline,
+button.outline {
   color: var(--primary);
+
   background: transparent;
-  border: 1px solid var(--primary);
+
+  border:
+    1px solid var(--primary);
 }
 
-/* Forms */
+
+/* ==========================================
+   FORMS
+   ========================================== */
 
 input,
 select,
 textarea {
   width: 100%;
+
   min-width: 0;
-  padding: 12px 13px;
-  margin: 5px 0 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
+
+  padding: 9px 11px;
+
+  margin: 4px 0 10px;
+
+  border:
+    1px solid #cbd5e1;
+
+  border-radius: 8px;
+
   background: white;
+
   color: var(--text);
+
   outline: none;
+
+  font-size: 14px;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.12);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(23, 105, 224, .12);
 }
 
 input[type="radio"],
 input[type="checkbox"] {
   width: auto;
-  margin: 0 8px 0 0;
-  accent-color: var(--primary);
+
+  margin:
+    0 6px 0 0;
+
+  accent-color:
+    var(--primary);
 }
 
 label {
   display: block;
+
   font-weight: 600;
-  margin-bottom: 5px;
+
+  margin-bottom: 4px;
 }
 
 .form-group {
-  margin-bottom: 12px;
+  margin-bottom: 9px;
 }
 
-/* Login */
+
+/* ==========================================
+   LOGIN
+   ========================================== */
 
 .login-box {
-  width: min(460px, calc(100% - 28px));
-  margin: 35px auto;
-  padding: 25px;
+  width:
+    min(400px, calc(100% - 24px));
+
+  margin: 25px auto;
+
+  padding: 20px;
 }
 
 .login-box h1,
 .login-box h2 {
   text-align: center;
-  color: var(--primary-dark);
+
+  color:
+    var(--primary-dark);
 }
 
 .login-box button,
@@ -291,45 +405,84 @@ label {
   width: 100%;
 }
 
-/* Exam information and timer */
+
+/* ==========================================
+   EXAM INFO
+   ========================================== */
 
 .exam-info,
 .exam-meta,
 .student-info {
   display: flex;
+
   flex-wrap: wrap;
+
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 15px;
-  margin-bottom: 16px;
+
+  justify-content:
+    space-between;
+
+  gap: 7px;
+
+  padding: 9px 12px;
+
+  margin-bottom: 10px;
+
   background: white;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 9px;
 }
+
+
+/* ==========================================
+   TIMER
+   ========================================== */
 
 .timer,
 #timer,
 #examTimer,
 .exam-timer {
   position: sticky;
-  top: 8px;
+
+  top: 5px;
+
   z-index: 50;
+
   display: inline-flex;
+
   justify-content: center;
+
   align-items: center;
-  min-width: 110px;
-  padding: 9px 15px;
-  margin: 5px 0 14px;
-  border-radius: 12px;
+
+  min-width: 90px;
+
+  padding: 6px 11px;
+
+  margin:
+    3px 0 9px;
+
+  border-radius: 9px;
+
   background: #172554;
-  color: #ffffff;
-  font-size: 19px;
+
+  color: white;
+
+  font-size: 15px;
+
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+
+  box-shadow:
+    0 3px 9px
+    rgba(15, 23, 42, .15);
 }
 
-/* Question cards */
+
+/* ==========================================
+   QUESTION CARD
+   ========================================== */
 
 .question-box,
 .question-card,
@@ -337,17 +490,30 @@ label {
 .mcq-question,
 .tf-question {
   position: relative;
+
   isolation: isolate;
+
   overflow: hidden;
-  padding: 20px;
-  margin: 0 0 18px;
-  border: 1px solid var(--border);
-  border-radius: 15px;
+
+  padding: 13px;
+
+  margin:
+    0 0 11px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 11px;
+
   background: white;
+
   box-shadow: var(--shadow);
 }
 
-/* Watermark behind question content */
+
+/* ==========================================
+   WATERMARK
+   ========================================== */
 
 .question-box::before,
 .question-card::before,
@@ -355,93 +521,186 @@ label {
 .mcq-question::before,
 .tf-question::before {
   content: "SEVEN NURSES";
+
   position: absolute;
+
   inset: 0;
+
   z-index: -1;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   color: #1769e0;
-  opacity: 0.055;
-  font-size: clamp(22px, 5vw, 48px);
+
+  opacity: .035;
+
+  font-size:
+    clamp(25px, 6vw, 50px);
+
   font-weight: 900;
+
   letter-spacing: 2px;
+
   text-align: center;
-  transform: rotate(-24deg);
+
+  transform:
+    rotate(-24deg);
+
   pointer-events: none;
+
   user-select: none;
 }
+
+
+/* ==========================================
+   QUESTION TEXT
+   ========================================== */
 
 .question-title,
 .question-text,
 .question-box h3,
 .question-card h3 {
   position: relative;
+
   z-index: 1;
+
+  margin:
+    0 0 8px;
+
+  font-size: 15px;
+
   font-weight: 700;
-  overflow-wrap: anywhere;
+
+  overflow-wrap:
+    anywhere;
 }
 
 .question-number {
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
-  min-width: 34px;
-  min-height: 34px;
-  padding: 4px 9px;
-  margin-right: 6px;
-  border-radius: 9px;
-  background: #dbeafe;
-  color: #1d4ed8;
+
+  min-width: 28px;
+
+  min-height: 28px;
+
+  padding: 3px 7px;
+
+  margin-right: 5px;
+
+  border-radius: 7px;
+
+  background:
+    #dbeafe;
+
+  color:
+    #1d4ed8;
+
   font-weight: 800;
 }
+
+
+/* ==========================================
+   QUESTION IMAGE
+   ========================================== */
 
 .question-image,
 .question-box img,
 .question-card img {
   position: relative;
+
   z-index: 1;
+
   display: block;
+
   max-width: 100%;
-  max-height: 350px;
-  margin: 12px auto;
-  border-radius: 10px;
+
+  max-height: 260px;
+
+  margin: 8px auto;
+
+  border-radius: 8px;
+
   object-fit: contain;
 }
 
-/* Answer options */
+
+/* ==========================================
+   OPTIONS
+   ========================================== */
 
 .options,
 .option-list,
 .answers {
   position: relative;
+
   z-index: 1;
+
   display: grid;
-  gap: 10px;
-  margin-top: 15px;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 7px;
+
+  margin-top: 9px;
 }
+
+
+/* ==========================================
+   NORMAL OPTION
+   ========================================== */
 
 .option,
 .answer-option,
 .option-label,
 .options label {
   display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.94);
+
+  align-items:
+    flex-start;
+
+  gap: 7px;
+
+  min-height: 38px;
+
+  padding: 8px 10px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 8px;
+
+  background:
+    rgba(255,255,255,.96);
+
   cursor: pointer;
-  overflow-wrap: anywhere;
+
+  overflow-wrap:
+    anywhere;
+
+  font-size: 13px;
+
+  transition:
+    border-color .15s ease,
+    background .15s ease;
 }
 
 .option:hover,
 .answer-option:hover,
 .option-label:hover,
 .options label:hover {
-  border-color: var(--primary);
-  background: #eff6ff;
+  border-color:
+    var(--primary);
+
+  background:
+    #eff6ff;
 }
 
 .option input,
@@ -449,306 +708,731 @@ label {
 .option-label input,
 .options label input {
   flex-shrink: 0;
-  margin-top: 7px;
+
+  margin-top: 4px;
 }
 
-/* Review status colors */
+
+/* ==========================================
+   CORRECT ANSWER
+   সবুজ
+   ========================================== */
 
 .correct,
 .correct-answer,
-.review-correct {
-  border-color: #22c55e !important;
-  background: var(--green-bg) !important;
-  color: #14532d !important;
+.review-correct,
+.correct-option,
+.option.correct-option,
+.answer-option.correct-option {
+  border:
+    1px solid
+    var(--green-border) !important;
+
+  background:
+    var(--green-bg) !important;
+
+  color:
+    #14532d !important;
 }
+
+
+/* ==========================================
+   WRONG ANSWER
+   লাল
+   ========================================== */
 
 .wrong,
 .wrong-answer,
-.review-wrong {
-  border-color: #ef4444 !important;
-  background: var(--red-bg) !important;
-  color: #7f1d1d !important;
+.review-wrong,
+.wrong-option,
+.option.wrong-option,
+.answer-option.wrong-option {
+  border:
+    1px solid
+    var(--red-border) !important;
+
+  background:
+    var(--red-bg) !important;
+
+  color:
+    #991b1b !important;
+
+  font-weight: 700;
 }
+
+
+/* ==========================================
+   UNANSWERED
+   হলুদ
+   ========================================== */
 
 .unanswered,
 .unanswered-question,
 .review-unanswered {
-  border-color: #f59e0b !important;
-  background: var(--yellow-bg) !important;
-  color: #78350f !important;
+  border:
+    1px solid
+    var(--yellow-border) !important;
+
+  background:
+    var(--yellow-bg) !important;
+
+  color:
+    #92400e !important;
 }
 
-.correct-option,
+
+/* ==========================================
+   WRONG QUESTION:
+   Wrong answer = RED
+   Correct answer = GREEN
+   ========================================== */
+
+.question-card.result-wrong
 .option.correct-option,
-.answer-option.correct-option {
-  border: 2px solid #16a34a !important;
-  background: #dcfce7 !important;
-  color: #14532d !important;
+.question.result-wrong
+.option.correct-option,
+.review-wrong
+.correct-answer-option {
+  border:
+    1px solid
+    var(--green-border) !important;
+
+  background:
+    var(--green-bg) !important;
+
+  color:
+    #166534 !important;
+
   font-weight: 700;
 }
 
-.wrong-option,
-.option.wrong-option,
-.answer-option.wrong-option {
-  border: 2px solid #dc2626 !important;
-  background: #fee2e2 !important;
-  color: #7f1d1d !important;
-  font-weight: 700;
-}
 
-.unanswered-option {
-  border-color: #f59e0b !important;
-  background: #fffbeb !important;
-}
+/* ==========================================
+   YOUR ANSWER / CORRECT ANSWER INFO
+   ========================================== */
 
 .your-answer,
 .answer-not-given,
 .correct-answer-text,
 .review-answer {
   position: relative;
+
   z-index: 1;
-  padding: 9px 12px;
-  margin-top: 10px;
-  border-radius: 8px;
-  overflow-wrap: anywhere;
+
+  padding: 7px 9px;
+
+  margin-top: 8px;
+
+  border-radius: 7px;
+
+  overflow-wrap:
+    anywhere;
+
+  font-size: 13px;
 }
+
+
+/* User selected wrong */
 
 .your-answer {
-  background: #f1f5f9;
-  color: #334155;
+  background:
+    #fff1f2;
+
+  color:
+    #991b1b;
+
+  border:
+    1px solid
+    #fda4af;
 }
+
+
+/* No answer */
 
 .answer-not-given {
-  border: 1px solid #f59e0b;
-  background: #fef3c7;
-  color: #92400e;
+  border:
+    1px solid
+    var(--yellow-border);
+
+  background:
+    var(--yellow-bg);
+
+  color:
+    #92400e;
+
   font-weight: 700;
 }
+
+
+/* Correct answer */
 
 .correct-answer-text {
-  border: 1px solid #86efac;
-  background: #f0fdf4;
-  color: #166534;
+  border:
+    1px solid
+    var(--green-border);
+
+  background:
+    var(--green-bg);
+
+  color:
+    #166534;
+
   font-weight: 700;
 }
 
-/* PASS / FAIL result banners */
+
+/* ==========================================
+   REVIEW ANSWER SUMMARY
+   ========================================== */
+
+.review-answer {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px 12px;
+
+  align-items: center;
+
+  background:
+    #f8fafc;
+
+  border:
+    1px solid
+    var(--border);
+}
+
+
+/* ==========================================
+   STATUS LABEL
+   ========================================== */
+
+.answer-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 3px 8px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 800;
+}
+
+.answer-status.correct {
+  background:
+    #bbf7d0 !important;
+
+  color:
+    #166534 !important;
+}
+
+.answer-status.wrong {
+  background:
+    #fecaca !important;
+
+  color:
+    #991b1b !important;
+}
+
+.answer-status.unanswered {
+  background:
+    #fde68a !important;
+
+  color:
+    #92400e !important;
+}
+
+
+/* ==========================================
+   RESULT BANNER
+   ========================================== */
 
 .result-banner,
 #resultBanner,
 .pass-banner,
 .fail-banner {
-  padding: 18px;
-  margin: 0 0 20px;
-  border-radius: 14px;
+  padding: 13px;
+
+  margin:
+    0 0 13px;
+
+  border-radius: 10px;
+
   text-align: center;
-  font-size: clamp(22px, 4vw, 30px);
+
+  font-size: 22px;
+
   font-weight: 900;
 }
+
+
+/* PASS */
 
 .pass-banner,
 .result-banner.pass,
 .result-banner.PASS,
 #resultBanner.pass {
-  color: #14532d;
-  background: #bbf7d0;
-  border: 2px solid #22c55e;
+  color:
+    #166534;
+
+  background:
+    #dcfce7;
+
+  border:
+    1px solid
+    #86efac;
 }
+
+
+/* FAIL */
 
 .fail-banner,
 .result-banner.fail,
 .result-banner.FAIL,
 #resultBanner.fail {
-  color: #7f1d1d;
-  background: #fecaca;
-  border: 2px solid #ef4444;
+  color:
+    #991b1b;
+
+  background:
+    #fee2e2;
+
+  border:
+    1px solid
+    #fca5a5;
 }
+
+
+/* ==========================================
+   RESULT SUMMARY
+   ========================================== */
 
 .result-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 18px 0;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin:
+    12px 0;
 }
 
 .result-stat {
-  padding: 15px 10px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 10px 7px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 9px;
+
   background: white;
+
   text-align: center;
 }
 
 .result-stat strong {
   display: block;
-  font-size: 25px;
-  color: var(--primary-dark);
+
+  font-size: 21px;
+
+  color:
+    var(--primary-dark);
 }
 
-/* Progress */
+
+/* ==========================================
+   PROGRESS
+   ========================================== */
 
 .progress,
 .progress-bar {
   width: 100%;
-  height: 10px;
+
+  height: 7px;
+
   overflow: hidden;
+
   border-radius: 99px;
-  background: #e2e8f0;
+
+  background:
+    #e2e8f0;
 }
 
 .progress-bar > div,
 .progress-fill {
   height: 100%;
+
   border-radius: inherit;
-  background: var(--primary);
-  transition: width 0.25s ease;
+
+  background:
+    var(--primary);
+
+  transition:
+    width .2s ease;
 }
 
-/* Tables */
+
+/* ==========================================
+   TABLE
+   ========================================== */
 
 table {
   width: 100%;
-  border-collapse: collapse;
-  background: white;
+
+  border-collapse:
+    collapse;
+
+  background:
+    white;
+
+  font-size: 13px;
 }
 
 th,
 td {
-  padding: 11px;
-  border: 1px solid var(--border);
+  padding: 8px;
+
+  border:
+    1px solid
+    var(--border);
+
   text-align: left;
-  overflow-wrap: anywhere;
+
+  overflow-wrap:
+    anywhere;
 }
 
 th {
-  background: #eaf1fc;
-  color: #173b76;
+  background:
+    #eaf1fc;
+
+  color:
+    #173b76;
+
   font-weight: 800;
 }
 
 tr:nth-child(even) td {
-  background: #f8fafc;
+  background:
+    #f8fafc;
 }
 
-/* Admin navigation and panels */
+
+/* ==========================================
+   ADMIN NAVIGATION
+   ========================================== */
 
 .admin-nav,
 .nav-tabs,
 .tabs {
   display: flex;
+
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
+
+  gap: 6px;
+
+  margin-bottom:
+    12px;
 }
 
 .admin-nav button,
 .nav-tabs button,
 .tabs button {
-  flex: 0 1 auto;
+  flex:
+    0 1 auto;
 }
+
+
+/* ==========================================
+   ADMIN PANELS
+   ========================================== */
 
 .admin-section,
 .admin-panel {
-  padding: 18px;
-  margin-bottom: 20px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  padding: 13px;
+
+  margin-bottom:
+    13px;
+
+  background:
+    white;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius);
+
+  box-shadow:
+    var(--shadow);
 }
 
 .admin-section h2,
 .admin-panel h2 {
-  color: var(--primary-dark);
+  color:
+    var(--primary-dark);
+
+  font-size: 19px;
 }
+
+
+/* ==========================================
+   ACTIONS
+   ========================================== */
 
 .actions,
 .button-row {
   display: flex;
+
   flex-wrap: wrap;
-  gap: 10px;
+
+  gap: 7px;
+
   align-items: center;
 }
 
 .actions button,
 .button-row button {
-  flex: 0 1 auto;
+  flex:
+    0 1 auto;
 }
 
-/* Alerts and status labels */
+
+/* ==========================================
+   ALERTS
+   ========================================== */
 
 .alert,
 .message,
 .notice {
-  padding: 12px 15px;
-  margin: 12px 0;
-  border-radius: 9px;
-  overflow-wrap: anywhere;
+  padding: 8px 11px;
+
+  margin:
+    8px 0;
+
+  border-radius: 7px;
+
+  overflow-wrap:
+    anywhere;
+
+  font-size: 13px;
 }
 
 .alert-success,
 .message.success {
-  color: #166534;
-  background: #dcfce7;
-  border: 1px solid #86efac;
+  color:
+    #166534;
+
+  background:
+    #dcfce7;
+
+  border:
+    1px solid
+    #86efac;
 }
 
 .alert-error,
 .message.error {
-  color: #991b1b;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
+  color:
+    #991b1b;
+
+  background:
+    #fee2e2;
+
+  border:
+    1px solid
+    #fca5a5;
 }
 
 .alert-warning,
 .message.warning {
-  color: #92400e;
-  background: #fef3c7;
-  border: 1px solid #fcd34d;
+  color:
+    #92400e;
+
+  background:
+    #fef3c7;
+
+  border:
+    1px solid
+    #fcd34d;
 }
+
+
+/* ==========================================
+   BADGES
+   ========================================== */
 
 .badge,
 .status-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #e2e8f0;
-  color: #334155;
-  font-size: 13px;
+
+  padding:
+    2px 7px;
+
+  border-radius:
+    999px;
+
+  background:
+    #e2e8f0;
+
+  color:
+    #334155;
+
+  font-size: 11px;
+
   font-weight: 800;
 }
 
 .badge-pass {
-  background: var(--green-bg);
-  color: var(--green);
+  background:
+    var(--green-bg);
+
+  color:
+    var(--green);
 }
 
 .badge-fail {
-  background: var(--red-bg);
-  color: var(--red);
+  background:
+    var(--red-bg);
+
+  color:
+    var(--red);
 }
 
-/* Footer */
+
+/* ==========================================
+   ADMIN ITEM
+   ========================================== */
+
+.admin-item {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 10px;
+
+  padding: 9px;
+
+  margin-bottom: 6px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 8px;
+
+  background:
+    white;
+}
+
+.admin-item-main {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.admin-item-title {
+  font-weight: 800;
+
+  font-size: 14px;
+
+  overflow-wrap:
+    anywhere;
+}
+
+.admin-item-sub {
+  color:
+    var(--muted);
+
+  font-size: 12px;
+
+  overflow-wrap:
+    anywhere;
+}
+
+.btn-mini {
+  min-height: 32px;
+
+  padding:
+    5px 9px;
+
+  font-size: 12px;
+}
+
+
+/* ==========================================
+   EMPTY
+   ========================================== */
+
+.empty {
+  padding: 18px;
+
+  text-align: center;
+
+  color:
+    var(--muted);
+
+  background:
+    #f8fafc;
+
+  border:
+    1px dashed
+    var(--border);
+
+  border-radius: 8px;
+}
+
+
+/* ==========================================
+   FOOTER
+   ========================================== */
 
 footer,
 .site-footer {
-  padding: 22px 14px;
-  margin-top: 35px;
-  background: #10284f;
-  color: white;
-  text-align: center;
+  padding:
+    15px 10px;
+
+  margin-top:
+    25px;
+
+  background:
+    #10284f;
+
+  color:
+    white;
+
+  text-align:
+    center;
+
+  font-size: 12px;
 }
 
 footer a,
 .site-footer a {
-  color: #bfdbfe;
+  color:
+    #bfdbfe;
 }
 
-/* Mobile layout */
+
+/* ==========================================
+   MOBILE
+   ========================================== */
 
 @media (max-width: 700px) {
+
   body {
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .container,
@@ -756,8 +1440,11 @@ footer a,
   .exam-container,
   .result-container,
   .admin-container {
-    width: calc(100% - 18px);
-    margin: 12px auto;
+    width:
+      calc(100% - 12px);
+
+    margin:
+      8px auto;
   }
 
   .card,
@@ -767,15 +1454,29 @@ footer a,
   .result-card,
   .admin-section,
   .admin-panel {
-    padding: 14px;
-    border-radius: 11px;
+    padding: 11px;
+
+    border-radius: 9px;
   }
 
   header,
   .site-header,
   .exam-header,
   .top-header {
-    padding: 14px 10px;
+    padding:
+      10px 9px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  h3 {
+    font-size: 16px;
   }
 
   .question-box,
@@ -783,21 +1484,45 @@ footer a,
   .question,
   .mcq-question,
   .tf-question {
-    padding: 14px;
-    margin-bottom: 13px;
+    padding: 10px;
+
+    margin-bottom:
+      9px;
+  }
+
+  .question-title,
+  .question-text,
+  .question-box h3,
+  .question-card h3 {
+    font-size: 14px;
   }
 
   .options,
   .option-list,
   .answers {
-    gap: 8px;
+    grid-template-columns:
+      1fr;
+
+    gap: 6px;
   }
 
   .option,
   .answer-option,
   .option-label,
   .options label {
-    padding: 10px;
+    min-height: 36px;
+
+    padding:
+      7px 8px;
+
+    font-size: 12px;
+  }
+
+  .question-image,
+  .question-box img,
+  .question-card img {
+    max-height:
+      220px;
   }
 
   button,
@@ -805,86 +1530,160 @@ footer a,
   .button,
   input[type="submit"],
   input[type="button"] {
-    min-height: 42px;
-    padding: 9px 12px;
+    min-height:
+      35px;
+
+    padding:
+      7px 10px;
+
+    font-size:
+      12px;
   }
 
   .actions button,
   .button-row button {
-    flex: 1 1 130px;
+    flex:
+      1 1 110px;
   }
 
   .result-summary {
-    grid-template-columns: 1fr;
-    gap: 9px;
+    grid-template-columns:
+      repeat(3, 1fr);
+
+    gap: 5px;
   }
 
   .result-stat {
-    padding: 12px;
+    padding:
+      8px 4px;
   }
 
   .result-stat strong {
-    font-size: 22px;
+    font-size:
+      18px;
   }
 
   .exam-info,
   .exam-meta,
   .student-info {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    gap: 5px;
   }
 
   .timer,
   #timer,
   #examTimer,
   .exam-timer {
-    top: 5px;
-    min-width: 95px;
-    font-size: 17px;
+    top: 3px;
+
+    min-width:
+      82px;
+
+    padding:
+      5px 8px;
+
+    font-size:
+      14px;
+  }
+
+  .admin-item {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .admin-item button {
+    width: 100%;
   }
 
   table {
     display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+
+    overflow-x:
+      auto;
+
+    white-space:
+      nowrap;
   }
+
 }
 
+
+/* ==========================================
+   VERY SMALL MOBILE
+   ========================================== */
+
 @media (max-width: 380px) {
+
+  body {
+    font-size:
+      12px;
+  }
+
   h1 {
-    font-size: 22px;
+    font-size:
+      20px;
   }
 
   h2 {
-    font-size: 19px;
+    font-size:
+      17px;
   }
 
   .question-box,
   .question-card,
   .question {
-    padding: 11px;
+    padding:
+      8px;
+  }
+
+  .result-summary {
+    grid-template-columns:
+      1fr;
   }
 
   .admin-nav button,
   .nav-tabs button,
   .tabs button {
-    flex: 1 1 100%;
+    flex:
+      1 1 100%;
   }
+
 }
 
-/* Accessibility */
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
 
 :focus-visible {
-  outline: 3px solid #60a5fa;
-  outline-offset: 2px;
+  outline:
+    2px solid #60a5fa;
+
+  outline-offset:
+    2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+    scroll-behavior:
+      auto !important;
+
+    transition-duration:
+      .01ms !important;
+
+    animation-duration:
+      .01ms !important;
   }
-}
+
+   }
