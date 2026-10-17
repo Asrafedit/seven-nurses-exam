@@ -1,40 +1,25 @@
 /* =========================================================
-   SEVEN NURSES — RESULT / REVIEW PAGE
-   Compact • Responsive • Mobile Friendly+Desktop
+   SEVEN NURSES — COMPACT RESULT / REVIEW DESIGN
+   Mobile + Desktop Responsive
    ========================================================= */
 
 :root{
-  --primary:#1769e0;
-  --primary-dark:#0f4fb8;
-
-  --green:#168653;
-  --green-dark:#087443;
-  --green-bg:#e9f8f1;
-  --green-border:#9bd9bf;
-
-  --red:#dc3545;
-  --red-dark:#b42332;
-  --red-bg:#fff0f1;
-  --red-border:#f0a5ad;
-
-  --yellow:#c58a00;
-  --yellow-dark:#996b00;
-  --yellow-bg:#fff9e7;
-  --yellow-border:#f0d47a;
-
-  --blue-bg:#eef5ff;
-  --border:#dbe4ef;
+  --blue:#1769e0;
+  --blue-dark:#0d47a1;
+  --green:#15945b;
+  --green-bg:#eaf9f2;
+  --red:#e33445;
+  --red-bg:#fff0f2;
+  --yellow:#d99a00;
+  --yellow-bg:#fff9e5;
   --text:#172033;
   --muted:#64748b;
+  --border:#dce5ef;
   --white:#fff;
-
-  --shadow:0 2px 10px rgba(15,23,42,.07);
+  --bg:#f5f8fc;
+  --shadow:0 2px 8px rgba(20,40,80,.07);
   --radius:9px;
 }
-
-/* =========================================================
-   BASIC
-   ========================================================= */
 
 *{
   box-sizing:border-box;
@@ -46,18 +31,23 @@ html{
 
 body{
   margin:0;
-  background:#f5f8fc;
+  background:var(--bg);
   color:var(--text);
-
   font-family:
     "Noto Sans Bengali",
     "Hind Siliguri",
     "SolaimanLipi",
-    Arial,
-    sans-serif;
-
+    Arial,sans-serif;
   font-size:14px;
   line-height:1.45;
+}
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+img{
+  max-width:100%;
 }
 
 button,
@@ -71,13 +61,31 @@ button{
   cursor:pointer;
 }
 
-img{
-  max-width:100%;
-}
-
 [hidden],
 .hidden{
   display:none!important;
+}
+
+h1,h2,h3,h4{
+  margin:0 0 6px;
+  line-height:1.35;
+}
+
+p{
+  margin:5px 0;
+}
+
+/* =========================================================
+   MAIN CONTAINERS
+   ========================================================= */
+
+.container,
+.page-container,
+.exam-container,
+.result-container,
+.admin-container{
+  width:min(960px,calc(100% - 24px));
+  margin:14px auto;
 }
 
 /* =========================================================
@@ -86,223 +94,167 @@ img{
 
 header,
 .site-header,
-.top-header,
-.exam-header{
-
-  background:
-    linear-gradient(
-      135deg,
-      #1451b8,
-      #1769e0
-    );
-
-  color:white;
-
-  padding:9px 16px;
-
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.14);
+.exam-header,
+.top-header{
+  background:linear-gradient(
+    135deg,
+    #1455c7,
+    #1769e0
+  );
+  color:#fff;
+  padding:9px 14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
 }
 
 header h1,
 header h2,
 .site-header h1,
-.site-header h2,
-.top-header h1,
-.exam-header h1{
-
+.exam-header h1,
+.top-header h1{
+  color:#fff;
   margin:0;
-
-  color:white;
-
-  font-size:20px;
-
-  line-height:1.25;
+  font-size:21px;
 }
 
 header p,
 .site-header p,
+.exam-header p,
 .top-header p{
+  margin:1px 0;
+  font-size:12px;
+}
 
-  margin:2px 0;
-
-  font-size:11px;
+.logo,
+.site-logo{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  border-radius:50%;
 }
 
 /* =========================================================
-   MAIN CONTAINER
+   NAVIGATION
    ========================================================= */
 
-.container,
-.page-container,
-.exam-container,
-.result-container,
-.admin-container{
-
-  width:
-    min(
-      1100px,
-      calc(100% - 24px)
-    );
-
-  margin:
-    12px auto;
+.admin-nav,
+.nav-tabs,
+.tabs{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:8px 0;
 }
 
-/* Result page specifically */
-
-.result-container{
-
-  max-width:1100px;
-
-  margin-top:12px;
-  margin-bottom:18px;
+.admin-nav button,
+.nav-tabs button,
+.tabs button{
+  min-height:34px;
+  padding:6px 11px;
+  border-radius:7px;
+  font-size:13px;
 }
 
 /* =========================================================
-   GENERAL CARD
+   CARDS
    ========================================================= */
 
 .card,
 .panel,
+.login-box,
 .exam-card,
-.result-card{
-
+.result-card,
+.admin-section,
+.admin-panel{
   background:#fff;
-
   border:1px solid var(--border);
-
-  border-radius:9px;
-
-  padding:12px;
-
+  border-radius:var(--radius);
+  padding:13px;
   margin-bottom:10px;
-
   box-shadow:var(--shadow);
 }
 
 /* =========================================================
-   RESULT TOP AREA
+   RESULT HEADER
    ========================================================= */
+
+.result-container{
+  max-width:960px;
+}
 
 .result-header,
+.result-top,
 .review-header{
-
   display:grid;
-
-  grid-template-columns:
-    minmax(0,1.7fr)
-    minmax(280px,.9fr);
-
+  grid-template-columns:1fr 350px;
   gap:10px;
-
-  background:#fff;
-
-  border:1px solid var(--border);
-
-  border-radius:9px;
-
-  padding:12px;
-
-  margin-bottom:10px;
-
-  box-shadow:var(--shadow);
+  align-items:stretch;
+  margin-bottom:9px;
 }
 
-/* Left result information */
-
-.result-info{
-
-  min-width:0;
-}
-
-.result-info h1,
-.result-info h2{
-
-  margin:
-    0 0 3px;
-
-  color:#174b9c;
-
-  font-size:22px;
-
-  line-height:1.25;
-}
-
-.result-info p{
-
-  margin:
-    2px 0;
-
-  color:var(--muted);
-
-  font-size:12px;
-}
-
-/* =========================================================
-   EXAM META
-   ========================================================= */
+/* Exam information */
 
 .exam-info,
 .exam-meta,
 .student-info{
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(4,minmax(0,1fr));
-
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
   gap:0;
-
-  padding:8px 4px;
-
-  margin-top:9px;
-
-  background:#f7faff;
-
-  border:1px solid #dce7f4;
-
+  padding:8px;
+  margin:7px 0 0;
+  background:#f8fbff;
+  border:1px solid #dce8f5;
   border-radius:7px;
 }
 
-.exam-info > div,
-.exam-meta > div,
-.student-info > div{
-
-  padding:
-    3px 10px;
-
-  border-right:
-    1px solid #d9e3ef;
+.exam-info > *,
+.exam-meta > *,
+.student-info > *{
+  flex:1;
+  min-width:100px;
+  padding:4px 9px;
+  border-right:1px solid #dbe5ef;
 }
 
-.exam-info > div:last-child,
-.exam-meta > div:last-child,
-.student-info > div:last-child{
-
+.exam-info > *:last-child,
+.exam-meta > *:last-child,
+.student-info > *:last-child{
   border-right:0;
 }
 
-.exam-info strong,
-.exam-meta strong,
-.student-info strong{
+/* =========================================================
+   PASS / FAIL
+   ========================================================= */
 
-  display:block;
-
-  color:#174b9c;
-
-  font-size:13px;
+.result-banner,
+#resultBanner,
+.pass-banner,
+.fail-banner{
+  padding:9px 12px;
+  margin:0 0 7px;
+  border-radius:8px;
+  text-align:center;
+  font-size:20px;
+  font-weight:800;
 }
 
-.exam-info span,
-.exam-meta span,
-.student-info span{
+.pass-banner,
+.result-banner.pass,
+.result-banner.PASS,
+#resultBanner.pass{
+  color:#087443;
+  background:#e5f8ef;
+  border:1px solid #b7ead3;
+}
 
-  display:block;
-
-  color:#26364d;
-
-  font-size:12px;
+.fail-banner,
+.result-banner.fail,
+.result-banner.FAIL,
+#resultBanner.fail{
+  color:#b42332;
+  background:#fff0f2;
+  border:1px solid #f4bdc5;
 }
 
 /* =========================================================
@@ -310,256 +262,79 @@ header p,
    ========================================================= */
 
 .result-summary{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(3,minmax(0,1fr));
-
-  gap:7px;
-
-  margin:8px 0;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin:7px 0;
 }
 
 .result-stat{
-
-  padding:8px 6px;
-
+  padding:7px 5px;
   border:1px solid var(--border);
-
   border-radius:7px;
-
   background:#fff;
-
   text-align:center;
+  font-size:13px;
 }
 
 .result-stat strong{
-
   display:block;
-
-  font-size:19px;
-
+  font-size:21px;
   line-height:1.15;
-}
-
-.result-stat span{
-
-  display:block;
-
-  margin-top:2px;
-
-  font-size:11px;
-
-  color:var(--muted);
-}
-
-/* Correct stat */
-
-.result-stat.correct,
-.result-stat.pass{
-
-  background:#edf9f3;
-
-  border-color:#b9e5d0;
-}
-
-.result-stat.correct strong,
-.result-stat.pass strong{
-
-  color:var(--green);
-}
-
-/* Wrong stat */
-
-.result-stat.wrong,
-.result-stat.fail{
-
-  background:#fff1f2;
-
-  border-color:#f3b5bc;
-}
-
-.result-stat.wrong strong,
-.result-stat.fail strong{
-
-  color:var(--red);
-}
-
-/* Unanswered stat */
-
-.result-stat.unanswered{
-
-  background:#fff9e8;
-
-  border-color:#f0d782;
-}
-
-.result-stat.unanswered strong{
-
-  color:var(--yellow-dark);
+  color:var(--blue-dark);
 }
 
 /* =========================================================
-   PASS / FAIL BANNER
+   RESULT QUESTION CARD
    ========================================================= */
-
-.result-banner,
-.pass-banner,
-.fail-banner{
-
-  padding:9px 12px;
-
-  margin-bottom:8px;
-
-  border-radius:7px;
-
-  text-align:center;
-
-  font-size:18px;
-
-  font-weight:800;
-
-  line-height:1.25;
-}
-
-.pass-banner,
-.result-banner.pass,
-.result-banner.PASS{
-
-  color:#087443;
-
-  background:#e5f8ef;
-
-  border:1px solid #a8dec5;
-}
-
-.fail-banner,
-.result-banner.fail,
-.result-banner.FAIL{
-
-  color:#b42332;
-
-  background:#fff0f1;
-
-  border:1px solid #f1afb7;
-}
-
-/* =========================================================
-   SCORE LINE
-   ========================================================= */
-
-.total-score,
-.score-line{
-
-  margin-top:5px;
-
-  text-align:center;
-
-  color:#174b9c;
-
-  font-size:15px;
-
-  font-weight:800;
-}
-
-/* =========================================================
-   REVIEW QUESTIONS
-   ========================================================= */
-
-.review-list,
-.results-list,
-.question-review{
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:8px;
-}
-
-/* Main question card */
 
 .question-box,
 .question-card,
 .question,
 .mcq-question,
 .tf-question{
-
   position:relative;
-
   overflow:hidden;
-
   padding:10px 11px;
-
-  margin:0 0 8px;
-
-  background:#fff;
-
+  margin:0 0 7px;
   border:1px solid var(--border);
-
   border-radius:9px;
-
-  box-shadow:var(--shadow);
+  background:#fff;
+  box-shadow:0 1px 5px rgba(20,40,80,.05);
 }
 
-/* =========================================================
-   CORRECT QUESTION
-   ========================================================= */
+/* Question card status */
 
-.question-box.correct,
-.question-card.correct,
-.question.correct,
-.mcq-question.correct,
-.tf-question.correct{
-
-  background:
-    linear-gradient(
-      180deg,
-      #f4fcf8 0%,
-      #ffffff 100%
-    );
-
-  border-color:#b8e3ce;
+.question-box.result-correct,
+.question-card.result-correct,
+.question.result-correct{
+  background:linear-gradient(
+    90deg,
+    #f1fcf7,
+    #fff
+  );
+  border-color:#b9e8d2;
 }
 
-/* =========================================================
-   WRONG QUESTION
-   ========================================================= */
-
-.question-box.wrong,
-.question-card.wrong,
-.question.wrong,
-.mcq-question.wrong,
-.tf-question.wrong{
-
-  background:
-    linear-gradient(
-      180deg,
-      #fff6f7 0%,
-      #ffffff 100%
-    );
-
-  border-color:#f2c1c6;
+.question-box.result-wrong,
+.question-card.result-wrong,
+.question.result-wrong{
+  background:linear-gradient(
+    90deg,
+    #fff4f5,
+    #fff
+  );
+  border-color:#f2c2c8;
 }
 
-/* =========================================================
-   UNANSWERED QUESTION
-   ========================================================= */
-
-.question-box.unanswered,
-.question-card.unanswered,
-.question.unanswered,
-.mcq-question.unanswered,
-.tf-question.unanswered{
-
-  background:
-    linear-gradient(
-      180deg,
-      #fffdf5 0%,
-      #ffffff 100%
-    );
-
+.question-box.result-unanswered,
+.question-card.result-unanswered,
+.question.result-unanswered{
+  background:linear-gradient(
+    90deg,
+    #fffbed,
+    #fff
+  );
   border-color:#f1dda0;
 }
 
@@ -568,201 +343,72 @@ header p,
    ========================================================= */
 
 .question-header,
-.question-head{
-
+.question-top{
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
-
   gap:7px;
-
   margin-bottom:5px;
 }
 
-/* Question number */
-
 .question-number{
-
   display:inline-flex;
-
   align-items:center;
-
   justify-content:center;
-
-  width:31px;
-  height:31px;
-
-  flex:0 0 31px;
-
+  min-width:28px;
+  height:28px;
+  padding:3px 7px;
   border-radius:50%;
-
-  background:#168653;
-
-  color:white;
-
-  font-size:15px;
-
+  background:var(--blue);
+  color:#fff;
+  font-size:13px;
   font-weight:800;
 }
-
-.question-box.wrong .question-number,
-.question-card.wrong .question-number,
-.question.wrong .question-number{
-
-  background:#c92130;
-}
-
-.question-box.unanswered .question-number,
-.question-card.unanswered .question-number,
-.question.unanswered .question-number{
-
-  background:#c28a00;
-}
-
-/* =========================================================
-   TYPE BADGE
-   ========================================================= */
-
-.question-type,
-.type-badge{
-
-  display:inline-flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  padding:2px 8px;
-
-  border-radius:20px;
-
-  background:#e8f7f0;
-
-  color:#087443;
-
-  border:1px solid #b7e2ce;
-
-  font-size:10px;
-
-  font-weight:800;
-}
-
-.question-box.wrong .question-type,
-.question-card.wrong .question-type{
-
-  background:#fff0f1;
-
-  color:#b42332;
-
-  border-color:#f0b4ba;
-}
-
-.question-box.unanswered .question-type,
-.question-card.unanswered .question-type{
-
-  background:#fff8df;
-
-  color:#946900;
-
-  border-color:#edd68d;
-}
-
-/* =========================================================
-   STATUS BADGE
-   ========================================================= */
-
-.question-status,
-.status-badge{
-
-  display:inline-flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  margin-left:auto;
-
-  padding:3px 9px;
-
-  border-radius:6px;
-
-  font-size:10px;
-
-  font-weight:800;
-
-  white-space:nowrap;
-}
-
-.question-status.correct,
-.status-badge.correct{
-
-  color:white;
-
-  background:#168653;
-}
-
-.question-status.wrong,
-.status-badge.wrong{
-
-  color:white;
-
-  background:#e53949;
-}
-
-.question-status.unanswered,
-.status-badge.unanswered{
-
-  color:#765400;
-
-  background:#ffe8a3;
-}
-
-/* =========================================================
-   QUESTION TEXT
-   ========================================================= */
 
 .question-title,
 .question-text,
 .question-box h3,
-.question-card h3{
-
-  position:relative;
-
-  margin:
-    3px 0 7px;
-
-  color:#162238;
-
-  font-size:15px;
-
-  line-height:1.5;
-
-  font-weight:800;
-
-  overflow-wrap:anywhere;
+.question-card h3,
+.question-box h4{
+  font-size:14px;
+  font-weight:700;
+  color:#172033;
+  margin-bottom:6px;
 }
 
 /* =========================================================
-   QUESTION IMAGE
+   STATUS BADGES
    ========================================================= */
 
-.question-image,
-.question-box img,
-.question-card img{
+.status-badge,
+.result-badge,
+.question-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
 
-  display:block;
+.status-correct,
+.result-correct .question-status{
+  color:#087443;
+  background:#d9f5e8;
+}
 
-  max-width:100%;
+.status-wrong,
+.result-wrong .question-status{
+  color:#b42332;
+  background:#ffdfe3;
+}
 
-  max-height:230px;
-
-  margin:7px auto;
-
-  border-radius:7px;
-
-  object-fit:contain;
+.status-unanswered,
+.result-unanswered .question-status{
+  color:#946500;
+  background:#ffefb5;
 }
 
 /* =========================================================
@@ -772,361 +418,421 @@ header p,
 .options,
 .option-list,
 .answers{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(2,minmax(0,1fr));
-
-  gap:6px;
-
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
   margin-top:6px;
 }
-
-/* Individual option */
 
 .option,
 .answer-option,
 .option-label,
 .options label{
-
-  position:relative;
-
   display:flex;
-
   align-items:center;
-
-  gap:6px;
-
-  min-height:37px;
-
-  padding:7px 9px;
-
+  gap:7px;
+  min-height:34px;
+  padding:6px 9px;
   margin:0;
-
-  border:1px solid #dbe4ee;
-
+  border:1px solid #dce5ee;
   border-radius:7px;
-
   background:#fff;
-
-  color:#26364d;
-
-  font-size:12px;
-
+  font-size:13px;
   line-height:1.35;
-
-  overflow-wrap:anywhere;
 }
-
-/* =========================================================
-   NORMAL / UNSELECTED OPTION
-   ========================================================= */
-
-.option:hover,
-.answer-option:hover,
-.option-label:hover,
-.options label:hover{
-
-  background:#f7faff;
-
-}
-
-/* =========================================================
-   CORRECT OPTION = GREEN
-   ========================================================= */
-
-.option.correct,
-.option.correct-option,
-.answer-option.correct,
-.answer-option.correct-option,
-.option-label.correct,
-.options label.correct{
-
-  color:#087443;
-
-  background:#e9f8f1;
-
-  border:1.5px solid #6fc59e;
-
-  font-weight:700;
-}
-
-/* =========================================================
-   WRONG SELECTED OPTION = RED
-   ========================================================= */
-
-.option.wrong,
-.option.wrong-option,
-.answer-option.wrong,
-.answer-option.wrong-option,
-.option-label.wrong,
-.options label.wrong{
-
-  color:#b42332;
-
-  background:#fff0f1;
-
-  border:1.5px solid #e88690;
-
-  font-weight:700;
-}
-
-/* =========================================================
-   RADIO / CHECKBOX
-   ========================================================= */
 
 .option input,
 .answer-option input,
 .option-label input,
 .options label input{
-
   flex:0 0 auto;
-
   width:15px;
   height:15px;
-
   margin:0;
-
-  accent-color:#168653;
-}
-
-/* Wrong radio */
-
-.option.wrong input,
-.answer-option.wrong input,
-.option-label.wrong input{
-
-  accent-color:#dc3545;
 }
 
 /* =========================================================
-   ANSWER INFORMATION BAR
+   CORRECT OPTION — GREEN
+   ========================================================= */
+
+.correct,
+.correct-answer,
+.correct-option,
+.option.correct-option,
+.answer-option.correct-option,
+.option.correct,
+.answer-option.correct{
+  border:1px solid #38ad78!important;
+  background:#e5f8ef!important;
+  color:#087443!important;
+  font-weight:700;
+}
+
+/* =========================================================
+   WRONG SELECTED OPTION — RED
+   ========================================================= */
+
+.wrong,
+.wrong-answer,
+.wrong-option,
+.option.wrong-option,
+.answer-option.wrong-option,
+.option.wrong,
+.answer-option.wrong{
+  border:1px solid #ed6673!important;
+  background:#fff0f2!important;
+  color:#b42332!important;
+  font-weight:700;
+}
+
+/* =========================================================
+   UNANSWERED OPTION — YELLOW
+   ========================================================= */
+
+.unanswered,
+.unanswered-question,
+.unanswered-option,
+.review-unanswered{
+  border-color:#e8c95d!important;
+  background:#fff9e5!important;
+  color:#805f00!important;
+}
+
+/* =========================================================
+   ANSWER INFORMATION BOX
    ========================================================= */
 
 .your-answer,
 .answer-not-given,
 .correct-answer-text,
-.review-answer{
-
+.review-answer,
+.answer-result{
   position:relative;
-
-  margin-top:7px;
-
-  padding:7px 9px;
-
-  border-radius:6px;
-
-  font-size:11px;
-
+  z-index:2;
+  display:block;
+  padding:6px 9px;
+  margin-top:6px;
+  border-radius:7px;
+  font-size:12px;
   line-height:1.45;
-
-  overflow-wrap:anywhere;
 }
 
-/* Correct answer info */
+/* Correct result */
 
 .your-answer.correct,
+.answer-result.correct,
 .review-answer.correct{
-
   color:#087443;
-
-  background:#e5f7ee;
-
-  border:1px solid #9ed9be;
+  background:#dff6eb;
+  border:1px solid #a9dfc7;
 }
 
-/* Wrong answer info */
+/* Wrong result */
 
 .your-answer.wrong,
+.answer-result.wrong,
 .review-answer.wrong{
-
   color:#b42332;
-
-  background:#ffe9eb;
-
-  border:1px solid #efaab2;
+  background:#ffe4e7;
+  border:1px solid #f0b3bb;
 }
 
 /* Unanswered */
 
-.answer-not-given{
-
-  color:#795700;
-
-  background:#fff7dc;
-
-  border:1px solid #edd37d;
-
-  font-weight:600;
-}
-
-/* Correct answer text inside wrong/unanswered */
-
-.correct-answer-text{
-
-  color:#087443;
-
-  background:#e8f8f0;
-
-  border:1px solid #9ed9be;
-
-  font-weight:700;
+.answer-not-given,
+.review-answer.unanswered{
+  color:#855f00;
+  background:#fff4c7;
+  border:1px solid #efd36d;
 }
 
 /* =========================================================
    IMPORTANT:
-   WRONG ANSWER + CORRECT ANSWER
+   WRONG ANSWER BOX
+   Shows wrong selected answer RED
+   AND correct answer GREEN
    ========================================================= */
 
-.wrong-answer-review{
-
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:6px;
-
-  margin-top:7px;
-}
-
-.wrong-answer-review .your-answer{
-
-  margin-top:0;
-
+.wrong-answer-info{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 12px;
+  padding:7px 9px;
+  margin-top:6px;
+  border:1px solid #efb5bd;
+  border-radius:7px;
+  background:#fff0f2;
   color:#b42332;
-
-  background:#fff0f1;
-
-  border:1px solid #efaab2;
+  font-size:12px;
 }
 
-.wrong-answer-review .correct-answer-text{
+.wrong-answer-info .your-choice{
+  color:#b42332;
+  font-weight:800;
+}
 
-  margin-top:0;
-
+.wrong-answer-info .correct-choice{
   color:#087443;
-
-  background:#e8f8f0;
-
-  border:1px solid #9ed9be;
+  font-weight:800;
 }
 
 /* =========================================================
-   UNANSWERED:
-   YELLOW BOX + GREEN CORRECT ANSWER
+   UNANSWERED RESULT
+   Yellow box + correct answer green
    ========================================================= */
 
-.unanswered-review{
-
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:6px;
-
-  margin-top:7px;
+.unanswered-answer-info{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 12px;
+  padding:7px 9px;
+  margin-top:6px;
+  border:1px solid #efd36d;
+  border-radius:7px;
+  background:#fff8df;
+  color:#805f00;
+  font-size:12px;
 }
 
-.unanswered-review .answer-not-given{
-
-  margin-top:0;
-}
-
-.unanswered-review .correct-answer-text{
-
-  margin-top:0;
+.unanswered-answer-info .correct-choice{
+  color:#087443;
+  font-weight:800;
 }
 
 /* =========================================================
-   RESULT REVIEW TABLE
+   GREEN / RED / YELLOW ICON
+   ========================================================= */
+
+.answer-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  border-radius:50%;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+}
+
+.answer-icon.green{
+  background:#15945b;
+}
+
+.answer-icon.red{
+  background:#dc2638;
+}
+
+.answer-icon.yellow{
+  background:#d99a00;
+}
+
+/* =========================================================
+   WATERMARK
+   ========================================================= */
+
+.question-box::before,
+.question-card::before,
+.question::before,
+.mcq-question::before,
+.tf-question::before{
+  content:"SEVEN NURSES";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#1769e0;
+  opacity:.025;
+  font-size:38px;
+  font-weight:900;
+  letter-spacing:1px;
+  transform:rotate(-22deg);
+  pointer-events:none;
+  user-select:none;
+}
+
+.question-box > *,
+.question-card > *,
+.question > *,
+.mcq-question > *,
+.tf-question > *{
+  position:relative;
+  z-index:1;
+}
+
+/* =========================================================
+   TABLE
    ========================================================= */
 
 table{
-
   width:100%;
-
   border-collapse:collapse;
-
   background:#fff;
-
   font-size:12px;
 }
 
 th,
 td{
-
-  padding:7px 8px;
-
+  padding:7px 6px;
   border:1px solid var(--border);
-
   text-align:left;
-
-  overflow-wrap:anywhere;
 }
 
 th{
-
-  background:#edf4fd;
-
-  color:#174b9c;
-
+  background:#eaf2fc;
+  color:#173b76;
   font-weight:800;
 }
 
+tr:nth-child(even) td{
+  background:#fafcff;
+}
+
 /* =========================================================
-   NAVIGATION
+   BUTTONS
    ========================================================= */
 
-.result-navigation,
-.review-navigation,
-.pagination{
-
-  display:flex;
-
+button,
+.btn,
+.button,
+input[type="submit"],
+input[type="button"]{
+  display:inline-flex;
   align-items:center;
-
-  justify-content:space-between;
-
-  gap:8px;
-
-  margin-top:9px;
-}
-
-.result-navigation button,
-.review-navigation button,
-.pagination button{
-
+  justify-content:center;
+  gap:5px;
   min-height:34px;
-
-  padding:6px 12px;
-
+  padding:6px 11px;
+  border:0;
   border-radius:7px;
-
+  background:var(--blue);
+  color:#fff;
   font-size:12px;
+  font-weight:700;
+  transition:.15s;
+}
 
+button:hover,
+.btn:hover,
+.button:hover{
+  background:var(--blue-dark);
+}
+
+.btn-green,
+.btn-success,
+button.success{
+  background:#15945b;
+}
+
+.btn-red,
+.btn-danger,
+button.danger{
+  background:#d92d3f;
+}
+
+.btn-yellow,
+.btn-warning,
+button.warning{
+  background:#d99a00;
+}
+
+.btn-blue{
+  background:var(--blue);
+}
+
+.btn-mini{
+  min-height:30px;
+  padding:4px 8px;
+  font-size:11px;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+input,
+select,
+textarea{
+  width:100%;
+  min-width:0;
+  padding:8px 9px;
+  margin:3px 0 8px;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  background:#fff;
+  color:var(--text);
+  font-size:13px;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--blue);
+  outline:none;
+  box-shadow:0 0 0 2px rgba(23,105,224,.10);
+}
+
+label{
+  display:block;
+  margin-bottom:3px;
+  font-size:12px;
   font-weight:700;
 }
 
-.page-number{
+/* =========================================================
+   ADMIN ITEMS
+   ========================================================= */
 
-  min-width:55px;
-
-  padding:6px 10px;
-
-  text-align:center;
-
+.admin-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px;
+  margin-bottom:5px;
+  border:1px solid var(--border);
   border-radius:7px;
+  background:#fff;
+}
 
-  background:#edf4fc;
+.admin-item-main{
+  min-width:0;
+}
 
-  color:#26364d;
-
-  font-size:12px;
-
+.admin-item-title{
+  font-size:13px;
   font-weight:700;
+  overflow-wrap:anywhere;
+}
+
+.admin-item-sub{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.progress,
+.progress-bar{
+  width:100%;
+  height:7px;
+  overflow:hidden;
+  border-radius:99px;
+  background:#e5eaf0;
+}
+
+.progress-fill,
+.progress-bar > div{
+  height:100%;
+  border-radius:99px;
+  background:var(--blue);
 }
 
 /* =========================================================
@@ -1135,17 +841,11 @@ th{
 
 footer,
 .site-footer{
-
-  padding:13px 10px;
-
-  margin-top:20px;
-
-  background:#102b56;
-
+  padding:12px;
+  margin-top:18px;
+  background:#10284f;
   color:#fff;
-
   text-align:center;
-
   font-size:11px;
 }
 
@@ -1156,10 +856,7 @@ footer,
 @media(max-width:700px){
 
   body{
-
     font-size:13px;
-
-    line-height:1.4;
   }
 
   .container,
@@ -1167,358 +864,224 @@ footer,
   .exam-container,
   .result-container,
   .admin-container{
-
-    width:
-      calc(100% - 12px);
-
-    margin:
-      7px auto;
-  }
-
-  header,
-  .site-header,
-  .top-header,
-  .exam-header{
-
-    padding:
-      8px 9px;
-  }
-
-  header h1,
-  .site-header h1,
-  .top-header h1,
-  .exam-header h1{
-
-    font-size:17px;
+    width:calc(100% - 12px);
+    margin:7px auto;
   }
 
   .card,
   .panel,
+  .login-box,
   .exam-card,
-  .result-card{
-
+  .result-card,
+  .admin-section,
+  .admin-panel{
     padding:9px;
-
-    border-radius:8px;
-
     margin-bottom:7px;
+    border-radius:8px;
   }
 
-  /* Result header */
+  header,
+  .site-header,
+  .exam-header,
+  .top-header{
+    padding:7px 9px;
+  }
+
+  header h1,
+  .site-header h1,
+  .exam-header h1,
+  .top-header h1{
+    font-size:17px;
+  }
+
+  .logo,
+  .site-logo{
+    width:40px;
+    height:40px;
+  }
 
   .result-header,
+  .result-top,
   .review-header{
-
     grid-template-columns:1fr;
-
     gap:7px;
-
-    padding:9px;
-
-    margin-bottom:7px;
   }
-
-  .result-info h1,
-  .result-info h2{
-
-    font-size:18px;
-  }
-
-  /* Meta */
 
   .exam-info,
   .exam-meta,
   .student-info{
-
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-
-    padding:4px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:0;
   }
 
-  .exam-info > div,
-  .exam-meta > div,
-  .student-info > div{
-
-    padding:4px 7px;
-
+  .exam-info > *,
+  .exam-meta > *,
+  .student-info > *{
+    min-width:0;
+    padding:4px 6px;
     border-right:0;
-
-    border-bottom:
-      1px solid #dce5ef;
+    border-bottom:1px solid #dbe5ef;
   }
 
-  .exam-info > div:nth-last-child(-n+2),
-  .exam-meta > div:nth-last-child(-n+2),
-  .student-info > div:nth-last-child(-n+2){
-
+  .exam-info > *:nth-last-child(-n+2),
+  .exam-meta > *:nth-last-child(-n+2),
+  .student-info > *:nth-last-child(-n+2){
     border-bottom:0;
   }
 
-  /* Summary */
-
   .result-summary{
-
-    grid-template-columns:
-      repeat(3,minmax(0,1fr));
-
-    gap:5px;
+    grid-template-columns:repeat(3,1fr);
+    gap:4px;
   }
 
   .result-stat{
-
-    padding:7px 3px;
+    padding:6px 3px;
+    font-size:11px;
   }
 
   .result-stat strong{
-
     font-size:17px;
   }
 
-  .result-stat span{
-
-    font-size:9px;
-  }
-
-  /* Banner */
-
   .result-banner,
+  #resultBanner,
   .pass-banner,
   .fail-banner{
-
-    padding:7px;
-
-    font-size:16px;
+    padding:7px 9px;
+    font-size:17px;
   }
-
-  /* Question */
 
   .question-box,
   .question-card,
   .question,
   .mcq-question,
   .tf-question{
-
     padding:8px;
-
-    margin-bottom:7px;
-
-    border-radius:8px;
-  }
-
-  .question-number{
-
-    width:28px;
-    height:28px;
-
-    flex-basis:28px;
-
-    font-size:13px;
+    margin-bottom:6px;
   }
 
   .question-title,
   .question-text,
   .question-box h3,
-  .question-card h3{
-
+  .question-card h3,
+  .question-box h4{
     font-size:13px;
-
-    line-height:1.45;
   }
 
-  .question-type,
-  .type-badge{
-
-    padding:2px 6px;
-
-    font-size:9px;
+  .question-number{
+    min-width:25px;
+    height:25px;
+    font-size:12px;
   }
-
-  .question-status,
-  .status-badge{
-
-    padding:2px 7px;
-
-    font-size:9px;
-  }
-
-  /* Options */
 
   .options,
   .option-list,
   .answers{
-
-    grid-template-columns:1fr;
-
-    gap:5px;
-
-    margin-top:5px;
+    grid-template-columns:1fr 1fr;
+    gap:4px;
   }
 
   .option,
   .answer-option,
   .option-label,
   .options label{
-
-    min-height:34px;
-
-    padding:6px 8px;
-
-    font-size:11px;
-
-    border-radius:6px;
+    min-height:31px;
+    padding:5px 6px;
+    gap:5px;
+    font-size:11.5px;
   }
 
   .option input,
   .answer-option input,
   .option-label input,
   .options label input{
-
-    width:14px;
-    height:14px;
-  }
-
-  /* Wrong/correct information */
-
-  .wrong-answer-review,
-  .unanswered-review{
-
-    grid-template-columns:1fr;
-
-    gap:5px;
+    width:13px;
+    height:13px;
   }
 
   .your-answer,
   .answer-not-given,
   .correct-answer-text,
-  .review-answer{
-
-    padding:6px 8px;
-
-    font-size:10px;
-  }
-
-  /* Question image */
-
-  .question-image,
-  .question-box img,
-  .question-card img{
-
-    max-height:180px;
-
-    margin:6px auto;
-  }
-
-  /* Navigation */
-
-  .result-navigation,
-  .review-navigation,
-  .pagination{
-
-    gap:5px;
-
-    margin-top:7px;
-  }
-
-  .result-navigation button,
-  .review-navigation button,
-  .pagination button{
-
-    min-height:32px;
-
-    padding:5px 9px;
-
-    font-size:11px;
-  }
-
-  .page-number{
-
-    min-width:45px;
-
+  .review-answer,
+  .answer-result,
+  .wrong-answer-info,
+  .unanswered-answer-info{
     padding:5px 7px;
+    font-size:10.5px;
+  }
 
-    font-size:10px;
+  .status-badge,
+  .result-badge,
+  .question-status{
+    padding:2px 6px;
+    font-size:9px;
+  }
+
+  .actions,
+  .button-row{
+    gap:5px;
+  }
+
+  .actions button,
+  .button-row button{
+    flex:1 1 100px;
+    min-height:32px;
+    padding:5px 8px;
   }
 
   table{
-
     font-size:10px;
   }
 
   th,
   td{
-
-    padding:6px;
-  }
-
-  footer,
-  .site-footer{
-
-    font-size:9px;
-
-    padding:10px 7px;
+    padding:5px 4px;
   }
 }
 
 /* =========================================================
-   VERY SMALL MOBILE
+   VERY SMALL PHONES
    ========================================================= */
 
 @media(max-width:380px){
 
-  .result-summary{
+  body{
+    font-size:12px;
+  }
 
+  .container,
+  .page-container,
+  .exam-container,
+  .result-container,
+  .admin-container{
+    width:calc(100% - 8px);
+  }
+
+  .result-summary{
     gap:3px;
   }
 
   .result-stat{
-
-    padding:6px 2px;
+    padding:5px 2px;
+    font-size:10px;
   }
 
   .result-stat strong{
-
-    font-size:15px;
+    font-size:16px;
   }
 
-  .result-stat span{
-
-    font-size:8px;
-  }
-
-  .question-box,
-  .question-card,
-  .question,
-  .mcq-question,
-  .tf-question{
-
-    padding:7px;
-  }
-
-  .question-title,
-  .question-text,
-  .question-box h3,
-  .question-card h3{
-
-    font-size:12px;
+  .options,
+  .option-list,
+  .answers{
+    grid-template-columns:1fr;
   }
 
   .option,
   .answer-option,
   .option-label,
   .options label{
-
-    font-size:10.5px;
-
-    padding:5px 7px;
-  }
-
-  .question-status,
-  .status-badge{
-
-    font-size:8px;
-
-    padding:2px 5px;
+    font-size:11px;
   }
 }
 
@@ -1527,21 +1090,15 @@ footer,
    ========================================================= */
 
 :focus-visible{
-
-  outline:
-    2px solid #60a5fa;
-
+  outline:2px solid #60a5fa;
   outline-offset:2px;
 }
 
 @media(prefers-reduced-motion:reduce){
-
-  *{
-
+  *,
+  *::before,
+  *::after{
     scroll-behavior:auto!important;
-
     transition:none!important;
-
-    animation:none!important;
   }
-     }
+   }
