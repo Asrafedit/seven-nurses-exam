@@ -1,42 +1,30 @@
-/* ==========================================
-   SEVEN NURSES ONLINE EXAM SYSTEM
-   Compact + Responsive + Result Review UI
-   ========================================== */
+/* =========================================================
+   SEVEN NURSES ONLINE EXAM
+   COMPACT • RESPONSIVE • MOBILE + DESKTOP
+   ========================================================= */
 
 :root {
   --primary: #1769e0;
-  --primary-dark: #104eaf;
-
+  --primary-dark: #0f4fb8;
+  --green: #15803d;
+  --green-bg: #dcfce7;
+  --red: #b91c1c;
+  --red-bg: #fee2e2;
+  --yellow: #a16207;
+  --yellow-bg: #fef3c7;
+  --blue-bg: #eff6ff;
   --bg: #f4f7fb;
-  --surface: #ffffff;
+  --white: #fff;
   --text: #172033;
   --muted: #64748b;
-  --border: #d9e2ef;
-
-  --green: #15803d;
-  --green-bg: #ecfdf3;
-  --green-border: #86efac;
-
-  --red: #dc2626;
-  --red-bg: #fff1f2;
-  --red-border: #fda4af;
-
-  --yellow: #a16207;
-  --yellow-bg: #fffbeb;
-  --yellow-border: #fcd34d;
-
-  --blue-bg: #eff6ff;
-
-  --shadow:
-    0 3px 12px rgba(15, 23, 42, 0.07);
-
-  --radius: 10px;
+  --border: #d9e2ee;
+  --shadow: 0 2px 10px rgba(15, 23, 42, .07);
+  --radius: 9px;
 }
 
-
-/* ==========================================
-   RESET
-   ========================================== */
+/* =========================================================
+   BASIC
+   ========================================================= */
 
 * {
   box-sizing: border-box;
@@ -49,10 +37,8 @@ html {
 body {
   margin: 0;
   padding: 0;
-
   background: var(--bg);
   color: var(--text);
-
   font-family:
     "Noto Sans Bengali",
     "Hind Siliguri",
@@ -61,7 +47,7 @@ body {
     sans-serif;
 
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 button,
@@ -99,10 +85,9 @@ a:hover {
   display: none !important;
 }
 
-
-/* ==========================================
-   LAYOUT
-   ========================================== */
+/* =========================================================
+   CONTAINER
+   ========================================================= */
 
 .container,
 .page-container,
@@ -113,50 +98,42 @@ a:hover {
   margin: 14px auto;
 }
 
-
-/* ==========================================
+/* =========================================================
    CARDS
-   ========================================== */
+   ========================================================= */
 
 .card,
 .panel,
 .login-box,
 .exam-card,
 .result-card {
-  background: var(--surface);
-
-  border:
-    1px solid var(--border);
-
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-
   padding: 14px;
-
   margin-bottom: 12px;
-
   box-shadow: var(--shadow);
 }
 
-
-/* ==========================================
+/* =========================================================
    HEADINGS
-   ========================================== */
+   ========================================================= */
 
 h1,
 h2,
 h3,
 h4 {
-  line-height: 1.4;
-  margin-top: 0;
+  line-height: 1.3;
+  margin: 0 0 8px;
   overflow-wrap: anywhere;
 }
 
 h1 {
-  font-size: 27px;
+  font-size: 25px;
 }
 
 h2 {
-  font-size: 21px;
+  font-size: 20px;
 }
 
 h3 {
@@ -168,6 +145,7 @@ h4 {
 }
 
 p {
+  margin: 5px 0 8px;
   overflow-wrap: anywhere;
 }
 
@@ -177,10 +155,9 @@ small {
   color: var(--muted);
 }
 
-
-/* ==========================================
+/* =========================================================
    HEADER
-   ========================================== */
+   ========================================================= */
 
 header,
 .site-header,
@@ -197,12 +174,10 @@ header,
     );
 
   color: white;
-
-  padding: 12px 16px;
+  padding: 12px 14px;
 
   box-shadow:
-    0 3px 12px
-    rgba(15, 23, 42, .14);
+    0 2px 10px rgba(15, 23, 42, .12);
 }
 
 header h1,
@@ -225,26 +200,24 @@ header a,
 .site-logo {
   max-width: 65px;
   max-height: 65px;
-
   object-fit: contain;
-
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
-
-/* ==========================================
+/* =========================================================
    BUTTONS
-   ========================================== */
+   ========================================================= */
 
 button,
 .btn,
 .button,
 input[type="submit"],
 input[type="button"] {
+
   display: inline-flex;
 
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   gap: 5px;
 
@@ -253,16 +226,13 @@ input[type="button"] {
   padding: 7px 12px;
 
   border: 0;
-
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: var(--primary);
-
   color: white;
 
-  font-weight: 700;
-
   font-size: 13px;
+  font-weight: 700;
 
   text-align: center;
 
@@ -308,36 +278,32 @@ button.warning {
 .btn-outline,
 button.outline {
   color: var(--primary);
-
-  background: transparent;
-
-  border:
-    1px solid var(--primary);
+  background: white;
+  border: 1px solid var(--primary);
 }
 
-
-/* ==========================================
+/* =========================================================
    FORMS
-   ========================================== */
+   ========================================================= */
 
 input,
 select,
 textarea {
+
   width: 100%;
 
   min-width: 0;
 
-  padding: 9px 11px;
+  padding: 8px 10px;
 
-  margin: 4px 0 10px;
+  margin: 3px 0 9px;
 
   border:
     1px solid #cbd5e1;
 
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: white;
-
   color: var(--text);
 
   outline: none;
@@ -348,15 +314,17 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
+
   border-color: var(--primary);
 
   box-shadow:
     0 0 0 2px
-    rgba(23, 105, 224, .12);
+    rgba(23, 105, 224, .10);
 }
 
 input[type="radio"],
 input[type="checkbox"] {
+
   width: auto;
 
   margin:
@@ -367,33 +335,36 @@ input[type="checkbox"] {
 }
 
 label {
+
   display: block;
 
   font-weight: 600;
 
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .form-group {
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 }
 
-
-/* ==========================================
+/* =========================================================
    LOGIN
-   ========================================== */
+   ========================================================= */
 
 .login-box {
+
   width:
     min(400px, calc(100% - 24px));
 
-  margin: 25px auto;
+  margin:
+    25px auto;
 
-  padding: 20px;
+  padding: 18px;
 }
 
 .login-box h1,
 .login-box h2 {
+
   text-align: center;
 
   color:
@@ -405,14 +376,14 @@ label {
   width: 100%;
 }
 
-
-/* ==========================================
-   EXAM INFO
-   ========================================== */
+/* =========================================================
+   EXAM INFORMATION
+   ========================================================= */
 
 .exam-info,
 .exam-meta,
 .student-info {
+
   display: flex;
 
   flex-wrap: wrap;
@@ -424,7 +395,7 @@ label {
 
   gap: 7px;
 
-  padding: 9px 12px;
+  padding: 8px 10px;
 
   margin-bottom: 10px;
 
@@ -433,18 +404,18 @@ label {
   border:
     1px solid var(--border);
 
-  border-radius: 9px;
+  border-radius: 8px;
 }
 
-
-/* ==========================================
+/* =========================================================
    TIMER
-   ========================================== */
+   ========================================================= */
 
 .timer,
 #timer,
 #examTimer,
 .exam-timer {
+
   position: sticky;
 
   top: 5px;
@@ -453,18 +424,17 @@ label {
 
   display: inline-flex;
 
-  justify-content: center;
-
   align-items: center;
+  justify-content: center;
 
   min-width: 90px;
 
-  padding: 6px 11px;
+  padding: 6px 10px;
 
   margin:
-    3px 0 9px;
+    3px 0 8px;
 
-  border-radius: 9px;
+  border-radius: 8px;
 
   background: #172554;
 
@@ -475,52 +445,53 @@ label {
   font-weight: 800;
 
   box-shadow:
-    0 3px 9px
-    rgba(15, 23, 42, .15);
+    0 2px 8px
+    rgba(15, 23, 42, .14);
 }
 
-
-/* ==========================================
+/* =========================================================
    QUESTION CARD
-   ========================================== */
+   ========================================================= */
 
 .question-box,
 .question-card,
 .question,
 .mcq-question,
 .tf-question {
+
   position: relative;
 
   isolation: isolate;
 
   overflow: hidden;
 
-  padding: 13px;
+  padding: 12px;
 
   margin:
-    0 0 11px;
+    0 0 10px;
 
   border:
     1px solid var(--border);
 
-  border-radius: 11px;
+  border-radius: 9px;
 
   background: white;
 
   box-shadow: var(--shadow);
 }
 
-
-/* ==========================================
+/* =========================================================
    WATERMARK
-   ========================================== */
+   ========================================================= */
 
 .question-box::before,
 .question-card::before,
 .question::before,
 .mcq-question::before,
 .tf-question::before {
-  content: "SEVEN NURSES";
+
+  content:
+    "SEVEN NURSES";
 
   position: absolute;
 
@@ -531,7 +502,6 @@ label {
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   color: #1769e0;
@@ -539,80 +509,81 @@ label {
   opacity: .035;
 
   font-size:
-    clamp(25px, 6vw, 50px);
+    clamp(20px, 5vw, 40px);
 
   font-weight: 900;
 
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 
   text-align: center;
 
   transform:
-    rotate(-24deg);
+    rotate(-22deg);
 
   pointer-events: none;
 
   user-select: none;
 }
 
-
-/* ==========================================
+/* =========================================================
    QUESTION TEXT
-   ========================================== */
+   ========================================================= */
 
 .question-title,
 .question-text,
 .question-box h3,
 .question-card h3 {
+
   position: relative;
 
   z-index: 1;
 
-  margin:
-    0 0 8px;
-
   font-size: 15px;
 
   font-weight: 700;
+
+  line-height: 1.5;
+
+  margin-bottom: 8px;
 
   overflow-wrap:
     anywhere;
 }
 
 .question-number {
+
   display: inline-flex;
 
   align-items: center;
-
   justify-content: center;
 
-  min-width: 28px;
+  min-width: 27px;
 
-  min-height: 28px;
+  min-height: 27px;
 
-  padding: 3px 7px;
+  padding: 2px 7px;
 
   margin-right: 5px;
 
-  border-radius: 7px;
+  border-radius: 6px;
 
-  background:
-    #dbeafe;
+  background: #dbeafe;
 
-  color:
-    #1d4ed8;
+  color: #1d4ed8;
+
+  font-size: 12px;
 
   font-weight: 800;
 }
 
-
-/* ==========================================
+/* =========================================================
    QUESTION IMAGE
-   ========================================== */
+   ========================================================= */
 
 .question-image,
 .question-box img,
 .question-card img {
+
   position: relative;
 
   z-index: 1;
@@ -621,241 +592,272 @@ label {
 
   max-width: 100%;
 
-  max-height: 260px;
+  max-height: 240px;
 
   margin: 8px auto;
 
-  border-radius: 8px;
+  border-radius: 7px;
 
   object-fit: contain;
 }
 
-
-/* ==========================================
+/* =========================================================
    OPTIONS
-   ========================================== */
+   ========================================================= */
 
 .options,
 .option-list,
 .answers {
+
   position: relative;
 
   z-index: 1;
 
   display: grid;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  gap: 6px;
 
-  gap: 7px;
-
-  margin-top: 9px;
+  margin-top: 8px;
 }
 
-
-/* ==========================================
+/* =========================================================
    NORMAL OPTION
-   ========================================== */
+   ========================================================= */
 
 .option,
 .answer-option,
 .option-label,
 .options label {
+
   display: flex;
 
-  align-items:
-    flex-start;
+  align-items: flex-start;
 
   gap: 7px;
 
-  min-height: 38px;
-
-  padding: 8px 10px;
+  padding: 8px 9px;
 
   border:
     1px solid var(--border);
 
-  border-radius: 8px;
+  border-radius: 7px;
 
   background:
     rgba(255,255,255,.96);
 
   cursor: pointer;
 
-  overflow-wrap:
-    anywhere;
-
   font-size: 13px;
 
-  transition:
-    border-color .15s ease,
-    background .15s ease;
+  line-height: 1.4;
+
+  overflow-wrap:
+    anywhere;
 }
 
 .option:hover,
 .answer-option:hover,
 .option-label:hover,
 .options label:hover {
+
   border-color:
     var(--primary);
 
   background:
-    #eff6ff;
+    var(--blue-bg);
 }
 
 .option input,
 .answer-option input,
 .option-label input,
 .options label input {
+
   flex-shrink: 0;
 
   margin-top: 4px;
 }
 
-
-/* ==========================================
-   CORRECT ANSWER
-   সবুজ
-   ========================================== */
+/* =========================================================
+   CORRECT
+   ========================================================= */
 
 .correct,
 .correct-answer,
-.review-correct,
-.correct-option,
-.option.correct-option,
-.answer-option.correct-option {
+.review-correct {
+
   border:
-    1px solid
-    var(--green-border) !important;
+    2px solid #22c55e !important;
 
   background:
     var(--green-bg) !important;
 
   color:
     #14532d !important;
+
+  font-weight: 700;
 }
 
-
-/* ==========================================
-   WRONG ANSWER
-   লাল
-   ========================================== */
+/* =========================================================
+   WRONG
+   ========================================================= */
 
 .wrong,
 .wrong-answer,
-.review-wrong,
-.wrong-option,
-.option.wrong-option,
-.answer-option.wrong-option {
+.review-wrong {
+
   border:
-    1px solid
-    var(--red-border) !important;
+    2px solid #ef4444 !important;
 
   background:
     var(--red-bg) !important;
 
   color:
-    #991b1b !important;
+    #7f1d1d !important;
 
   font-weight: 700;
 }
 
-
-/* ==========================================
+/* =========================================================
    UNANSWERED
-   হলুদ
-   ========================================== */
+   ========================================================= */
 
 .unanswered,
 .unanswered-question,
 .review-unanswered {
+
   border:
-    1px solid
-    var(--yellow-border) !important;
+    2px solid #f59e0b !important;
 
   background:
     var(--yellow-bg) !important;
 
   color:
-    #92400e !important;
+    #78350f !important;
 }
 
+/* =========================================================
+   WRONG SELECTED + CORRECT ANSWER
+   ========================================================= */
 
-/* ==========================================
-   WRONG QUESTION:
-   Wrong answer = RED
-   Correct answer = GREEN
-   ========================================== */
+/*
+   ভুল উত্তর:
+   RED
 
-.question-card.result-wrong
+   সঠিক উত্তর:
+   GREEN
+*/
+
+.correct-option,
 .option.correct-option,
-.question.result-wrong
-.option.correct-option,
-.review-wrong
-.correct-answer-option {
+.answer-option.correct-option {
+
   border:
-    1px solid
-    var(--green-border) !important;
+    2px solid #16a34a !important;
 
   background:
-    var(--green-bg) !important;
+    #dcfce7 !important;
 
   color:
-    #166534 !important;
+    #14532d !important;
 
   font-weight: 700;
 }
 
+.wrong-option,
+.option.wrong-option,
+.answer-option.wrong-option {
 
-/* ==========================================
-   YOUR ANSWER / CORRECT ANSWER INFO
-   ========================================== */
+  border:
+    2px solid #dc2626 !important;
+
+  background:
+    #fee2e2 !important;
+
+  color:
+    #7f1d1d !important;
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   UNANSWERED OPTIONS
+   ========================================================= */
+
+.unanswered-option {
+
+  border:
+    2px solid #f59e0b !important;
+
+  background:
+    #fffbeb !important;
+
+  color:
+    #78350f !important;
+}
+
+/*
+   উত্তর না দিলেও সঠিক উত্তরটি সবুজ থাকবে
+*/
+
+.unanswered-option.correct-option {
+
+  border:
+    2px solid #16a34a !important;
+
+  background:
+    #dcfce7 !important;
+
+  color:
+    #14532d !important;
+}
+
+/* =========================================================
+   ANSWER INFORMATION
+   ========================================================= */
 
 .your-answer,
 .answer-not-given,
 .correct-answer-text,
 .review-answer {
+
   position: relative;
 
   z-index: 1;
 
   padding: 7px 9px;
 
-  margin-top: 8px;
+  margin-top: 7px;
 
-  border-radius: 7px;
+  border-radius: 6px;
+
+  font-size: 13px;
+
+  line-height: 1.4;
 
   overflow-wrap:
     anywhere;
-
-  font-size: 13px;
 }
 
-
-/* User selected wrong */
+/* Student answer */
 
 .your-answer {
+
   background:
-    #fff1f2;
+    #f1f5f9;
 
   color:
-    #991b1b;
-
-  border:
-    1px solid
-    #fda4af;
+    #334155;
 }
-
 
 /* No answer */
 
 .answer-not-given {
+
   border:
-    1px solid
-    var(--yellow-border);
+    1px solid #f59e0b;
 
   background:
-    var(--yellow-bg);
+    #fef3c7;
 
   color:
     #92400e;
@@ -863,16 +865,15 @@ label {
   font-weight: 700;
 }
 
-
 /* Correct answer */
 
 .correct-answer-text {
+
   border:
-    1px solid
-    var(--green-border);
+    1px solid #86efac;
 
   background:
-    var(--green-bg);
+    #f0fdf4;
 
   color:
     #166534;
@@ -880,157 +881,83 @@ label {
   font-weight: 700;
 }
 
-
-/* ==========================================
-   REVIEW ANSWER SUMMARY
-   ========================================== */
-
-.review-answer {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 6px 12px;
-
-  align-items: center;
-
-  background:
-    #f8fafc;
-
-  border:
-    1px solid
-    var(--border);
-}
-
-
-/* ==========================================
-   STATUS LABEL
-   ========================================== */
-
-.answer-status {
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  padding: 3px 8px;
-
-  border-radius: 999px;
-
-  font-size: 11px;
-
-  font-weight: 800;
-}
-
-.answer-status.correct {
-  background:
-    #bbf7d0 !important;
-
-  color:
-    #166534 !important;
-}
-
-.answer-status.wrong {
-  background:
-    #fecaca !important;
-
-  color:
-    #991b1b !important;
-}
-
-.answer-status.unanswered {
-  background:
-    #fde68a !important;
-
-  color:
-    #92400e !important;
-}
-
-
-/* ==========================================
+/* =========================================================
    RESULT BANNER
-   ========================================== */
+   ========================================================= */
 
 .result-banner,
 #resultBanner,
 .pass-banner,
 .fail-banner {
-  padding: 13px;
+
+  padding: 11px;
 
   margin:
-    0 0 13px;
+    0 0 12px;
 
-  border-radius: 10px;
+  border-radius: 9px;
 
   text-align: center;
 
-  font-size: 22px;
+  font-size: 20px;
 
   font-weight: 900;
 }
-
-
-/* PASS */
 
 .pass-banner,
 .result-banner.pass,
 .result-banner.PASS,
 #resultBanner.pass {
+
   color:
-    #166534;
+    #14532d;
 
   background:
-    #dcfce7;
+    #bbf7d0;
 
   border:
-    1px solid
-    #86efac;
+    2px solid #22c55e;
 }
-
-
-/* FAIL */
 
 .fail-banner,
 .result-banner.fail,
 .result-banner.FAIL,
 #resultBanner.fail {
+
   color:
-    #991b1b;
+    #7f1d1d;
 
   background:
-    #fee2e2;
+    #fecaca;
 
   border:
-    1px solid
-    #fca5a5;
+    2px solid #ef4444;
 }
 
-
-/* ==========================================
+/* =========================================================
    RESULT SUMMARY
-   ========================================== */
+   ========================================================= */
 
 .result-summary {
+
   display: grid;
 
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
-  gap: 8px;
+  gap: 7px;
 
-  margin:
-    12px 0;
+  margin: 10px 0;
 }
 
 .result-stat {
-  padding: 10px 7px;
+
+  padding: 9px;
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
-  border-radius: 9px;
+  border-radius: 8px;
 
   background: white;
 
@@ -1038,21 +965,22 @@ label {
 }
 
 .result-stat strong {
+
   display: block;
 
-  font-size: 21px;
+  font-size: 20px;
 
   color:
     var(--primary-dark);
 }
 
-
-/* ==========================================
+/* =========================================================
    PROGRESS
-   ========================================== */
+   ========================================================= */
 
 .progress,
 .progress-bar {
+
   width: 100%;
 
   height: 7px;
@@ -1061,12 +989,12 @@ label {
 
   border-radius: 99px;
 
-  background:
-    #e2e8f0;
+  background: #e2e8f0;
 }
 
 .progress-bar > div,
 .progress-fill {
+
   height: 100%;
 
   border-radius: inherit;
@@ -1075,33 +1003,32 @@ label {
     var(--primary);
 
   transition:
-    width .2s ease;
+    width .25s ease;
 }
 
-
-/* ==========================================
+/* =========================================================
    TABLE
-   ========================================== */
+   ========================================================= */
 
 table {
+
   width: 100%;
 
   border-collapse:
     collapse;
 
-  background:
-    white;
+  background: white;
 
   font-size: 13px;
 }
 
 th,
 td {
-  padding: 8px;
+
+  padding: 7px;
 
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   text-align: left;
 
@@ -1110,6 +1037,7 @@ td {
 }
 
 th {
+
   background:
     #eaf1fc;
 
@@ -1120,114 +1048,189 @@ th {
 }
 
 tr:nth-child(even) td {
+
   background:
     #f8fafc;
 }
 
-
-/* ==========================================
-   ADMIN NAVIGATION
-   ========================================== */
+/* =========================================================
+   ADMIN NAV
+   ========================================================= */
 
 .admin-nav,
 .nav-tabs,
 .tabs {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-bottom: 10px;
+}
+
+.admin-nav button,
+.nav-tabs button,
+.tabs button {
+
+  flex:
+    0 1 auto;
+
+  min-height: 34px;
+
+  padding:
+    6px 10px;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   ADMIN PANELS
+   ========================================================= */
+
+.admin-section,
+.admin-panel {
+
+  padding: 12px;
+
+  margin-bottom: 12px;
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 9px;
+
+  box-shadow: var(--shadow);
+}
+
+.admin-section h2,
+.admin-panel h2 {
+
+  color:
+    var(--primary-dark);
+
+  font-size: 18px;
+}
+
+/* =========================================================
+   ADMIN ITEMS
+   ========================================================= */
+
+.admin-item {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 8px;
+
+  padding: 8px;
+
+  margin-bottom: 6px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 7px;
+
+  background:
+    #fff;
+}
+
+.admin-item-main {
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+.admin-item-title {
+
+  font-weight: 700;
+
+  font-size: 13px;
+
+  overflow-wrap:
+    anywhere;
+}
+
+.admin-item-sub {
+
+  color:
+    var(--muted);
+
+  font-size: 11px;
+
+  overflow-wrap:
+    anywhere;
+}
+
+.btn-mini {
+
+  min-height: 31px;
+
+  padding:
+    5px 9px;
+
+  font-size: 11px;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.actions,
+.button-row {
+
   display: flex;
 
   flex-wrap: wrap;
 
   gap: 6px;
 
-  margin-bottom:
-    12px;
-}
-
-.admin-nav button,
-.nav-tabs button,
-.tabs button {
-  flex:
-    0 1 auto;
-}
-
-
-/* ==========================================
-   ADMIN PANELS
-   ========================================== */
-
-.admin-section,
-.admin-panel {
-  padding: 13px;
-
-  margin-bottom:
-    13px;
-
-  background:
-    white;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius:
-    var(--radius);
-
-  box-shadow:
-    var(--shadow);
-}
-
-.admin-section h2,
-.admin-panel h2 {
-  color:
-    var(--primary-dark);
-
-  font-size: 19px;
-}
-
-
-/* ==========================================
-   ACTIONS
-   ========================================== */
-
-.actions,
-.button-row {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 7px;
-
   align-items: center;
 }
 
 .actions button,
 .button-row button {
+
   flex:
     0 1 auto;
 }
 
-
-/* ==========================================
+/* =========================================================
    ALERTS
-   ========================================== */
+   ========================================================= */
 
 .alert,
 .message,
 .notice {
-  padding: 8px 11px;
+
+  padding:
+    8px 10px;
 
   margin:
     8px 0;
 
   border-radius: 7px;
 
+  font-size: 13px;
+
   overflow-wrap:
     anywhere;
-
-  font-size: 13px;
 }
 
 .alert-success,
 .message.success {
+
   color:
     #166534;
 
@@ -1235,12 +1238,12 @@ tr:nth-child(even) td {
     #dcfce7;
 
   border:
-    1px solid
-    #86efac;
+    1px solid #86efac;
 }
 
 .alert-error,
 .message.error {
+
   color:
     #991b1b;
 
@@ -1248,12 +1251,12 @@ tr:nth-child(even) td {
     #fee2e2;
 
   border:
-    1px solid
-    #fca5a5;
+    1px solid #fca5a5;
 }
 
 .alert-warning,
 .message.warning {
+
   color:
     #92400e;
 
@@ -1261,17 +1264,16 @@ tr:nth-child(even) td {
     #fef3c7;
 
   border:
-    1px solid
-    #fcd34d;
+    1px solid #fcd34d;
 }
 
-
-/* ==========================================
+/* =========================================================
    BADGES
-   ========================================== */
+   ========================================================= */
 
 .badge,
 .status-badge {
+
   display: inline-block;
 
   padding:
@@ -1286,12 +1288,15 @@ tr:nth-child(even) td {
   color:
     #334155;
 
-  font-size: 11px;
+  font-size:
+    11px;
 
-  font-weight: 800;
+  font-weight:
+    800;
 }
 
 .badge-pass {
+
   background:
     var(--green-bg);
 
@@ -1300,6 +1305,7 @@ tr:nth-child(even) td {
 }
 
 .badge-fail {
+
   background:
     var(--red-bg);
 
@@ -1307,127 +1313,37 @@ tr:nth-child(even) td {
     var(--red);
 }
 
-
-/* ==========================================
-   ADMIN ITEM
-   ========================================== */
-
-.admin-item {
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 10px;
-
-  padding: 9px;
-
-  margin-bottom: 6px;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 8px;
-
-  background:
-    white;
-}
-
-.admin-item-main {
-  min-width: 0;
-
-  flex: 1;
-}
-
-.admin-item-title {
-  font-weight: 800;
-
-  font-size: 14px;
-
-  overflow-wrap:
-    anywhere;
-}
-
-.admin-item-sub {
-  color:
-    var(--muted);
-
-  font-size: 12px;
-
-  overflow-wrap:
-    anywhere;
-}
-
-.btn-mini {
-  min-height: 32px;
-
-  padding:
-    5px 9px;
-
-  font-size: 12px;
-}
-
-
-/* ==========================================
-   EMPTY
-   ========================================== */
-
-.empty {
-  padding: 18px;
-
-  text-align: center;
-
-  color:
-    var(--muted);
-
-  background:
-    #f8fafc;
-
-  border:
-    1px dashed
-    var(--border);
-
-  border-radius: 8px;
-}
-
-
-/* ==========================================
+/* =========================================================
    FOOTER
-   ========================================== */
+   ========================================================= */
 
 footer,
 .site-footer {
+
   padding:
     15px 10px;
 
   margin-top:
-    25px;
+    20px;
 
   background:
     #10284f;
 
-  color:
-    white;
+  color: white;
 
-  text-align:
-    center;
+  text-align: center;
 
-  font-size: 12px;
+  font-size: 13px;
 }
 
 footer a,
 .site-footer a {
-  color:
-    #bfdbfe;
+  color: #bfdbfe;
 }
 
-
-/* ==========================================
+/* =========================================================
    MOBILE
-   ========================================== */
+   ========================================================= */
 
 @media (max-width: 700px) {
 
@@ -1440,6 +1356,7 @@ footer a,
   .exam-container,
   .result-container,
   .admin-container {
+
     width:
       calc(100% - 12px);
 
@@ -1454,21 +1371,25 @@ footer a,
   .result-card,
   .admin-section,
   .admin-panel {
-    padding: 11px;
 
-    border-radius: 9px;
+    padding: 10px;
+
+    margin-bottom: 8px;
+
+    border-radius: 8px;
   }
 
   header,
   .site-header,
   .exam-header,
   .top-header {
+
     padding:
       10px 9px;
   }
 
   h1 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   h2 {
@@ -1476,7 +1397,7 @@ footer a,
   }
 
   h3 {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .question-box,
@@ -1484,45 +1405,76 @@ footer a,
   .question,
   .mcq-question,
   .tf-question {
-    padding: 10px;
+
+    padding:
+      9px;
 
     margin-bottom:
-      9px;
+      8px;
   }
 
   .question-title,
   .question-text,
   .question-box h3,
   .question-card h3 {
-    font-size: 14px;
+
+    font-size:
+      14px;
+
+    line-height:
+      1.45;
+  }
+
+  .question-number {
+
+    min-width:
+      24px;
+
+    min-height:
+      24px;
+
+    padding:
+      2px 6px;
+
+    font-size:
+      11px;
+  }
+
+  .question-image,
+  .question-box img,
+  .question-card img {
+
+    max-height:
+      190px;
+
+    margin:
+      6px auto;
   }
 
   .options,
   .option-list,
   .answers {
-    grid-template-columns:
-      1fr;
 
-    gap: 6px;
+    gap:
+      5px;
+
+    margin-top:
+      6px;
   }
 
   .option,
   .answer-option,
   .option-label,
   .options label {
-    min-height: 36px;
 
     padding:
-      7px 8px;
+      7px;
 
-    font-size: 12px;
-  }
+    font-size:
+      12px;
 
-  .question-image,
-  .question-box img,
-  .question-card img {
-    max-height:
-      220px;
+    line-height:
+      1.35;
   }
 
   button,
@@ -1530,11 +1482,12 @@ footer a,
   .button,
   input[type="submit"],
   input[type="button"] {
+
     min-height:
-      35px;
+      34px;
 
     padding:
-      7px 10px;
+      6px 9px;
 
     font-size:
       12px;
@@ -1542,23 +1495,43 @@ footer a,
 
   .actions button,
   .button-row button {
+
     flex:
       1 1 110px;
   }
 
   .result-summary {
+
     grid-template-columns:
       repeat(3, 1fr);
 
-    gap: 5px;
+    gap:
+      5px;
   }
 
   .result-stat {
+
     padding:
-      8px 4px;
+      7px 4px;
+
+    font-size:
+      11px;
   }
 
   .result-stat strong {
+
+    font-size:
+      17px;
+  }
+
+  .result-banner,
+  #resultBanner,
+  .pass-banner,
+  .fail-banner {
+
+    padding:
+      9px;
+
     font-size:
       18px;
   }
@@ -1566,20 +1539,27 @@ footer a,
   .exam-info,
   .exam-meta,
   .student-info {
+
     align-items:
       flex-start;
 
     flex-direction:
       column;
 
-    gap: 5px;
+    gap:
+      4px;
+
+    padding:
+      7px 9px;
   }
 
   .timer,
   #timer,
   #examTimer,
   .exam-timer {
-    top: 3px;
+
+    top:
+      3px;
 
     min-width:
       82px;
@@ -1591,20 +1571,10 @@ footer a,
       14px;
   }
 
-  .admin-item {
-    align-items:
-      flex-start;
-
-    flex-direction:
-      column;
-  }
-
-  .admin-item button {
-    width: 100%;
-  }
-
   table {
-    display: block;
+
+    display:
+      block;
 
     overflow-x:
       auto;
@@ -1613,23 +1583,85 @@ footer a,
       nowrap;
   }
 
-}
+  th,
+  td {
 
+    padding:
+      6px;
 
-/* ==========================================
-   VERY SMALL MOBILE
-   ========================================== */
+    font-size:
+      11px;
+  }
 
-@media (max-width: 380px) {
+  .admin-item {
 
-  body {
+    padding:
+      7px;
+  }
+
+  .admin-item-title {
+
     font-size:
       12px;
   }
 
+  .admin-item-sub {
+
+    font-size:
+      10px;
+  }
+
+  .btn-mini {
+
+    min-height:
+      29px;
+
+    padding:
+      4px 7px;
+
+    font-size:
+      10px;
+  }
+
+  .admin-nav,
+  .nav-tabs,
+  .tabs {
+
+    gap:
+      4px;
+  }
+
+  .admin-nav button,
+  .nav-tabs button,
+  .tabs button {
+
+    flex:
+      1 1 auto;
+
+    min-height:
+      32px;
+
+    padding:
+      5px 7px;
+
+    font-size:
+      11px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  body {
+    font-size: 12px;
+  }
+
   h1 {
     font-size:
-      20px;
+      19px;
   }
 
   h2 {
@@ -1637,33 +1669,57 @@ footer a,
       17px;
   }
 
+  .container,
+  .page-container,
+  .exam-container,
+  .result-container,
+  .admin-container {
+
+    width:
+      calc(100% - 8px);
+  }
+
   .question-box,
   .question-card,
   .question {
+
     padding:
       8px;
   }
 
+  .option,
+  .answer-option,
+  .option-label,
+  .options label {
+
+    padding:
+      6px;
+
+    font-size:
+      11px;
+  }
+
   .result-summary {
+
     grid-template-columns:
-      1fr;
+      1fr 1fr 1fr;
   }
 
   .admin-nav button,
   .nav-tabs button,
   .tabs button {
-    flex:
-      1 1 100%;
-  }
 
+    flex:
+      1 1 48%;
+  }
 }
 
-
-/* ==========================================
+/* =========================================================
    ACCESSIBILITY
-   ========================================== */
+   ========================================================= */
 
 :focus-visible {
+
   outline:
     2px solid #60a5fa;
 
@@ -1676,6 +1732,7 @@ footer a,
   *,
   *::before,
   *::after {
+
     scroll-behavior:
       auto !important;
 
@@ -1685,5 +1742,4 @@ footer a,
     animation-duration:
       .01ms !important;
   }
-
    }
