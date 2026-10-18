@@ -13,259 +13,235 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 
-const $ =
-  id => document.getElementById(id);
+const $ = id => document.getElementById(id);
+
+let state = {
+  students: [],
+  exams: [],
+  results: [],
+  notifications: []
+};
 
 
-// ==================================================
-// ESCAPE HTML
-// ==================================================
+/* =========================================
+   SAFE TEXT
+   ========================================= */
 
-function esc(v) {
-
-  return String(v ?? "")
-    .replace(
-      /[&<>"']/g,
-      m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[m])
-    );
-
+function esc(value){
+  return String(value ?? "")
+    .replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m]));
 }
 
 
-// ==================================================
-// MESSAGE
-// ==================================================
+/* =========================================
+   MESSAGE
+   ========================================= */
 
-function msg(text, error = false) {
+function msg(text, error = false){
 
   const el = $("loginMsg");
 
-  if (!el) return;
+  if(!el) return;
 
   el.textContent = text;
 
   el.style.background =
-    error
-      ? "#fff3f4"
-      : "#f4f8fb";
+    error ? "#fee2e2" : "#eff6ff";
 
   el.style.color =
-    error
-      ? "#b4232d"
-      : "#315a78";
-
+    error ? "#991b1b" : "#174b8f";
 }
 
 
-// ==================================================
-// API
-// ==================================================
+/* =========================================
+   API
+   ========================================= */
 
-async function api(path, opt = {}) {
+async function api(path, options = {}){
 
-  const u = auth.currentUser;
+  const user = auth.currentUser;
 
-  const token =
-    u
-      ? await u.getIdToken(true)
-      : "";
+  const token = user
+    ? await user.getIdToken(true)
+    : "";
 
   const headers = {
-    "Content-Type":
-      "application/json",
-
-    ...(opt.headers || {})
+    "Content-Type":"application/json",
+    ...(options.headers || {})
   };
 
-  if (token) {
-
+  if(token){
     headers.Authorization =
       "Bearer " + token;
-
   }
 
-  const r =
-    await fetch(
-      path,
-      {
-        ...opt,
-        headers
-      }
-    );
+  const response = await fetch(
+    path,
+    {
+      ...options,
+      headers
+    }
+  );
 
-  const raw =
-    await r.text();
+  const raw = await response.text();
 
   let data = {};
 
-  try {
-
-    data =
-      JSON.parse(raw);
-
+  try{
+    data = JSON.parse(raw);
   }
-  catch {
-
+  catch{
     data = {
-      error:
-        raw ||
-        ("HTTP " + r.status)
+      error: raw || `HTTP ${response.status}`
     };
-
   }
 
-  if (!r.ok) {
-
+  if(!response.ok){
     throw new Error(
       data.error ||
       data.message ||
-      ("HTTP " + r.status)
+      `HTTP ${response.status}`
     );
-
   }
 
   return data;
-
 }
 
 
-// ==================================================
-// LOGIN
-// ==================================================
+/* =========================================
+   ADMIN LOGIN
+   ========================================= */
 
-if ($("loginBtn")) {
+if($("loginBtn")){
 
-  $("loginBtn").onclick =
-    async () => {
+  $("loginBtn").onclick = async()=>{
 
-      const email =
-        $("email")
-          .value
-          .trim();
+    const email =
+      $("email").value.trim();
 
-      const password =
-        $("password")
-          .value;
+    const password =
+      $("password").value;
 
+    if(!email || !password){
 
-      if (!email || !password) {
-
-        return msg(
-          "Enter email and password.",
-          true
-        );
-
-      }
-
-
-      const btn =
-        $("loginBtn");
-
-      btn.disabled = true;
-
-      btn.textContent =
-        "Signing in...";
-
-
-      try {
-
-        await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-
-        msg(
-          "Login successful."
-        );
-
-      }
-      catch (e) {
-
-        msg(
-          e.message ||
-          "Login failed.",
-          true
-        );
-
-      }
-      finally {
-
-        btn.disabled = false;
-
-        btn.textContent =
-          "Login";
-
-      }
-
-    };
-
-}
-
-
-// ==================================================
-// LOGOUT
-// ==================================================
-
-if ($("logout")) {
-
-  $("logout").onclick =
-    () => signOut(auth);
-
-}
-
-
-// ==================================================
-// AUTH STATE
-// ==================================================
-
-onAuthStateChanged(
-  auth,
-  async user => {
-
-    if (!user) {
-
-      if ($("loginBox"))
-        $("loginBox").hidden = false;
-
-      if ($("panel"))
-        $("panel").hidden = true;
-
-      if ($("logout"))
-        $("logout").hidden = true;
+      msg(
+        "Email and password required.",
+        true
+      );
 
       return;
+    }
+
+    const button =
+      $("loginBtn");
+
+    button.disabled = true;
+
+    button.textContent =
+      "Signing in...";
+
+    try{
+
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      msg(
+        "Login successful."
+      );
+
+    }
+    catch(error){
+
+      msg(
+        error.message ||
+        "Login failed.",
+        true
+      );
+
+    }
+    finally{
+
+      button.disabled = false;
+
+      button.textContent =
+        "Login";
 
     }
 
+  };
 
-    if ($("loginBox"))
+}
+
+
+/* =========================================
+   LOGOUT
+   ========================================= */
+
+if($("logout")){
+
+  $("logout").onclick = async()=>{
+
+    await signOut(auth);
+
+  };
+
+}
+
+
+/* =========================================
+   AUTH STATE
+   ========================================= */
+
+onAuthStateChanged(
+  auth,
+  async user=>{
+
+    if(!user){
+
+      if($("loginBox"))
+        $("loginBox").hidden = false;
+
+      if($("panel"))
+        $("panel").hidden = true;
+
+      if($("logout"))
+        $("logout").hidden = true;
+
+      return;
+    }
+
+    if($("loginBox"))
       $("loginBox").hidden = true;
 
-    if ($("panel"))
+    if($("panel"))
       $("panel").hidden = false;
 
-    if ($("logout"))
+    if($("logout"))
       $("logout").hidden = false;
 
-
-    try {
+    try{
 
       await loadAll();
 
       await registerPush();
 
     }
-    catch (e) {
+    catch(error){
+
+      console.error(error);
 
       msg(
-        e.message,
+        error.message ||
+        "Could not load admin panel.",
         true
       );
 
@@ -275,28 +251,11 @@ onAuthStateChanged(
 );
 
 
-// ==================================================
-// STATE
-// ==================================================
+/* =========================================
+   LOAD EVERYTHING
+   ========================================= */
 
-let state = {
-
-  exams: [],
-
-  students: [],
-
-  results: [],
-
-  notifications: []
-
-};
-
-
-// ==================================================
-// LOAD ALL
-// ==================================================
-
-async function loadAll() {
+async function loadAll(){
 
   const [
     settings,
@@ -304,46 +263,43 @@ async function loadAll() {
     exams,
     results,
     notifications
-  ] =
-    await Promise.all([
+  ] = await Promise.all([
 
-      api(
-        "/api/admin/settings"
-      ),
+    api("/api/admin/settings"),
 
-      api(
-        "/api/admin/students"
-      ),
+    api("/api/admin/students"),
 
-      api(
-        "/api/admin/exams"
-      ),
+    api("/api/admin/exams"),
 
-      api(
-        "/api/admin/results"
-      ),
+    api("/api/admin/results"),
 
-      api(
-        "/api/admin/notifications"
-      )
+    api("/api/admin/notifications")
 
-    ]);
+  ]);
 
+  state.students =
+    Array.isArray(students)
+      ? students
+      : [];
 
-  state = {
+  state.exams =
+    Array.isArray(exams)
+      ? exams
+      : [];
 
-    students,
+  state.results =
+    Array.isArray(results)
+      ? results
+      : [];
 
-    exams,
-
-    results,
-
-    notifications
-
-  };
-
+  state.notifications =
+    Array.isArray(notifications)
+      ? notifications
+      : [];
 
   fillSettings(settings);
+
+  renderDashboard();
 
   renderStudents();
 
@@ -353,8 +309,6 @@ async function loadAll() {
 
   renderNotifications();
 
-  renderDashboard();
-
   populateExamSelect();
 
   await loadQuestions();
@@ -362,42 +316,50 @@ async function loadAll() {
 }
 
 
-// ==================================================
-// SETTINGS
-// ==================================================
+/* =========================================
+   SETTINGS
+   ========================================= */
 
-function fillSettings(s) {
+function fillSettings(settings){
 
-  for (
-    const k of [
-      "siteName",
-      "headerTitle",
-      "subtitle",
-      "logoUrl",
-      "backgroundUrl",
-      "notice",
-      "footerText",
-      "commonExamPin"
-    ]
-  ) {
+  const fields = [
 
-    if ($(k)) {
+    "siteName",
+    "headerTitle",
+    "subtitle",
+    "logoUrl",
+    "backgroundUrl",
+    "notice",
+    "footerText",
+    "commonExamPin",
 
-      $(k).value =
-        s?.[k] ?? "";
+    /*
+      যদি admin.html-এ headerColor
+      field থাকে তাহলে এটাও কাজ করবে
+    */
+    "headerColor"
+
+  ];
+
+  fields.forEach(key=>{
+
+    if($(key)){
+
+      $(key).value =
+        settings?.[key] ?? "";
 
     }
 
-  }
+  });
 
 
-  if (
-    s?.logoUrl &&
+  if(
+    settings?.logoUrl &&
     $("adminLogo")
-  ) {
+  ){
 
     $("adminLogo").src =
-      s.logoUrl;
+      settings.logoUrl;
 
     $("adminLogo").style.display =
       "block";
@@ -407,117 +369,103 @@ function fillSettings(s) {
 }
 
 
-// ==================================================
-// LOGO PICKER
-// ==================================================
+/* =========================================
+   LOGO UPLOAD
+   ========================================= */
 
-if ($("adminLogo")) {
+if($("adminLogo")){
 
-  $("adminLogo").onclick =
-    () => {
+  $("adminLogo").onclick = ()=>{
 
-      if ($("logoFile"))
-        $("logoFile").click();
+    if($("logoFile")){
 
-    };
+      $("logoFile").click();
 
-}
+    }
 
-
-if ($("logoFile")) {
-
-  $("logoFile").onchange =
-    () => {
-
-      const file =
-        $("logoFile")
-          .files?.[0];
-
-      if (!file) return;
-
-
-      if (
-        !file.type.startsWith(
-          "image/"
-        )
-      ) {
-
-        alert(
-          "Please select an image file."
-        );
-
-        return;
-
-      }
-
-
-      if (
-        file.size >
-        1024 * 1024
-      ) {
-
-        alert(
-          "Logo must be smaller than 1 MB."
-        );
-
-        return;
-
-      }
-
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        () => {
-
-          const dataUrl =
-            reader.result;
-
-          $("adminLogo").src =
-            dataUrl;
-
-          $("adminLogo")
-            .style
-            .display =
-            "block";
-
-          $("logoUrl").value =
-            dataUrl;
-
-        };
-
-
-      reader.readAsDataURL(file);
-
-    };
+  };
 
 }
 
 
-// ==================================================
-// DASHBOARD
-// ==================================================
+if($("logoFile")){
 
-function renderDashboard() {
+  $("logoFile").onchange = ()=>{
+
+    const file =
+      $("logoFile").files?.[0];
+
+    if(!file) return;
+
+    if(
+      !file.type.startsWith("image/")
+    ){
+
+      alert(
+        "Please select an image file."
+      );
+
+      return;
+
+    }
+
+    if(
+      file.size > 1024 * 1024
+    ){
+
+      alert(
+        "Logo must be smaller than 1 MB."
+      );
+
+      return;
+
+    }
+
+    const reader =
+      new FileReader();
+
+    reader.onload = ()=>{
+
+      const data =
+        reader.result;
+
+      if($("adminLogo")){
+
+        $("adminLogo").src = data;
+
+        $("adminLogo").style.display =
+          "block";
+
+      }
+
+      if($("logoUrl")){
+
+        $("logoUrl").value = data;
+
+      }
+
+    };
+
+    reader.readAsDataURL(file);
+
+  };
+
+}
+
+
+/* =========================================
+   DASHBOARD
+   ========================================= */
+
+function renderDashboard(){
 
   const stats = [
 
-    [
-      "Students",
-      state.students.length
-    ],
+    ["Students", state.students.length],
 
-    [
-      "Exams",
-      state.exams.length
-    ],
+    ["Exams", state.exams.length],
 
-    [
-      "Results",
-      state.results.length
-    ],
+    ["Results", state.results.length],
 
     [
       "Notifications",
@@ -527,104 +475,604 @@ function renderDashboard() {
   ];
 
 
-  if ($("dashboardStats")) {
+  if($("dashboardStats")){
 
-    $("dashboardStats")
-      .innerHTML =
-        stats
-          .map(
-            x => `
+    $("dashboardStats").innerHTML =
+      stats.map(item=>`
 
-              <div class="stat">
+        <div class="stat">
 
-                <b>
-                  ${esc(x[1])}
-                </b>
+          <b>
+            ${esc(item[1])}
+          </b>
 
-                <span>
-                  ${x[0]}
-                </span>
+          <span>
+            ${esc(item[0])}
+          </span>
 
-              </div>
+        </div>
 
-            `
-          )
-          .join("");
+      `).join("");
 
   }
 
 
-  if ($("dashboardNotifications")) {
+  if($("dashboardNotifications")){
 
-    $("dashboardNotifications")
-      .innerHTML =
-        state.notifications
-          .slice(0, 8)
-          .map(
-            n => `
+    $("dashboardNotifications").innerHTML =
 
-              <div class="admin-item">
+      state.notifications
+      .slice(0,8)
+      .map(n=>`
 
-                <div class="admin-item-main">
+        <div class="admin-item">
 
-                  <div class="admin-item-title">
-                    ${esc(
-                      n.title ||
-                      "New Notification"
-                    )}
-                  </div>
+          <div class="admin-item-main">
 
-                  <div class="admin-item-sub">
-                    ${esc(
-                      n.body ||
-                      ""
-                    )}
-                  </div>
+            <div class="admin-item-title">
+              ${esc(
+                n.title ||
+                "Notification"
+              )}
+            </div>
 
-                </div>
+            <div class="admin-item-sub">
+              ${esc(n.body || "")}
+            </div>
 
-              </div>
+          </div>
 
-            `
-          )
-          .join("")
-          ||
-          '<div class="empty">No notifications.</div>';
+        </div>
+
+      `)
+      .join("")
+
+      ||
+
+      `<div class="empty">
+        No notifications.
+      </div>`;
 
   }
 
 }
 
 
-// ==================================================
-// STUDENTS
-// ==================================================
+/* =========================================
+   STUDENTS
+   ========================================= */
 
-function renderStudents() {
+function renderStudents(){
 
-  if (!$("students")) return;
+  if(!$("students")) return;
+
+  $("students").innerHTML =
+
+    state.students.map(s=>`
+
+      <div class="admin-item">
+
+        <div class="admin-item-main">
+
+          <div class="admin-item-title">
+            ${esc(s.name)}
+          </div>
+
+          <div class="admin-item-sub">
+
+            ${
+              s.active === false
+              ? "Inactive"
+              : "Active"
+            }
+
+          </div>
+
+        </div>
+
+        <button
+          class="btn btn-red btn-mini"
+          onclick="deleteStudent('${esc(s.id)}')"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    `).join("")
+
+    ||
+
+    `<div class="empty">
+      No students.
+    </div>`;
+
+}
 
 
-  $("students")
-    .innerHTML =
-      state.students
-        .map(
-          s => `
+/* =========================================
+   EXAMS
+   ========================================= */
+
+function renderExams(){
+
+  if(!$("exams")) return;
+
+  $("exams").innerHTML =
+
+    state.exams.map(e=>{
+
+      const open =
+        e.active !== false &&
+        e.enabled !== false &&
+        e.closed !== true;
+
+      return `
+
+        <div class="admin-item">
+
+          <div class="admin-item-main">
+
+            <div class="admin-item-title">
+              ${esc(e.title)}
+            </div>
+
+            <div class="admin-item-sub">
+
+              ${esc(e.duration)}
+              minutes
+
+              · Pass
+              ${esc(e.passMark)}%
+
+              ·
+
+              <b style="
+                color:${open ? "#15803d" : "#b91c1c"}
+              ">
+
+                ${
+                  open
+                  ? "OPEN"
+                  : "CLOSED"
+                }
+
+              </b>
+
+            </div>
+
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              class="btn ${
+                open
+                ? "btn-red"
+                : "btn-green"
+              } btn-mini"
+              onclick="toggleExam('${esc(e.id)}')"
+            >
+
+              ${
+                open
+                ? "Close"
+                : "Open"
+              }
+
+            </button>
+
+
+            <button
+              class="btn btn-red btn-mini"
+              onclick="deleteExam('${esc(e.id)}')"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("")
+
+    ||
+
+    `<div class="empty">
+      No examinations.
+    </div>`;
+
+}
+
+
+/* =========================================
+   OPEN / CLOSE EXAM
+   ========================================= */
+
+window.toggleExam = async id=>{
+
+  const exam =
+    state.exams.find(
+      x => String(x.id) === String(id)
+    );
+
+  if(!exam){
+
+    alert("Exam not found.");
+
+    return;
+
+  }
+
+  const currentlyOpen =
+    exam.active !== false &&
+    exam.enabled !== false &&
+    exam.closed !== true;
+
+  const action =
+    currentlyOpen
+    ? "close"
+    : "open";
+
+  if(
+    !confirm(
+      currentlyOpen
+      ? "Close this examination?"
+      : "Open this examination?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  try{
+
+    await api(
+      "/api/admin/exams/" +
+      encodeURIComponent(id) +
+      "/status",
+      {
+        method:"PUT",
+
+        body:JSON.stringify({
+
+          active: !currentlyOpen,
+
+          enabled: !currentlyOpen,
+
+          closed: currentlyOpen
+
+        })
+
+      }
+    );
+
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    /*
+      যদি backend-এ /status endpoint
+      এখনো না থাকে, error দেখাবে।
+      তখন server.js-এ endpoint যোগ করতে হবে।
+    */
+
+    alert(
+      error.message
+    );
+
+  }
+
+};
+
+
+/* =========================================
+   DELETE STUDENT
+   ========================================= */
+
+window.deleteStudent = async id=>{
+
+  if(
+    !confirm(
+      "Delete this student?"
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/students/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   SAVE STUDENT
+   ========================================= */
+
+window.saveStudent = async()=>{
+
+  const input =
+    $("studentName");
+
+  if(!input) return;
+
+  const name =
+    input.value.trim();
+
+  if(!name){
+
+    alert(
+      "Enter student name."
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/students",
+      {
+        method:"POST",
+
+        body:JSON.stringify({
+          name
+        })
+      }
+    );
+
+    input.value = "";
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   SAVE EXAM
+   ========================================= */
+
+window.saveExam = async()=>{
+
+  const title =
+    $("examTitleInput")
+      ?.value
+      .trim();
+
+  const duration =
+    Number(
+      $("examDuration")
+        ?.value || 30
+    );
+
+  const passMark =
+    Number(
+      $("examPass")
+        ?.value || 40
+    );
+
+  if(!title){
+
+    alert(
+      "Enter exam title."
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/exams",
+      {
+        method:"POST",
+
+        body:JSON.stringify({
+
+          title,
+
+          duration,
+
+          passMark,
+
+          active:true,
+
+          enabled:true,
+
+          closed:false
+
+        })
+
+      }
+    );
+
+    if($("examTitleInput"))
+      $("examTitleInput").value = "";
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   DELETE EXAM
+   ========================================= */
+
+window.deleteExam = async id=>{
+
+  if(
+    !confirm(
+      "Delete this examination?"
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/exams/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   EXAM SELECT
+   ========================================= */
+
+function populateExamSelect(){
+
+  if(!$("examSelect")) return;
+
+  $("examSelect").innerHTML =
+
+    state.exams.map(e=>`
+
+      <option value="${esc(e.id)}">
+
+        ${esc(e.title)}
+
+      </option>
+
+    `).join("")
+
+    ||
+
+    `<option value="">
+      No examination
+    </option>`;
+
+}
+
+
+/* =========================================
+   QUESTIONS
+   ========================================= */
+
+window.loadQuestions = async()=>{
+
+  if(!$("examSelect")) return;
+
+  const examId =
+    $("examSelect").value;
+
+  if(!examId){
+
+    if($("questions")){
+
+      $("questions").innerHTML =
+        `<div class="empty">
+          Select an examination.
+        </div>`;
+
+    }
+
+    return;
+
+  }
+
+  try{
+
+    const response =
+      await api(
+        "/api/admin/questions/" +
+        encodeURIComponent(examId)
+      );
+
+    const questions =
+      Array.isArray(response)
+      ? response
+      : response.questions || [];
+
+    if($("questions")){
+
+      $("questions").innerHTML =
+
+        questions.map(q=>{
+
+          const type =
+            q.type || "tf";
+
+          return `
 
             <div class="admin-item">
 
               <div class="admin-item-main">
 
                 <div class="admin-item-title">
-                  ${esc(s.name)}
+
+                  Q${esc(q.order || "")}
+
+                  ·
+
+                  ${esc(q.question)}
+
                 </div>
 
                 <div class="admin-item-sub">
 
                   ${
-                    s.active === false
-                      ? "Inactive"
-                      : "Active"
+                    type === "mcq"
+                    ? "Multiple Choice"
+                    : "True / False"
                   }
 
                 </div>
@@ -633,1763 +1081,662 @@ function renderStudents() {
 
               <button
                 class="btn btn-red btn-mini"
-                onclick="deleteStudent('${esc(s.id)}')"
+                onclick="deleteQuestion('${esc(q.id)}')"
               >
                 Delete
               </button>
 
             </div>
 
-          `
-        )
-        .join("")
+          `;
+
+        }).join("")
+
         ||
-        '<div class="empty">No students.</div>';
+
+        `<div class="empty">
+          No questions.
+        </div>`;
+
+    }
+
+  }
+  catch(error){
+
+    if($("questions")){
+
+      $("questions").innerHTML =
+        `<div class="empty">
+          ${esc(error.message)}
+        </div>`;
+
+    }
+
+  }
+
+};
+
+
+/* =========================================
+   DELETE QUESTION
+   ========================================= */
+
+window.deleteQuestion = async id=>{
+
+  if(
+    !confirm(
+      "Delete this question?"
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/questions/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    await loadQuestions();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   RESULTS
+   ========================================= */
+
+function renderResults(){
+
+  if(!$("results")) return;
+
+  const rows =
+    state.results.map(r=>`
+
+      <tr>
+
+        <td>
+          ${esc(r.rank || "-")}
+        </td>
+
+        <td>
+          ${esc(r.studentName)}
+        </td>
+
+        <td>
+          ${esc(r.examTitle)}
+        </td>
+
+        <td>
+          ${esc(r.score)}
+          /
+          ${esc(r.total)}
+        </td>
+
+        <td>
+          ${esc(r.grade)}
+        </td>
+
+        <td>
+          ${esc(r.status)}
+        </td>
+
+        <td>
+
+          <button
+            class="btn btn-blue btn-mini"
+            onclick="viewResult('${esc(r.id)}')"
+          >
+            View
+          </button>
+
+          <button
+            class="btn btn-red btn-mini"
+            onclick="deleteResult('${esc(r.id)}')"
+          >
+            Delete
+          </button>
+
+        </td>
+
+      </tr>
+
+    `).join("");
+
+
+  $("results").innerHTML = `
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Rank</th>
+
+          <th>Name</th>
+
+          <th>Exam</th>
+
+          <th>Score</th>
+
+          <th>Grade</th>
+
+          <th>Status</th>
+
+          <th>Action</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${
+          rows ||
+
+          `<tr>
+
+            <td
+              colspan="7"
+              style="text-align:center"
+            >
+              No results.
+            </td>
+
+          </tr>`
+
+        }
+
+      </tbody>
+
+    </table>
+
+  `;
 
 }
 
 
-// ==================================================
-// EXAMS
-// ==================================================
+/* =========================================
+   DELETE RESULT / HISTORY
+   ========================================= */
 
-function renderExams() {
+window.deleteResult = async id=>{
 
-  if (!$("exams")) return;
+  if(
+    !confirm(
+      "Delete this result from history?"
+    )
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+      "/api/admin/results/" +
+      encodeURIComponent(id),
+      {
+        method:"DELETE"
+      }
+    );
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
 
 
-  $("exams")
-    .innerHTML =
-      state.exams
-        .map(
-          e => {
+/* =========================================
+   VIEW RESULT
+   ========================================= */
 
-            const active =
-              e.active !== false;
+window.viewResult = async id=>{
 
+  try{
+
+    const result =
+      await api(
+        "/api/admin/results/" +
+        encodeURIComponent(id)
+      );
+
+    const review =
+      result.review || [];
+
+    const questions =
+      review.map(item=>{
+
+        const options =
+          ["A","B","C","D","E"]
+          .map(letter=>{
+
+            const option =
+              item.options?.[letter] || {};
+
+            let cls = "";
+
+            if(option.correct){
+              cls = "correct";
+            }
+
+            if(
+              option.selected &&
+              !option.correct
+            ){
+
+              cls = "wrong";
+
+            }
 
             return `
 
-              <div class="admin-item">
+              <div style="
+                margin:5px 0;
+                padding:8px;
+                border-radius:6px;
+                background:${
+                  option.correct
+                  ? "#dcfce7"
+                  : option.selected
+                  ? "#fee2e2"
+                  : "#f8fafc"
+                };
+              ">
 
-                <div class="admin-item-main">
+                <b>${letter}.</b>
 
-                  <div class="admin-item-title">
+                ${esc(option.text || "")}
 
-                    ${esc(e.title)}
+                ${
+                  option.selected
+                  ? " — Your Answer"
+                  : ""
+                }
 
-                  </div>
-
-                  <div class="admin-item-sub">
-
-                    ${esc(e.duration)}
-                    minutes · Pass
-                    ${esc(e.passMark)}%
-
-                    ·
-
-                    ${
-                      active
-                        ? "🟢 Running"
-                        : "🔴 Closed"
-                    }
-
-                  </div>
-
-                </div>
-
-
-                <div
-                  style="
-                    display:flex;
-                    gap:6px;
-                    flex-wrap:wrap;
-                    justify-content:flex-end;
-                  "
-                >
-
-                  <button
-                    class="btn ${
-                      active
-                        ? "btn-red"
-                        : "btn-green"
-                    } btn-mini"
-                    onclick="toggleExam('${esc(e.id)}')"
-                  >
-
-                    ${
-                      active
-                        ? "Close Exam"
-                        : "Start Exam"
-                    }
-
-                  </button>
-
-
-                  <button
-                    class="btn btn-red btn-mini"
-                    onclick="deleteExam('${esc(e.id)}')"
-                  >
-
-                    Delete
-
-                  </button>
-
-                </div>
+                ${
+                  option.correct
+                  ? " — Correct Answer"
+                  : ""
+                }
 
               </div>
 
             `;
 
-          }
-        )
-        .join("")
-        ||
-        '<div class="empty">No examinations.</div>';
-
-}
-
-
-// ==================================================
-// TOGGLE EXAM
-// ==================================================
-
-window.toggleExam =
-  async id => {
-
-    const exam =
-      state.exams.find(
-        x => x.id === id
-      );
-
-
-    if (!exam) {
-
-      return alert(
-        "Exam not found."
-      );
-
-    }
-
-
-    const currentlyActive =
-      exam.active !== false;
-
-
-    const newStatus =
-      !currentlyActive;
-
-
-    const actionText =
-      newStatus
-        ? "start"
-        : "close";
-
-
-    const ok =
-      confirm(
-        `Are you sure you want to ${actionText} "${exam.title}"?`
-      );
-
-
-    if (!ok) return;
-
-
-    try {
-
-      await api(
-        "/api/admin/exams",
-        {
-
-          method: "POST",
-
-          body:
-            JSON.stringify({
-
-              id: exam.id,
-
-              title:
-                exam.title,
-
-              duration:
-                Number(
-                  exam.duration
-                ) || 30,
-
-              passMark:
-                Number(
-                  exam.passMark
-                ) || 40,
-
-              active:
-                newStatus,
-
-              order:
-                Number(
-                  exam.order
-                ) || 0,
-
-              totalQuestions:
-                Number(
-                  exam.totalQuestions
-                ) || 0
-
-            })
-
-        }
-      );
-
-
-      await loadAll();
-
-
-      alert(
-        newStatus
-          ? "Exam started successfully."
-          : "Exam closed successfully."
-      );
-
-    }
-    catch (e) {
-
-      alert(
-        e.message ||
-        "Could not change exam status."
-      );
-
-    }
-
-  };
-
-
-// ==================================================
-// RESULTS
-// ==================================================
-
-function renderResults() {
-
-  if (!$("results")) return;
-
-
-  const rows =
-    state.results
-      .map(
-        r => `
-
-          <tr>
-
-            <td>
-              ${esc(r.rank || "-")}
-            </td>
-
-            <td>
-              ${esc(r.studentName)}
-            </td>
-
-            <td>
-              ${esc(r.examTitle)}
-            </td>
-
-            <td>
-              ${esc(r.score)}/${esc(r.total)}
-            </td>
-
-            <td>
-              ${esc(r.grade)}
-            </td>
-
-            <td>
-              ${esc(r.status)}
-            </td>
-
-            <td>
-
-              <div
-                style="
-                  display:flex;
-                  gap:5px;
-                  flex-wrap:wrap;
-                "
-              >
-
-                <button
-                  class="btn btn-blue btn-mini"
-                  onclick="viewResult('${esc(r.id)}')"
-                >
-                  View
-                </button>
-
-
-                <button
-                  class="btn btn-red btn-mini"
-                  onclick="deleteResult('${esc(r.id)}')"
-                >
-                  Delete
-                </button>
-
-              </div>
-
-            </td>
-
-          </tr>
-
-        `
-      )
-      .join("");
-
-
-  $("results")
-    .innerHTML = `
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Rank</th>
-
-            <th>Name</th>
-
-            <th>Exam</th>
-
-            <th>Score</th>
-
-            <th>Grade</th>
-
-            <th>Status</th>
-
-            <th>Action</th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-          ${
-            rows ||
-
-            `
-
-              <tr>
-
-                <td colspan="7">
-
-                  No results.
-
-                </td>
-
-              </tr>
-
-            `
-          }
-
-        </tbody>
-
-      </table>
-
-    `;
-
-}
-
-
-// ==================================================
-// DELETE RESULT / HISTORY
-// ==================================================
-
-window.deleteResult =
-  async id => {
-
-    const result =
-      state.results.find(
-        x => x.id === id
-      );
-
-
-    const studentName =
-      result?.studentName ||
-      "this student";
-
-
-    const examTitle =
-      result?.examTitle ||
-      "this exam";
-
-
-    const ok =
-      confirm(
-        `Delete result history of ${studentName} for ${examTitle}?\n\nThis action cannot be undone.`
-      );
-
-
-    if (!ok) return;
-
-
-    try {
-
-      await api(
-        "/api/admin/results/" +
-        encodeURIComponent(id),
-        {
-          method: "DELETE"
-        }
-      );
-
-
-      await loadAll();
-
-
-      alert(
-        "Result deleted successfully."
-      );
-
-    }
-    catch (e) {
-
-      alert(
-        e.message ||
-        "Result delete failed."
-      );
-
-    }
-
-  };
-
-
-// ==================================================
-// NOTIFICATIONS
-// ==================================================
-
-function renderNotifications() {
-
-  if (!$("notifications")) return;
-
-
-  $("notifications")
-    .innerHTML =
-      state.notifications
-        .map(
-          n => `
-
-            <div class="admin-item">
-
-              <div class="admin-item-main">
-
-                <div class="admin-item-title">
-
-                  ${esc(
-                    n.title ||
-                    "Submission"
-                  )}
-
-                </div>
-
-                <div class="admin-item-sub">
-
-                  ${esc(
-                    n.body ||
-                    ""
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-
-          `
-        )
-        .join("")
-        ||
-        '<div class="empty">No notifications.</div>';
-
-}
-
-
-// ==================================================
-// EXAM SELECT
-// ==================================================
-
-function populateExamSelect() {
-
-  if (!$("examSelect")) return;
-
-
-  $("examSelect")
-    .innerHTML =
-      state.exams
-        .map(
-          e => `
-
-            <option
-              value="${esc(e.id)}"
-            >
-
-              ${esc(e.title)}
-
-            </option>
-
-          `
-        )
-        .join("")
-        ||
-        '<option value="">No examination</option>';
-
-}
-
-
-// ==================================================
-// SAVE STUDENT
-// ==================================================
-
-window.saveStudent =
-  async () => {
-
-    const name =
-      $("studentName")
-        .value
-        .trim();
-
-
-    if (!name) {
-
-      return alert(
-        "Enter student name."
-      );
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/students",
-        {
-
-          method: "POST",
-
-          body:
-            JSON.stringify({
-              name
-            })
-
-        }
-      );
-
-
-      $("studentName")
-        .value = "";
-
-
-      await loadAll();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// DELETE STUDENT
-// ==================================================
-
-window.deleteStudent =
-  async id => {
-
-    if (
-      !confirm(
-        "Delete this student?"
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/students/" +
-        encodeURIComponent(id),
-        {
-          method: "DELETE"
-        }
-      );
-
-
-      await loadAll();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// SAVE EXAM
-// ==================================================
-
-window.saveExam =
-  async () => {
-
-    const title =
-      $("examTitleInput")
-        .value
-        .trim();
-
-
-    const duration =
-      Number(
-        $("examDuration").value ||
-        30
-      );
-
-
-    const passMark =
-      Number(
-        $("examPass").value ||
-        40
-      );
-
-
-    if (!title) {
-
-      return alert(
-        "Enter exam title."
-      );
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/exams",
-        {
-
-          method: "POST",
-
-          body:
-            JSON.stringify({
-
-              title,
-
-              duration,
-
-              passMark,
-
-              active: true
-
-            })
-
-        }
-      );
-
-
-      $("examTitleInput")
-        .value = "";
-
-
-      await loadAll();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// DELETE EXAM
-// ==================================================
-
-window.deleteExam =
-  async id => {
-
-    if (
-      !confirm(
-        "Delete this examination?\n\nAll questions belonging to this exam will also be deleted."
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/exams/" +
-        encodeURIComponent(id),
-        {
-          method: "DELETE"
-        }
-      );
-
-
-      await loadAll();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// QUESTION MANAGEMENT
-// ==================================================
-
-window.loadQuestions =
-  async () => {
-
-    const id =
-      $("examSelect")?.value;
-
-
-    if (!id) {
-
-      if ($("questionForm"))
-        $("questionForm")
-          .innerHTML = "";
-
-
-      if ($("questions"))
-        $("questions")
-          .innerHTML =
-            '<div class="empty">Select an examination.</div>';
-
-      return;
-
-    }
-
-
-    try {
-
-      const qs =
-        await api(
-          "/api/admin/questions/" +
-          encodeURIComponent(id)
-        );
-
-
-      const arr =
-        Array.isArray(qs)
-          ? qs
-          : (
-              qs.questions ||
-              []
-            );
-
-
-      if ($("questions")) {
-
-        $("questions")
-          .innerHTML =
-            arr
-              .map(
-                q => {
-
-                  const type =
-                    q.type ||
-                    "tf";
-
-
-                  let summary = "";
-
-
-                  if (
-                    type === "mcq"
-                  ) {
-
-                    summary =
-                      [
-                        "A",
-                        "B",
-                        "C",
-                        "D",
-                        "E"
-                      ]
-                        .map(
-                          k =>
-                            `${k}: ${
-                              q.options?.[k]?.correct
-                                ? "CORRECT"
-                                : "WRONG"
-                            }`
-                        )
-                        .join(" · ");
-
-                  }
-                  else {
-
-                    summary =
-                      [
-                        "A",
-                        "B",
-                        "C",
-                        "D",
-                        "E"
-                      ]
-                        .map(
-                          k =>
-                            `${k}: ${
-                              q.options?.[k]?.correct
-                                ? "TRUE"
-                                : "FALSE"
-                            }`
-                        )
-                        .join(" · ");
-
-                  }
-
-
-                  return `
-
-                    <div class="admin-item">
-
-                      <div class="admin-item-main">
-
-                        <div class="admin-item-title">
-
-                          Q${esc(
-                            q.order || ""
-                          )}
-
-                          ·
-
-                          ${esc(
-                            q.question
-                          )}
-
-                        </div>
-
-
-                        <div class="admin-item-sub">
-
-                          Type:
-
-                          ${
-                            type === "mcq"
-                              ? "Multiple Choice"
-                              : "True / False"
-                          }
-
-                          ·
-
-                          ${summary}
-
-                        </div>
-
-                      </div>
-
-
-                      <button
-                        class="btn btn-red btn-mini"
-                        onclick="deleteQuestion('${esc(q.id)}')"
-                      >
-
-                        Delete
-
-                      </button>
-
-                    </div>
-
-                  `;
-
-                }
-              )
-              .join("")
-              ||
-              '<div class="empty">No questions.</div>';
-
-      }
-
-
-      const next =
-        arr.length + 1;
-
-
-      if ($("questionForm")) {
-
-        $("questionForm")
-          .innerHTML = `
-
-            <h3>
-              Add Question
-            </h3>
-
-
-            <label>
-              Question Type
-            </label>
-
-
-            <select
-              id="questionType"
-              onchange="changeQuestionType()"
-            >
-
-              <option value="tf">
-                True / False
-              </option>
-
-              <option value="mcq">
-                Multiple Choice
-              </option>
-
-            </select>
-
-
-            <input
-              id="qtext"
-              placeholder="Question"
-            >
-
-
-            <input
-              id="qimage"
-              placeholder="Image URL (optional)"
-            >
-
-
-            <div
-              id="questionOptions"
-            ></div>
-
-
-            <input
-              id="qorder"
-              type="number"
-              min="1"
-              value="${next}"
-              placeholder="Order"
-            >
-
-
-            <button
-              class="btn btn-green"
-              onclick="saveQuestion()"
-            >
-
-              Add Question
-
-            </button>
-
-          `;
-
-
-        changeQuestionType();
-
-      }
-
-    }
-    catch (e) {
-
-      if ($("questions")) {
-
-        $("questions")
-          .innerHTML = `
-
-            <div class="empty">
-
-              ${esc(e.message)}
-
-            </div>
-
-          `;
-
-      }
-
-    }
-
-  };
-
-
-// ==================================================
-// QUESTION TYPE
-// ==================================================
-
-window.changeQuestionType =
-  () => {
-
-    const type =
-      $("questionType")?.value ||
-      "tf";
-
-
-    const box =
-      $("questionOptions");
-
-
-    if (!box) return;
-
-
-    if (type === "mcq") {
-
-      box.innerHTML = `
-
-        <h4>
-          Multiple Choice Options
-        </h4>
-
-
-        ${
-          [
-            "A",
-            "B",
-            "C",
-            "D",
-            "E"
-          ]
-            .map(
-              k => `
-
-                <div
-                  class="form-grid"
-                  style="margin-bottom:8px"
-                >
-
-                  <input
-                    id="t${k}"
-                    class="full"
-                    placeholder="Option ${k}"
-                  >
-
-
-                  <label>
-
-                    <input
-                      type="radio"
-                      name="mcqCorrect"
-                      value="${k}"
-                      ${
-                        k === "A"
-                          ? "checked"
-                          : ""
-                      }
-                    >
-
-                    Correct Answer
-
-                  </label>
-
-                </div>
-
-              `
-            )
-            .join("")
-        }
-
-      `;
-
-    }
-    else {
-
-      box.innerHTML = `
-
-        <h4>
-          Five Statements
-        </h4>
-
-
-        ${
-          [
-            "A",
-            "B",
-            "C",
-            "D",
-            "E"
-          ]
-            .map(
-              k => `
-
-                <div
-                  class="form-grid"
-                  style="margin-bottom:8px"
-                >
-
-                  <input
-                    id="t${k}"
-                    class="full"
-                    placeholder="Statement ${k}"
-                  >
-
-
-                  <select id="c${k}">
-
-                    <option value="true">
-                      TRUE
-                    </option>
-
-                    <option value="false">
-                      FALSE
-                    </option>
-
-                  </select>
-
-                </div>
-
-              `
-            )
-            .join("")
-        }
-
-      `;
-
-    }
-
-  };
-
-
-// ==================================================
-// SAVE QUESTION
-// ==================================================
-
-window.saveQuestion =
-  async () => {
-
-    const examId =
-      $("examSelect").value;
-
-
-    const type =
-      $("questionType")?.value ||
-      "tf";
-
-
-    const options = {};
-
-
-    if (type === "mcq") {
-
-      const selected =
-        document.querySelector(
-          'input[name="mcqCorrect"]:checked'
-        )?.value;
-
-
-      for (
-        const k of [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ]
-      ) {
-
-        options[k] = {
-
-          text:
-            $("t" + k)
-              .value
-              .trim(),
-
-          correct:
-            k === selected
-
-        };
-
-      }
-
-    }
-    else {
-
-      for (
-        const k of [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ]
-      ) {
-
-        options[k] = {
-
-          text:
-            $("t" + k)
-              .value
-              .trim(),
-
-          correct:
-            $("c" + k)
-              .value === "true"
-
-        };
-
-      }
-
-    }
-
-
-    if (
-      !$("qtext")
-        .value
-        .trim()
-      ||
-      Object.values(options)
-        .some(
-          x => !x.text
-        )
-    ) {
-
-      return alert(
-        "Question and all options/statements are required."
-      );
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/questions",
-        {
-
-          method: "POST",
-
-          body:
-            JSON.stringify({
-
-              examId,
-
-              type,
-
-              question:
-                $("qtext")
-                  .value
-                  .trim(),
-
-              imageUrl:
-                $("qimage")
-                  .value
-                  .trim(),
-
-              order:
-                Number(
-                  $("qorder")
-                    .value || 1
-                ),
-
-              options
-
-            })
-
-        }
-      );
-
-
-      await loadQuestions();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// DELETE QUESTION
-// ==================================================
-
-window.deleteQuestion =
-  async id => {
-
-    if (
-      !confirm(
-        "Delete this question?"
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      await api(
-        "/api/admin/questions/" +
-        encodeURIComponent(id),
-        {
-          method: "DELETE"
-        }
-      );
-
-
-      await loadQuestions();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
-
-
-// ==================================================
-// VIEW RESULT
-// ==================================================
-
-window.viewResult =
-  async id => {
-
-    try {
-
-      const r =
-        await api(
-          "/api/admin/results/" +
-          encodeURIComponent(id)
-        );
-
-
-      const review =
-        r.review || [];
-
-
-      const html =
-        review
-          .map(
-            x => {
-
-              const type =
-                x.type ||
-                "tf";
-
-
-              let optionsHtml =
-                "";
-
-
-              optionsHtml =
-                [
-                  "A",
-                  "B",
-                  "C",
-                  "D",
-                  "E"
-                ]
-                  .map(
-                    k => {
-
-                      const o =
-                        x.options?.[k] ||
-                        {};
-
-
-                      return `
-
-                        <div
-                          style="
-                            font-size:12px;
-                            margin-top:5px
-                          "
-                        >
-
-                          <b>
-                            ${k}.
-                          </b>
-
-                          ${esc(
-                            o.text || ""
-                          )}
-
-                          —
-
-                          Selected:
-
-                          ${
-                            o.selected
-                              ? "YES"
-                              : "NO"
-                          }
-
-                          ,
-
-                          Correct:
-
-                          ${
-                            o.correct
-                              ? "YES"
-                              : "NO"
-                          }
-
-                        </div>
-
-                      `;
-
-                    }
-                  )
-                  .join("");
-
-
-              return `
-
-                <div
-                  style="
-                    border:1px solid #ddd;
-                    border-radius:7px;
-                    padding:8px;
-                    margin:7px 0
-                  "
-                >
-
-                  <b>
-
-                    Q${esc(
-                      x.number
-                    )}.
-
-                    ${esc(
-                      x.question
-                    )}
-
-                  </b>
-
-
-                  <div>
-
-                    Type:
-
-                    ${
-                      type === "mcq"
-                        ? "Multiple Choice"
-                        : "True / False"
-                    }
-
-                  </div>
-
-
-                  ${optionsHtml}
-
-                </div>
-
-              `;
-
-            }
-          )
+          })
           .join("");
 
 
-      const box =
-        window.open(
-          "",
-          "_blank",
-          "width=600,height=750"
-        );
+        return `
+
+          <div style="
+            margin-bottom:15px;
+            padding:12px;
+            border:1px solid #dce4ef;
+            border-radius:9px;
+          ">
+
+            <b>
+              Q${esc(item.number)}.
+              ${esc(item.question)}
+            </b>
+
+            <div style="
+              margin-top:8px;
+            ">
+
+              ${options}
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join("");
 
 
-      if (!box) {
+    const popup =
+      window.open(
+        "",
+        "_blank",
+        "width=700,height=800"
+      );
 
-        return alert(
-          "Please allow pop-ups to view the result."
-        );
+    if(!popup){
 
-      }
+      alert(
+        "Please allow popups for this site."
+      );
 
+      return;
 
-      box.document.write(`
+    }
 
-        <html>
+    popup.document.write(`
 
-        <head>
+      <!DOCTYPE html>
 
-          <title>
-            SEVEN NURSES Result
-          </title>
+      <html>
 
+      <head>
 
-          <style>
+        <meta charset="UTF-8">
 
-            body{
+        <title>
+          SEVEN NURSES Result
+        </title>
 
-              font-family:Arial;
+        <style>
 
-              padding:16px;
+          body{
+            font-family:Arial,sans-serif;
+            background:#f3f6fb;
+            padding:20px;
+            color:#172033;
+          }
 
-            }
+          .box{
+            max-width:650px;
+            margin:auto;
+            background:white;
+            padding:20px;
+            border-radius:12px;
+          }
 
+          h2{
+            color:#1769e0;
+          }
 
-            h2{
+        </style>
 
-              color:#0056b3;
+      </head>
 
-            }
+      <body>
 
-          </style>
-
-        </head>
-
-
-        <body>
+        <div class="box">
 
           <h2>
             SEVEN NURSES
           </h2>
 
+          <b>
+            Student:
+          </b>
 
-          <b>Student:</b>
+          ${esc(result.studentName)}
 
-          ${esc(
-            r.studentName
-          )}
+          <br><br>
 
-          <br>
+          <b>
+            Exam:
+          </b>
 
+          ${esc(result.examTitle)}
 
-          <b>Exam:</b>
+          <br><br>
 
-          ${esc(
-            r.examTitle
-          )}
+          <b>
+            Score:
+          </b>
 
-          <br>
-
-
-          <b>Score:</b>
-
-          ${esc(r.score)}
+          ${esc(result.score)}
           /
-          ${esc(r.total)}
+          ${esc(result.total)}
 
-          ·
+          <br><br>
 
-          ${esc(r.grade)}
+          <b>
+            Grade:
+          </b>
 
-          ·
+          ${esc(result.grade)}
 
-          ${esc(r.status)}
+          <br><br>
 
-          ·
+          <b>
+            Status:
+          </b>
 
-          Rank
-
-          ${esc(
-            r.rank || "-"
-          )}
-
+          ${esc(result.status)}
 
           <hr>
 
+          ${questions}
 
-          ${html}
+        </div>
 
-        </body>
+      </body>
 
-        </html>
+      </html>
 
-      `);
+    `);
+
+    popup.document.close();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
 
 
-      box.document.close();
+/* =========================================
+   SAVE SETTINGS
+   ========================================= */
+
+window.saveSettings = async()=>{
+
+  const fields = [
+
+    "siteName",
+    "headerTitle",
+    "subtitle",
+    "logoUrl",
+    "backgroundUrl",
+    "notice",
+    "footerText",
+    "commonExamPin",
+    "headerColor"
+
+  ];
+
+  const body = {};
+
+  fields.forEach(key=>{
+
+    if($(key)){
+
+      body[key] =
+        $(key).value.trim();
 
     }
-    catch (e) {
 
-      alert(e.message);
-
-    }
-
-  };
+  });
 
 
-// ==================================================
-// SAVE SETTINGS
-// ==================================================
+  try{
 
-window.saveSettings =
-  async () => {
-
-    const b = {};
-
-
-    for (
-      const k of [
-        "siteName",
-        "headerTitle",
-        "subtitle",
-        "logoUrl",
-        "backgroundUrl",
-        "notice",
-        "footerText",
-        "commonExamPin"
-      ]
-    ) {
-
-      if ($(k)) {
-
-        b[k] =
-          $(k)
-            .value
-            .trim();
-
+    await api(
+      "/api/admin/settings",
+      {
+        method:"PUT",
+        body:JSON.stringify(body)
       }
+    );
+
+    alert(
+      "Settings saved successfully."
+    );
+
+    await loadAll();
+
+  }
+  catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =========================================
+   CHANGE PASSWORD
+   ========================================= */
+
+window.changePassword = async()=>{
+
+  const oldPassword =
+    $("oldPass")?.value;
+
+  const newPassword =
+    $("newPass")?.value;
+
+  const confirmPassword =
+    $("newPass2")?.value;
+
+  const message =
+    $("passMsg");
+
+
+  if(
+    !newPassword ||
+    newPassword.length < 6
+  ){
+
+    if(message){
+
+      message.textContent =
+        "New password must be at least 6 characters.";
 
     }
 
+    return;
 
-    try {
+  }
 
-      await api(
-        "/api/admin/settings",
-        {
 
-          method: "PUT",
+  if(
+    newPassword !==
+    confirmPassword
+  ){
 
-          body:
-            JSON.stringify(b)
+    if(message){
 
-        }
+      message.textContent =
+        "New passwords do not match.";
+
+    }
+
+    return;
+
+  }
+
+
+  try{
+
+    const credential =
+      EmailAuthProvider.credential(
+        auth.currentUser.email,
+        oldPassword
       );
 
+    await reauthenticateWithCredential(
+      auth.currentUser,
+      credential
+    );
 
-      alert(
-        "Settings saved."
-      );
-
-
-      await loadAll();
-
-    }
-    catch (e) {
-
-      alert(e.message);
-
-    }
-
-  };
+    await updatePassword(
+      auth.currentUser,
+      newPassword
+    );
 
 
-// ==================================================
-// CHANGE PASSWORD
-// ==================================================
+    if(message){
 
-window.changePassword =
-  async () => {
-
-    const oldP =
-      $("oldPass").value;
-
-    const newP =
-      $("newPass").value;
-
-    const newP2 =
-      $("newPass2").value;
-
-
-    if (newP.length < 6) {
-
-      return $("passMsg")
-        .textContent =
-          "New password must be at least 6 characters.";
+      message.textContent =
+        "Password changed successfully.";
 
     }
 
 
-    if (newP !== newP2) {
+    if($("oldPass"))
+      $("oldPass").value = "";
 
-      return $("passMsg")
-        .textContent =
-          "New passwords do not match.";
+    if($("newPass"))
+      $("newPass").value = "";
 
-    }
+    if($("newPass2"))
+      $("newPass2").value = "";
 
+  }
+  catch(error){
 
-    try {
+    if(message){
 
-      const cred =
-        EmailAuthProvider.credential(
-          auth.currentUser.email,
-          oldP
-        );
-
-
-      await reauthenticateWithCredential(
-        auth.currentUser,
-        cred
-      );
-
-
-      await updatePassword(
-        auth.currentUser,
-        newP
-      );
-
-
-      $("passMsg")
-        .textContent =
-          "Password changed successfully.";
-
-
-      $("oldPass").value =
-      $("newPass").value =
-      $("newPass2").value =
-        "";
-
-    }
-    catch (e) {
-
-      $("passMsg")
-        .textContent =
-          e.message ||
-          "Password change failed.";
+      message.textContent =
+        error.message ||
+        "Password change failed.";
 
     }
 
-  };
+  }
+
+};
 
 
-// ==================================================
-// ADMIN PUSH NOTIFICATION
-// ==================================================
+/* =========================================
+   FCM PUSH
+   ========================================= */
 
-async function registerPush() {
+async function registerPush(){
 
-  try {
+  try{
 
-    if (
+    if(
       !("serviceWorker" in navigator)
-    ) {
+    ){
 
       return;
 
     }
 
 
-    const mod =
+    const messagingModule =
       await import(
         "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js"
       );
 
 
-    if (
-      !mod.isSupported()
-    ) {
+    if(
+      !messagingModule.isSupported()
+    ){
 
       return;
 
@@ -2405,50 +1752,45 @@ async function registerPush() {
 
 
     const messaging =
-      mod.getMessaging();
+      messagingModule.getMessaging();
 
 
     const token =
-      await mod.getToken(
+      await messagingModule.getToken(
         messaging,
         {
-
           vapidKey:
             FCM_VAPID_KEY,
 
           serviceWorkerRegistration:
             registration
-
         }
       );
 
 
-    if (token) {
+    if(token){
 
       await api(
         "/api/admin/fcm-token",
         {
+          method:"POST",
 
-          method: "POST",
-
-          body:
-            JSON.stringify({
-              token
-            })
-
+          body:JSON.stringify({
+            token
+          })
         }
       );
 
     }
 
   }
-  catch (e) {
+  catch(error){
 
     console.log(
       "FCM skipped:",
-      e.message
+      error.message
     );
 
   }
 
-            }
+    }
