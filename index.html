@@ -8,162 +8,78 @@
 </head>
 
 <body>
-
 <div class="app-container">
 
 <header class="header">
-
   <div class="brand">
-
     <div class="logo-wrap">
       <img id="logo" class="logo" alt="Logo">
     </div>
-
     <div>
-      <div id="siteTitle" class="head-title">
-        SEVEN NURSES
-      </div>
-
-      <div id="siteSub" class="head-sub">
-        ONLINE EXAM SYSTEM
-      </div>
+      <div id="siteTitle" class="head-title">SEVEN NURSES</div>
+      <div id="siteSub" class="head-sub">Nursing Admission &amp; Exam</div>
     </div>
-
   </div>
 
-  <div id="timer" class="timer hidden">
-    00:00
-  </div>
-
+  <div id="timer" class="timer hidden">00:00</div>
 </header>
 
-
 <main>
+  <div id="notice" class="notice hidden"></div>
 
-<div id="notice" class="notice hidden"></div>
+  <section id="login" class="card login-card">
+    <div class="section-title">Student Login</div>
+    <div class="title-line"></div>
 
+    <label for="studentName">Registered Student Name</label>
+    <input id="studentName" autocomplete="name" placeholder="আপনার নিবন্ধিত নাম">
 
-<section id="login" class="card login-card">
+    <label for="pin">Common Exam PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Admin-এর দেওয়া PIN">
 
-  <div class="section-title">
-    Student Login
-  </div>
+    <label for="examSelect">Examination</label>
+    <select id="examSelect">
+      <option value="">Loading...</option>
+    </select>
 
-  <div class="title-line"></div>
-
-  <label for="studentName">
-    Registered Student Name
-  </label>
-
-  <input
-    id="studentName"
-    autocomplete="name"
-    placeholder="আপনার নিবন্ধিত নাম"
-  >
-
-  <label for="pin">
-    Common Exam PIN
-  </label>
-
-  <input
-    id="pin"
-    type="password"
-    inputmode="numeric"
-    autocomplete="off"
-    placeholder="Admin-এর দেওয়া PIN"
-  >
-
-  <label for="examSelect">
-    Examination
-  </label>
-
-  <select id="examSelect">
-    <option value="">
-      Loading...
-    </option>
-  </select>
-
-  <button
-    class="btn btn-green"
-    id="startBtn"
-    onclick="studentLogin()"
-  >
-    Start Examination
-  </button>
-
-  <button
-    class="btn btn-cyan"
-    onclick="location.href='/admin.html'"
-  >
-    Admin Panel
-  </button>
-
-  <div class="login-note">
-
-    <b>নির্দেশনা:</b>
-    আপনার নিবন্ধিত নাম এবং Admin-এর দেওয়া Common PIN ব্যবহার করুন।
-
-  </div>
-
-</section>
-
-
-<section id="exam" class="hidden">
-
-  <div class="exam-top">
-
-    <div>
-
-      <div class="exam-label">
-        EXAMINATION
-      </div>
-
-      <div id="examName" class="exam-title">
-        Examination
-      </div>
-
-    </div>
-
-    <div id="questionCounter" class="question-counter">
-      0/0
-    </div>
-
-  </div>
-
-  <div id="questions"></div>
-
-  <div class="submit-bar">
-
-    <button
-      class="btn btn-green"
-      onclick="submitExam(false)"
-    >
-      Submit Examination
+    <button class="btn btn-green" id="startBtn" onclick="studentLogin()">
+      Start Examination
     </button>
 
-  </div>
+    <div class="login-note">
+      <b>নির্দেশনা:</b> আপনার নিবন্ধিত নাম এবং Admin-এর দেওয়া Common PIN ব্যবহার করুন।
+    </div>
+  </section>
 
-</section>
+  <section id="exam" class="hidden">
+    <div class="exam-top">
+      <div>
+        <div class="exam-label">EXAMINATION</div>
+        <div id="examName" class="exam-title">Examination</div>
+      </div>
+      <div id="questionCounter" class="question-counter">0/0</div>
+    </div>
 
+    <div id="questions"></div>
 
-<section id="result" class="hidden"></section>
+    <div class="submit-bar">
+      <button class="btn btn-green" onclick="submitExam(false)">
+        Submit Examination
+      </button>
+    </div>
+  </section>
 
-
+  <section id="result" class="hidden"></section>
 </main>
-
 
 <div id="toast" class="toast"></div>
 
-
 <footer id="footer" class="footer">
-  © SEVEN NURSES
+  © 2025 Seven Nurses. All rights reserved.
 </footer>
-
 
 </div>
 
-
 <script src="/app.js"></script>
-
 </body>
     </html>
