@@ -1,611 +1,621 @@
-<!doctype html>
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="bn">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="utf-8">
+  <title>SEVEN NURSES — Admin Panel</title>
 
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1,viewport-fit=cover"
->
-
-<title>
-SEVEN NURSES - Admin Panel
-</title>
-
-<link
-rel="stylesheet"
-href="/style.css"
->
-
+  <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
 
 <div class="admin-shell">
 
-<header class="header">
+  <!-- ================= HEADER ================= -->
 
-  <div class="brand">
+  <header class="header">
 
-    <div class="logo-wrap">
+    <div class="brand">
+
+      <div class="logo-wrap">
+        <img
+          id="adminLogo"
+          class="logo"
+          alt="SEVEN NURSES"
+        >
+      </div>
+
+      <div>
+
+        <div class="head-title">
+          SEVEN NURSES
+        </div>
+
+        <div class="head-sub">
+          ADMIN CONTROL PANEL
+        </div>
+
+      </div>
+
+    </div>
+
+    <button
+      id="logout"
+      class="btn btn-red btn-mini"
+      hidden
+    >
+      Logout
+    </button>
+
+  </header>
+
+
+  <!-- ================= LOGIN ================= -->
+
+  <main class="admin-main">
+
+    <section
+      id="loginBox"
+      class="card login-card"
+    >
+
+      <div class="section-title">
+        Admin Login
+      </div>
+
+      <div class="title-line"></div>
+
+
+      <label for="email">
+        Admin Email
+      </label>
 
       <input
-        id="logoFile"
-        type="file"
-        accept="image/*"
+        id="email"
+        type="email"
+        autocomplete="username"
+        placeholder="Enter admin email"
+      >
+
+
+      <label for="password">
+        Password
+      </label>
+
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Enter password"
+      >
+
+
+      <button
+        id="loginBtn"
+        class="btn btn-green"
+      >
+        Login
+      </button>
+
+
+      <div
+        id="loginMsg"
+        class="login-note"
+      ></div>
+
+    </section>
+
+
+    <!-- ================= ADMIN PANEL ================= -->
+
+    <section
+      id="panel"
+      hidden
+    >
+
+      <!-- Dashboard -->
+
+      <div
+        id="dashboard"
+        class="admin-card"
+      >
+
+        <h3>
+          Dashboard
+        </h3>
+
+        <div
+          id="dashboardStats"
+          class="stat-grid"
+        ></div>
+
+        <div
+          id="dashboardNotifications"
+          class="notice-list"
+        ></div>
+
+      </div>
+
+
+      <!-- Navigation -->
+
+      <div class="admin-grid">
+
+        <button
+          class="admin-tab active"
+          data-section="dashboardSection"
+        >
+          Dashboard
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="studentsSection"
+        >
+          Students
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="examsSection"
+        >
+          Exams
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="questionsSection"
+        >
+          Questions
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="resultsSection"
+        >
+          Results
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="notificationsSection"
+        >
+          Notifications
+        </button>
+
+        <button
+          class="admin-tab"
+          data-section="settingsSection"
+        >
+          Settings
+        </button>
+
+      </div>
+
+
+      <!-- ================= STUDENTS ================= -->
+
+      <section
+        id="studentsSection"
+        class="admin-card"
         hidden
       >
 
-      <img
-        id="adminLogo"
-        class="logo"
-        alt="Logo"
-        title="Click to change logo"
-        style="cursor:pointer"
+        <h3>
+          Student Management
+        </h3>
+
+
+        <div class="form-grid">
+
+          <div>
+
+            <label>
+              Student Name
+            </label>
+
+            <input
+              id="studentName"
+              placeholder="Student name"
+            >
+
+          </div>
+
+          <div>
+
+            <label>
+              Action
+            </label>
+
+            <button
+              class="btn btn-green"
+              onclick="saveStudent()"
+            >
+              Add Student
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div id="students"></div>
+
+      </section>
+
+
+      <!-- ================= EXAMS ================= -->
+
+      <section
+        id="examsSection"
+        class="admin-card"
+        hidden
       >
 
-    </div>
-
-    <div>
-
-      <div class="head-title">
-        SEVEN NURSES
-      </div>
-
-      <div class="head-sub">
-        ADMIN PANEL
-      </div>
-
-    </div>
-
-  </div>
+        <h3>
+          Examination Management
+        </h3>
 
 
-  <button
-    id="logout"
-    class="btn btn-red btn-mini"
-    hidden
-  >
-    Logout
-  </button>
+        <label>
+          Examination Title
+        </label>
 
-</header>
-
-
-<main class="admin-main">
+        <input
+          id="examTitleInput"
+          placeholder="Example: Nursing Model Test"
+        >
 
 
-<section
-id="loginBox"
-class="card"
->
+        <div class="form-grid">
 
-  <div class="section-title">
-    Admin Login
-  </div>
+          <div>
 
-  <div class="title-line"></div>
+            <label>
+              Duration — Minutes
+            </label>
 
+            <input
+              id="examDuration"
+              type="number"
+              min="1"
+              value="30"
+            >
 
-  <label for="email">
-    Admin Email
-  </label>
-
-  <input
-    id="email"
-    type="email"
-    autocomplete="username"
-    placeholder="Admin Gmail"
-  >
+          </div>
 
 
-  <label for="password">
-    Password
-  </label>
+          <div>
 
-  <input
-    id="password"
-    type="password"
-    autocomplete="current-password"
-    placeholder="Password"
-  >
+            <label>
+              Pass Mark — %
+            </label>
 
+            <input
+              id="examPass"
+              type="number"
+              min="0"
+              max="100"
+              value="40"
+            >
 
-  <div
-    id="loginMsg"
-    class="login-note"
-  >
-    Sign in with Firebase Authentication.
-  </div>
+          </div>
 
-
-  <button
-    id="loginBtn"
-    class="btn btn-blue"
-  >
-    Login
-  </button>
+        </div>
 
 
-  <button
-    class="btn btn-gray"
-    onclick="location.href='/'"
-  >
-    Student Login
-  </button>
-
-</section>
+        <button
+          class="btn btn-green"
+          onclick="saveExam()"
+        >
+          Add Examination
+        </button>
 
 
-<section id="panel" hidden>
+        <div id="exams"></div>
+
+      </section>
 
 
-<div class="admin-grid">
+      <!-- ================= QUESTIONS ================= -->
 
-  <button
-    class="admin-tab active"
-    onclick="showAdminTab('dashboardTab',this)"
-  >
-    Dashboard
-  </button>
+      <section
+        id="questionsSection"
+        class="admin-card"
+        hidden
+      >
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('studentsTab',this)"
-  >
-    Students
-  </button>
+        <h3>
+          Question Management
+        </h3>
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('examsTab',this)"
-  >
-    Exams
-  </button>
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('questionsTab',this)"
-  >
-    Questions
-  </button>
+        <label>
+          Select Examination
+        </label>
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('resultsTab',this)"
-  >
-    Results
-  </button>
+        <select
+          id="examSelect"
+          onchange="loadQuestions()"
+        >
+          <option value="">
+            Select examination
+          </option>
+        </select>
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('notificationsTab',this)"
-  >
-    Notifications
-  </button>
 
-  <button
-    class="admin-tab"
-    onclick="showAdminTab('settingsTab',this)"
-  >
-    Settings
-  </button>
+        <div
+          id="questionForm"
+          class="admin-card"
+        ></div>
+
+
+        <div id="questions"></div>
+
+      </section>
+
+
+      <!-- ================= RESULTS ================= -->
+
+      <section
+        id="resultsSection"
+        class="admin-card"
+        hidden
+      >
+
+        <h3>
+          Examination Results
+        </h3>
+
+
+        <div class="table-wrap">
+
+          <div id="results"></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= NOTIFICATIONS ================= -->
+
+      <section
+        id="notificationsSection"
+        class="admin-card"
+        hidden
+      >
+
+        <h3>
+          Notifications
+        </h3>
+
+
+        <div id="notifications"></div>
+
+      </section>
+
+
+      <!-- ================= SETTINGS ================= -->
+
+      <section
+        id="settingsSection"
+        class="admin-card"
+        hidden
+      >
+
+        <h3>
+          Website Settings
+        </h3>
+
+
+        <label>
+          Site Name
+        </label>
+
+        <input id="siteName">
+
+
+        <label>
+          Header Title
+        </label>
+
+        <input id="headerTitle">
+
+
+        <label>
+          Subtitle
+        </label>
+
+        <input id="subtitle">
+
+
+        <label>
+          Logo URL
+        </label>
+
+        <input id="logoUrl">
+
+
+        <label>
+          Background URL
+        </label>
+
+        <input id="backgroundUrl">
+
+
+        <label>
+          Notice
+        </label>
+
+        <textarea
+          id="notice"
+          rows="3"
+        ></textarea>
+
+
+        <label>
+          Footer Text
+        </label>
+
+        <input id="footerText">
+
+
+        <label>
+          Common Exam PIN
+        </label>
+
+        <input
+          id="commonExamPin"
+          type="text"
+        >
+
+
+        <button
+          class="btn btn-green"
+          onclick="saveSettings()"
+        >
+          Save Settings
+        </button>
+
+      </section>
+
+
+      <!-- ================= PASSWORD ================= -->
+
+      <section class="admin-card">
+
+        <h3>
+          Change Admin Password
+        </h3>
+
+
+        <label>
+          Current Password
+        </label>
+
+        <input
+          id="oldPass"
+          type="password"
+        >
+
+
+        <label>
+          New Password
+        </label>
+
+        <input
+          id="newPass"
+          type="password"
+        >
+
+
+        <label>
+          Confirm New Password
+        </label>
+
+        <input
+          id="newPass2"
+          type="password"
+        >
+
+
+        <button
+          class="btn btn-blue"
+          onclick="changePassword()"
+        >
+          Change Password
+        </button>
+
+
+        <div
+          id="passMsg"
+          class="login-note"
+        ></div>
+
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <footer class="footer">
+    © 2025 Seven Nurses. All rights reserved.
+  </footer>
 
 </div>
 
 
-<section
-id="dashboardTab"
-class="admin-card admin-tab-content"
->
-
-<h3>
-Dashboard
-</h3>
-
-<div
-id="dashboardStats"
-class="stat-grid"
-></div>
-
-
-<div class="admin-card">
-
-<h3>
-Recent Notifications
-</h3>
-
-<div
-id="dashboardNotifications"
-class="notice-list"
-></div>
-
-</div>
-
-</section>
-
-
-<section
-id="studentsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-Students
-</h3>
-
-<div class="form-grid">
-
-<input
-id="studentName"
-class="full"
-placeholder="Registered Student Name"
->
-
-<button
-class="btn btn-green"
-onclick="saveStudent()"
->
-Add Student
-</button>
-
-</div>
-
-
-<div
-id="students"
-style="margin-top:10px"
-></div>
-
-</section>
-
-
-<section
-id="examsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-Examinations
-</h3>
-
-<div class="form-grid">
-
-<input
-id="examTitleInput"
-class="full"
-placeholder="Exam Title"
->
-
-<input
-id="examDuration"
-type="number"
-min="1"
-value="30"
-placeholder="Duration (minutes)"
->
-
-<input
-id="examPass"
-type="number"
-min="0"
-max="100"
-value="40"
-placeholder="Pass Mark %"
->
-
-<button
-class="btn btn-green"
-onclick="saveExam()"
->
-Create Examination
-</button>
-
-</div>
-
-
-<div
-id="exams"
-style="margin-top:10px"
-></div>
-
-</section>
-
-
-<section
-id="questionsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-Question Management
-</h3>
-
-
-<label for="examSelect">
-Select Examination
-</label>
-
-
-<select
-id="examSelect"
-onchange="loadQuestions()"
-></select>
-
-
-<div
-id="questionForm"
-class="admin-card"
-></div>
-
-
-<div
-id="questions"
-></div>
-
-</section>
-
-
-<section
-id="resultsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-Results & History
-</h3>
-
-
-<div
-id="results"
-class="table-wrap"
-></div>
-
-</section>
-
-
-<section
-id="notificationsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-Notifications
-</h3>
-
-
-<div
-id="notifications"
-class="notice-list"
-></div>
-
-</section>
-
-
-<section
-id="settingsTab"
-class="admin-card admin-tab-content hidden"
->
-
-<h3>
-System Settings
-</h3>
-
-
-<div class="admin-card">
-
-
-<div class="form-grid">
-
-
-<div>
-
-<label>
-Site Name
-</label>
-
-<input id="siteName">
-
-</div>
-
-
-<div>
-
-<label>
-Header Title
-</label>
-
-<input id="headerTitle">
-
-</div>
-
-
-<div>
-
-<label>
-Subtitle
-</label>
-
-<input id="subtitle">
-
-</div>
-
-
-<div>
-
-<label>
-Logo URL
-</label>
-
-<input id="logoUrl">
-
-</div>
-
-
-<div>
-
-<label>
-Background URL
-</label>
-
-<input id="backgroundUrl">
-
-</div>
-
-
-<div>
-
-<label>
-Common Exam PIN
-</label>
-
-<input
-id="commonExamPin"
-inputmode="numeric"
->
-
-</div>
-
-
-<div class="full">
-
-<label>
-Notice
-</label>
-
-<textarea
-id="notice"
-rows="3"
-></textarea>
-
-</div>
-
-
-<div class="full">
-
-<label>
-Footer Text
-</label>
-
-<input id="footerText">
-
-</div>
-
-
-</div>
-
-
-<button
-class="btn btn-green"
-onclick="saveSettings()"
->
-Save Settings
-</button>
-
-</div>
-
-
-<div class="admin-card">
-
-<h3>
-Change Admin Password
-</h3>
-
-
-<input
-id="oldPass"
-type="password"
-placeholder="Current Password"
->
-
-
-<input
-id="newPass"
-type="password"
-placeholder="New Password"
->
-
-
-<input
-id="newPass2"
-type="password"
-placeholder="Confirm New Password"
->
-
-
-<button
-class="btn btn-blue"
-onclick="changePassword()"
->
-Change Password
-</button>
-
-
-<div
-id="passMsg"
-class="login-note"
-></div>
-
-</div>
-
-
-</section>
-
-
-</section>
-
-
-</main>
-
-</div>
+<script type="module" src="/admin.js"></script>
 
 
 <script>
 
-function showAdminTab(id,btn){
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
 
-  document
-    .querySelectorAll(
-      '.admin-tab-content'
-    )
-    .forEach(
-      x=>x.classList.add('hidden')
-    );
+    const tabs =
+      document.querySelectorAll(
+        ".admin-tab"
+      );
 
-
-  document
-    .getElementById(id)
-    .classList.remove('hidden');
-
-
-  document
-    .querySelectorAll(
-      '.admin-tab'
-    )
-    .forEach(
-      x=>x.classList.remove('active')
-    );
+    const sections =
+      document.querySelectorAll(
+        "#panel > section, #panel > .admin-card"
+      );
 
 
-  if(btn){
-    btn.classList.add('active');
+    tabs.forEach(tab => {
+
+      tab.addEventListener(
+        "click",
+        () => {
+
+          const target =
+            tab.dataset.section;
+
+
+          document
+            .querySelectorAll(
+              "#panel > section"
+            )
+            .forEach(section => {
+
+              section.hidden =
+                section.id !== target;
+
+            });
+
+
+          document
+            .querySelectorAll(
+              ".admin-tab"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          tab.classList.add(
+            "active"
+          );
+
+        }
+      );
+
+    });
+
   }
-
-}
-
-window.showAdminTab=
-  showAdminTab;
+);
 
 </script>
 
-
-<script
-type="module"
-src="/admin.js"
-></script>
-
-
 </body>
-    </html>
+        </html>
