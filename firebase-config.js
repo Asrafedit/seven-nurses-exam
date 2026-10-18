@@ -29,7 +29,7 @@ import {
 const firebaseConfig = {
 
   apiKey:
-    "তোমার Firebase API KEY",
+    "AIzaSyB-8-lNp8bTySo0Ebb6l3hK58xf59HNxcE",
 
   authDomain:
     "seven-nurses-c7a87.firebaseapp.com",
@@ -44,10 +44,10 @@ const firebaseConfig = {
     "seven-nurses-c7a87.firebasestorage.app",
 
   messagingSenderId:
-    "তোমার Messaging Sender ID",
+    "306184363213",
 
   appId:
-    "তোমার App ID"
+    "1:306184363213:web:adb9078db0ce8141df9d84"
 
 };
 
