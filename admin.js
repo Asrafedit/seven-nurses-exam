@@ -1793,4 +1793,4 @@ async function registerPush(){
 
   }
 
-    }
+  }
