@@ -1,9 +1,5 @@
-import {
-  auth,
-  FCM_VAPID_KEY
-} from "./firebase-config.js";
-
-import {
+import { auth } from "./firebase-config.js";
+importt {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
