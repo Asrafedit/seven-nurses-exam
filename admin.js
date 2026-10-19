@@ -1,5 +1,6 @@
-import { auth } from "./firebase-config.js";
-importt {
+import { auth, FCM_VAPID_KEY } from "./firebase-config.js";
+
+import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
@@ -7,9 +8,7 @@ importt {
   EmailAuthProvider,
   updatePassword
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-
-
-const $ = id => document.getElementById(id);
+$ = id => document.getElementById(id);
 
 let state = {
   students: [],
