@@ -3,83 +3,206 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SEVEN NURSES - ONLINE EXAM SYSTEM</title>
+
+<title>SEVEN NURSES - Nursing Admission & Exam</title>
+
 <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
+
 <div class="app-container">
 
 <header class="header">
+
   <div class="brand">
+
     <div class="logo-wrap">
-      <img id="logo" class="logo" alt="Logo">
+      <img id="logo" class="logo" alt="Seven Nurses">
     </div>
-    <div>
-      <div id="siteTitle" class="head-title">SEVEN NURSES</div>
-      <div id="siteSub" class="head-sub">Nursing Admission &amp; Exam</div>
+
+    <div class="brand-text">
+      <div id="siteTitle" class="head-title">
+        SEVEN NURSES
+      </div>
+
+      <div id="siteSub" class="head-sub">
+        Nursing Admission &amp; Exam
+      </div>
     </div>
+
   </div>
 
-  <div id="timer" class="timer hidden">00:00</div>
+  <div id="timer" class="timer hidden">
+    00:00
+  </div>
+
 </header>
 
+
 <main>
-  <div id="notice" class="notice hidden"></div>
 
-  <section id="login" class="card login-card">
-    <div class="section-title">Student Login</div>
-    <div class="title-line"></div>
+<div id="notice" class="notice hidden"></div>
 
-    <label for="studentName">Registered Student Name</label>
-    <input id="studentName" autocomplete="name" placeholder="আপনার নিবন্ধিত নাম">
 
-    <label for="pin">Common Exam PIN</label>
-    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Admin-এর দেওয়া PIN">
+<!-- STUDENT LOGIN -->
 
-    <label for="examSelect">Examination</label>
-    <select id="examSelect">
-      <option value="">Loading...</option>
-    </select>
+<section id="login" class="card login-card">
 
-    <button class="btn btn-green" id="startBtn" onclick="studentLogin()">
-      Start Examination
+  <div class="student-icon">
+    <span>👥</span>
+  </div>
+
+  <div class="section-title">
+    Student Login
+  </div>
+
+  <div class="title-line"></div>
+
+
+  <label for="studentName">
+    Student Name
+  </label>
+
+  <div class="input-wrap">
+    <span class="input-icon">👤</span>
+
+    <input
+      id="studentName"
+      autocomplete="name"
+      placeholder="আপনার নিবন্ধিত নাম"
+    >
+  </div>
+
+
+  <label for="pin">
+    Common PIN / Password
+  </label>
+
+  <div class="input-wrap">
+    <span class="input-icon">🔒</span>
+
+    <input
+      id="pin"
+      type="password"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="Admin-এর দেওয়া PIN"
+    >
+  </div>
+
+
+  <label for="examSelect">
+    Examination
+  </label>
+
+  <select id="examSelect">
+    <option value="">
+      Loading...
+    </option>
+  </select>
+
+
+  <button
+    class="btn btn-green"
+    id="startBtn"
+    onclick="studentLogin()"
+  >
+    <span class="btn-arrow">→</span>
+    Login
+  </button>
+
+
+  <div class="forgot-text">
+    Forgot your pin? Contact your admin.
+  </div>
+
+
+  <button
+    class="admin-access"
+    onclick="location.href='/admin.html'"
+  >
+    <div class="admin-icon">👤</div>
+
+    <div class="admin-text">
+      <strong>Admin Panel →</strong>
+      <span>(Login from admin panel only)</span>
+    </div>
+  </button>
+
+
+  <div class="login-note">
+
+    <b>নির্দেশনা:</b>
+    আপনার নিবন্ধিত নাম এবং Admin-এর দেওয়া Common PIN ব্যবহার করুন।
+
+  </div>
+
+</section>
+
+
+<!-- EXAM -->
+
+<section id="exam" class="hidden">
+
+  <div class="exam-top">
+
+    <div>
+      <div class="exam-label">
+        EXAMINATION
+      </div>
+
+      <div id="examName" class="exam-title">
+        Examination
+      </div>
+    </div>
+
+    <div id="questionCounter" class="question-counter">
+      0/0
+    </div>
+
+  </div>
+
+
+  <div id="questions"></div>
+
+
+  <div class="submit-bar">
+
+    <button
+      class="btn btn-green"
+      onclick="submitExam(false)"
+    >
+      Submit Examination
     </button>
 
-    <div class="login-note">
-      <b>নির্দেশনা:</b> আপনার নিবন্ধিত নাম এবং Admin-এর দেওয়া Common PIN ব্যবহার করুন।
-    </div>
-  </section>
+  </div>
 
-  <section id="exam" class="hidden">
-    <div class="exam-top">
-      <div>
-        <div class="exam-label">EXAMINATION</div>
-        <div id="examName" class="exam-title">Examination</div>
-      </div>
-      <div id="questionCounter" class="question-counter">0/0</div>
-    </div>
+</section>
 
-    <div id="questions"></div>
 
-    <div class="submit-bar">
-      <button class="btn btn-green" onclick="submitExam(false)">
-        Submit Examination
-      </button>
-    </div>
-  </section>
+<section id="result" class="hidden"></section>
 
-  <section id="result" class="hidden"></section>
+
 </main>
+
 
 <div id="toast" class="toast"></div>
 
+
 <footer id="footer" class="footer">
-  © 2025 Seven Nurses. All rights reserved.
+
+  <div>
+    © 2025 Seven Nurses. All rights reserved.
+  </div>
+
 </footer>
+
 
 </div>
 
+
 <script src="/app.js"></script>
+
 </body>
     </html>
